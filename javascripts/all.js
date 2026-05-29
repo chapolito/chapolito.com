@@ -1,1 +1,135 @@
-function fadeInUp(){var t=window.innerHeight||$(window).height();$(".animated").each(function(){var e=$(this);if(!e.hasClass("fadeInUp")){var n=this.getBoundingClientRect();n.top<t-20&&e.addClass("fadeInUp")}})}function scheduleFadeInUp(){fadeInUp(),setTimeout(fadeInUp,50),setTimeout(fadeInUp,300)}function restartPageAnimations(t){t&&t.restartCSSAnimations&&t.restartCSSAnimations()}function playPageVideos(){$("#main video").each(function(){var v=this;v.load();var p=v.play();p&&p.catch&&p.catch(function(){})})}var header=$("header");$(function(){FastClick.attach(document.body),scheduleFadeInUp(),$(window).on("scroll resize load",fadeInUp)}),$(function(){"use strict";var t={debug:!1,prefetch:!0,cacheLength:2,onStart:{duration:450,render:function(n){n.removeClass("animate-content-in").addClass("animate-header-out animate-content-out"),restartPageAnimations(e)}},onReady:{duration:0,render:function(n,o){n.removeClass("animate-header-out animate-content-out").addClass("animate-header-in animate-content-in"),n.html(o),n.find("main, .identifier-wrapper > section").css("opacity",""),$("html, body").animate({scrollTop:0},0),scheduleFadeInUp()}},onAfter:function(){var n=$("#main");setTimeout(function(){n.removeClass("animate-content-in"),playPageVideos(),scheduleFadeInUp(),$("html").toggleClass("horizon-page",!!n.find(".identifier-wrapper.horizon-page").length)},500)}},e=$("#main").smoothState(t).data("smoothState")});
+function fadeInUp() {
+  var viewportHeight = window.innerHeight || $(window).height();
+  $(".animated").each(function() {
+    var $element = $(this);
+    if (!$element.hasClass("fadeInUp")) {
+      var rect = this.getBoundingClientRect();
+      if (rect.top < viewportHeight - 20) {
+        $element.addClass("fadeInUp");
+      }
+    }
+  });
+}
+
+function scheduleFadeInUp() {
+  fadeInUp();
+  setTimeout(fadeInUp, 50);
+  setTimeout(fadeInUp, 300);
+}
+
+function restartPageAnimations(smoothState) {
+  if (smoothState && smoothState.restartCSSAnimations) {
+    smoothState.restartCSSAnimations();
+  }
+}
+
+function playPageVideos() {
+  $("#main video").each(function() {
+    var video = this;
+    video.load();
+    var playPromise = video.play();
+    if (playPromise && playPromise.catch) {
+      playPromise.catch(function() {});
+    }
+  });
+}
+
+function pageHasHorizon($root) {
+  return $root.filter(".identifier-wrapper.horizon-page").length > 0 ||
+    $root.find(".identifier-wrapper.horizon-page").length > 0;
+}
+
+var horizonBackgroundTimeout;
+
+function syncHorizonBackground($root) {
+  var $html = $("html");
+
+  if (pageHasHorizon($root)) {
+    $html.addClass("horizon-page");
+    $html.removeClass("horizon-page--fading-in horizon-page--fading-out");
+    return;
+  }
+
+  $html.removeClass("horizon-page horizon-page--fading-in horizon-page--fading-out");
+}
+
+function fadeOutHorizonBackground() {
+  var $html = $("html");
+
+  if (!$html.hasClass("horizon-page")) {
+    return;
+  }
+
+  $html.addClass("horizon-page--fading-out");
+  clearTimeout(horizonBackgroundTimeout);
+  horizonBackgroundTimeout = setTimeout(function() {
+    $html.removeClass("horizon-page horizon-page--fading-out horizon-page--fading-in");
+  }, 450);
+}
+
+function fadeInHorizonBackground($root) {
+  if (!pageHasHorizon($root)) {
+    return;
+  }
+
+  var $html = $("html");
+
+  clearTimeout(horizonBackgroundTimeout);
+  $html.removeClass("horizon-page--fading-out");
+  $html.addClass("horizon-page horizon-page--fading-in");
+
+  if ($html[0]) {
+    void $html[0].offsetHeight;
+  }
+
+  horizonBackgroundTimeout = setTimeout(function() {
+    $html.removeClass("horizon-page--fading-in");
+  }, 20);
+}
+
+$(function() {
+  FastClick.attach(document.body);
+  scheduleFadeInUp();
+  $(window).on("scroll resize load", fadeInUp);
+});
+
+$(function() {
+  "use strict";
+
+  var options = {
+    debug: false,
+    prefetch: true,
+    cacheLength: 2,
+    onStart: {
+      duration: 450,
+      render: function($container) {
+        $container.removeClass("animate-content-in").addClass("animate-header-out animate-content-out");
+        fadeOutHorizonBackground();
+        restartPageAnimations(smoothState);
+      }
+    },
+    onReady: {
+      duration: 0,
+      render: function($container, html) {
+        $container.removeClass("animate-header-out animate-content-out").addClass("animate-header-in animate-content-in");
+        $container.html(html);
+        $container.find("main, .identifier-wrapper > section").css("opacity", "");
+        $("html, body").animate({ scrollTop: 0 }, 0);
+        fadeInHorizonBackground($container);
+        scheduleFadeInUp();
+      }
+    },
+    onAfter: function() {
+      var $container = $("#main");
+
+      setTimeout(function() {
+        $container.removeClass("animate-content-in");
+        playPageVideos();
+        scheduleFadeInUp();
+        syncHorizonBackground($container);
+      }, 500);
+    }
+  };
+
+  var smoothState = $("#main").smoothState(options).data("smoothState");
+});
