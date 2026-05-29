@@ -7,7 +7,7 @@ Static design portfolio for Jesse O'Chapo, deployed to Amazon S3.
 | Path | Purpose |
 |------|---------|
 | `index.html` | Home / portfolio grid |
-| `about/`, `contact/`, `testimonials/` | Site pages |
+| `about/`, `contact/` | Site pages |
 | `horizon/`, `quest-vr/`, `quest-for-business/`, `portal/`, `messenger-kids/`, `life360/`, `the-wiki-game/`, `fanpics/`, `spritzr/` | Case studies |
 | `free-design-resources/` | Legacy blog-style resource posts |
 | `stylesheets/all.css` | Compiled site styles (formerly Middleman `all.css`) |
