@@ -17,6 +17,11 @@ function scheduleFadeInUp() {
   setTimeout(fadeInUp, 300);
 }
 
+function syncHeaderScrollState() {
+  var scrolled = (window.pageYOffset || document.documentElement.scrollTop) > 20;
+  $("header").toggleClass("is-scrolled", scrolled);
+}
+
 function restartPageAnimations(smoothState) {
   if (smoothState && smoothState.restartCSSAnimations) {
     smoothState.restartCSSAnimations();
@@ -90,7 +95,9 @@ function fadeInHorizonBackground($root) {
 $(function() {
   FastClick.attach(document.body);
   scheduleFadeInUp();
+  syncHeaderScrollState();
   $(window).on("scroll resize load", fadeInUp);
+  $(window).on("scroll resize load", syncHeaderScrollState);
 });
 
 $(function() {
@@ -115,6 +122,7 @@ $(function() {
         $container.html(html);
         $container.find("main, .identifier-wrapper > section").css("opacity", "");
         $("html, body").animate({ scrollTop: 0 }, 0);
+        syncHeaderScrollState();
         fadeInHorizonBackground($container);
         scheduleFadeInUp();
       }
