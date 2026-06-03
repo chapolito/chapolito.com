@@ -128,7 +128,6 @@ function initMobileNav() {
 }
 
 $(function() {
-  FastClick.attach(document.body);
   scheduleFadeInUp();
   syncHeaderScrollState();
   initMobileNav();
