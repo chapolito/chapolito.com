@@ -1190,6 +1190,10 @@ header.is-scrolled {
   align-self: center
 }
 
+.identifier-wrapper:not(.index) .header-identity {
+  display: none
+}
+
 .header-identity__line {
   font-family: 'Karla', 'Alegreya', sans-serif;
   text-transform: none;
@@ -2884,6 +2888,7 @@ article img {
 .messenger-kids-case-study img,
 .portal-case-study img,
 .horizon-case-study img,
+.horizon-case-study video,
 .quest-vr-case-study img,
 .quest-for-business-case-study img,
 .case-study video,
@@ -2926,7 +2931,8 @@ article img {
 }
 
 .case-study .row+.row.marketing-images,
-.case-study .row+.row.quest-vr-media {
+.case-study .row+.row.quest-vr-media,
+.case-study .row+.row.horizon-media {
   margin-top: 1.75rem
 }
 
