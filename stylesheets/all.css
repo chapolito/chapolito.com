@@ -711,6 +711,10 @@ h6,
   font-size: .94625rem
 }
 
+.caption {
+  line-height: 1.5
+}
+
 .x-small {
   font-size: .79563rem
 }
