@@ -21,16 +21,32 @@
     <div id='main'>
       <div class='free-design-resources free-design-resources_the-urge-to-create identifier-wrapper'>
         <header class='row'>
-          <div class='logo col-xs-offset-1 col-xs-7 col-sm-offset-2 col-sm-6'>
-            <a href="/"><img src="/images/chapolito-logo.svg" />
-            </a>
+          <div class='header-brand col-xs-offset-1 col-sm-offset-2'>
+            <div class='logo col-sm-6'>
+              <a href="/"><img src="/images/chapolito-logo.svg" />
+              </a>
+            </div>
+            <div class='header-identity'>
+            <div class='header-identity__line header-identity__line--desktop'>
+              <span class='header-identity__name'>Jesse O'Chapo</span><span class='header-identity__sep' aria-hidden='true'> · </span><span class='header-identity__title'>Principal Product Designer</span><span class='header-identity__sep' aria-hidden='true'> · </span><span class='header-identity__location'>Santa Cruz, CA</span>
+            </div>
+            <div class='header-identity__line header-identity__line--mobile'>
+              <span class='header-identity__name'>Jesse O'Chapo</span>
+              <span class='header-identity__title'>Principal Product Designer</span>
+            </div>
+            </div>
           </div>
-          <nav class='top-nav col-xs-17 col-sm-offset-2 col-sm-14'>
-            <h5 class='x-small'>
-              <a href="/">Portfolio</a>
+          <button type='button' class='header-menu-toggle' aria-label='Open menu' aria-expanded='false' aria-controls='site-nav'>
+            <span class='header-menu-toggle__bar'></span>
+            <span class='header-menu-toggle__bar'></span>
+            <span class='header-menu-toggle__bar'></span>
+          </button>
+          <nav id='site-nav' class='top-nav col-xs-17 col-sm-offset-2 col-sm-14' aria-label='Site'>
+            <h5 class='top-nav__item x-small'>
+              <a href="/"><span class='top-nav__indicator' aria-hidden='true'></span>Portfolio</a>
             </h5>
-            <h5 class='x-small'>
-              <a href="/about">About</a>
+            <h5 class='top-nav__item x-small'>
+              <a href="/about"><span class='top-nav__indicator' aria-hidden='true'></span>About</a>
             </h5>
           </nav>
         </header>
