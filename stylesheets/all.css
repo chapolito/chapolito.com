@@ -954,18 +954,32 @@ header.is-scrolled {
   animation: 400ms ease-out 150ms both animate-header-in
 }
 
-.animate-header-in header nav h5:nth-of-type(1) a {
+.animate-header-in header .header-identity__line {
+  -webkit-animation: 400ms ease-out 200ms both animate-header-in;
+  -moz-animation: 400ms ease-out 200ms both animate-header-in;
+  -o-animation: 400ms ease-out 200ms both animate-header-in;
+  animation: 400ms ease-out 200ms both animate-header-in
+}
+
+.animate-header-in header .header-menu-toggle {
   -webkit-animation: 400ms ease-out 250ms both animate-header-in;
   -moz-animation: 400ms ease-out 250ms both animate-header-in;
   -o-animation: 400ms ease-out 250ms both animate-header-in;
   animation: 400ms ease-out 250ms both animate-header-in
 }
 
-.animate-header-in header nav h5:nth-of-type(2) a {
+.animate-header-in header nav h5:nth-of-type(1) a {
   -webkit-animation: 400ms ease-out 350ms both animate-header-in;
   -moz-animation: 400ms ease-out 350ms both animate-header-in;
   -o-animation: 400ms ease-out 350ms both animate-header-in;
   animation: 400ms ease-out 350ms both animate-header-in
+}
+
+.animate-header-in header nav h5:nth-of-type(2) a {
+  -webkit-animation: 400ms ease-out 450ms both animate-header-in;
+  -moz-animation: 400ms ease-out 450ms both animate-header-in;
+  -o-animation: 400ms ease-out 450ms both animate-header-in;
+  animation: 400ms ease-out 450ms both animate-header-in
 }
 
 .animate-header-out .identifier-wrapper>header .logo {
@@ -975,18 +989,32 @@ header.is-scrolled {
   animation: 250ms ease-in both animate-header-out
 }
 
-.animate-header-out .identifier-wrapper>header nav h5:nth-of-type(1) a {
+.animate-header-out .identifier-wrapper>header .header-identity__line {
   -webkit-animation: 250ms ease-in 100ms both animate-header-out;
   -moz-animation: 250ms ease-in 100ms both animate-header-out;
   -o-animation: 250ms ease-in 100ms both animate-header-out;
   animation: 250ms ease-in 100ms both animate-header-out
 }
 
-.animate-header-out .identifier-wrapper>header nav h5:nth-of-type(2) a {
+.animate-header-out .identifier-wrapper>header .header-menu-toggle {
+  -webkit-animation: 250ms ease-in 150ms both animate-header-out;
+  -moz-animation: 250ms ease-in 150ms both animate-header-out;
+  -o-animation: 250ms ease-in 150ms both animate-header-out;
+  animation: 250ms ease-in 150ms both animate-header-out
+}
+
+.animate-header-out .identifier-wrapper>header nav h5:nth-of-type(1) a {
   -webkit-animation: 250ms ease-in 200ms both animate-header-out;
   -moz-animation: 250ms ease-in 200ms both animate-header-out;
   -o-animation: 250ms ease-in 200ms both animate-header-out;
   animation: 250ms ease-in 200ms both animate-header-out
+}
+
+.animate-header-out .identifier-wrapper>header nav h5:nth-of-type(2) a {
+  -webkit-animation: 250ms ease-in 300ms both animate-header-out;
+  -moz-animation: 250ms ease-in 300ms both animate-header-out;
+  -o-animation: 250ms ease-in 300ms both animate-header-out;
+  animation: 250ms ease-in 300ms both animate-header-out
 }
 
 @keyframes animate-header-in {
@@ -1252,10 +1280,8 @@ header.is-scrolled {
   display: block
 }
 
-.header-brand {
-  display: flex;
-  align-items: center;
-  min-width: 0
+.header-identity__line--mobile {
+  display: block
 }
 
 @media screen and (max-width: 767px) {
@@ -1265,40 +1291,70 @@ header.is-scrolled {
 
   header.row {
     flex-wrap: nowrap;
-    align-items: center
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding-left: 7.69231%;
+    padding-right: 3.84615%;
+    overflow: hidden
   }
 
-  header .header-brand {
-    flex: 1 1 auto;
-    min-width: 0
-  }
-
-  header .header-brand .logo {
+  header .logo {
     flex: 0 0 auto;
+    max-width: none;
+    position: relative;
+    z-index: 2;
+    margin-left: 0
+  }
+
+  header .logo.col-xs-offset-1,
+  header .logo.col-xs-7 {
+    margin-left: 0;
+    flex-basis: auto;
     max-width: none
   }
 
+  header .logo img {
+    margin-left: 0
+  }
+
   header .header-identity {
-    position: static;
-    left: auto;
-    top: auto;
-    -moz-transform: none;
-    -ms-transform: none;
-    -webkit-transform: none;
-    transform: none;
-    flex: 1 1 auto;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    -moz-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -webkit-transform: translateY(-50%);
+    transform: translateY(-50%);
+    flex: none;
     min-width: 0;
-    padding-left: 1rem;
-    text-align: left;
-    pointer-events: auto
+    width: auto;
+    max-width: none;
+    margin-left: 0;
+    padding-left: 4.5rem;
+    padding-right: 4.5rem;
+    box-sizing: border-box;
+    text-align: center;
+    pointer-events: none;
+    z-index: 1
   }
 
   header .header-menu-toggle {
     flex: 0 0 auto;
-    margin-left: auto
+    margin-left: auto;
+    margin-right: 0;
+    position: relative;
+    z-index: 2
   }
 
   header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
     z-index: 10001
   }
 
@@ -1337,6 +1393,12 @@ header.is-scrolled {
     -o-transition: opacity 150ms ease-out, visibility 150ms ease-out, -o-transform 150ms ease-out;
     -webkit-transition: opacity 150ms ease-out, visibility 150ms ease-out, -webkit-transform 150ms ease-out;
     transition: opacity 150ms ease-out, visibility 150ms ease-out, transform 150ms ease-out
+  }
+
+  header .top-nav.col-xs-17 {
+    flex-basis: auto;
+    max-width: none;
+    margin-left: 0
   }
 
   header .top-nav.is-open {
@@ -1491,19 +1553,13 @@ header.is-scrolled {
 @media screen and (min-width: 768px) {
   header.row {
     flex-wrap: nowrap;
-    align-items: center;
-    position: relative
+    align-items: center
   }
 
-  header .header-brand {
-    display: flex;
-    align-items: center;
-    min-width: 0
-  }
-
-  header .header-brand .logo {
+  header .logo {
     flex: 0 0 auto;
-    max-width: none
+    max-width: none;
+    align-self: center
   }
 
   header .header-identity {
@@ -1514,11 +1570,14 @@ header.is-scrolled {
     -ms-transform: translate(-50%, -50%);
     -webkit-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
+    margin-left: 0;
+    flex-basis: auto;
+    max-width: min(53.84615%, calc(100% - 16rem));
+    width: auto;
     padding-left: 0;
     text-align: center;
     pointer-events: none;
     z-index: 2;
-    max-width: calc(100% - 16rem);
     white-space: nowrap
   }
 
@@ -1536,12 +1595,17 @@ header.is-scrolled {
 
   header .top-nav {
     display: block;
-    position: static;
+    position: absolute;
+    top: 0;
+    right: 7.69231%;
     visibility: visible;
     opacity: 1;
     pointer-events: auto;
     width: auto;
     min-width: 0;
+    margin-left: 0;
+    flex-basis: auto;
+    max-width: none;
     padding: 0;
     border-radius: 0;
     background-color: transparent;
@@ -1586,6 +1650,12 @@ header.is-scrolled {
     filter: progid:DXImageTransform.Microsoft.Alpha(enabled=false);
     opacity: 1;
     background-color: transparent
+  }
+}
+
+@media screen and (min-width: 75em) {
+  header .header-identity {
+    max-width: min(46.15385%, calc(100% - 16rem))
   }
 }
 
@@ -1670,11 +1740,14 @@ header.is-scrolled {
     mask-image: linear-gradient(to bottom, #000 0%, rgba(0, 0, 0, 0.9) 18%, transparent 52%)
   }
 
-  .identifier-wrapper.index>header .header-brand,
-  .identifier-wrapper.index>header .header-brand .logo,
-  .identifier-wrapper.index>header .header-identity,
+  .identifier-wrapper.index>header .logo,
   .identifier-wrapper.index>header .header-menu-toggle {
     position: relative;
+    z-index: 2
+  }
+
+  .identifier-wrapper.index>header .header-identity {
+    position: absolute;
     z-index: 2
   }
 
