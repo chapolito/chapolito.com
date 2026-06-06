@@ -1,3 +1,5 @@
 .DS_Store
 *.swp
 *~
+.env.local
+node_modules/
