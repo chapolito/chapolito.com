@@ -60,17 +60,34 @@
           </div>
           <div class='portfolio-chat__content'>
             <p class='portfolio-chat__intro' id='chat-intro' aria-live='polite'></p>
-            <p class='portfolio-chat__response' id='chat-response' aria-live='polite' hidden></p>
-            <div class='portfolio-chat__links' id='chat-links'></div>
-            <form class='portfolio-chat__form' id='chat-form'>
-              <label class='visually-hidden' for='chat-input'>Ask anything</label>
-              <div class='portfolio-chat__input-shell'>
-                <input type='text' id='chat-input' placeholder='Ask anything' autocomplete='off' />
-                <button type='submit' class='portfolio-chat__submit' aria-label='Send message'>
-                  <img src='/images/chat-send-button.svg' alt='' width='32' height='32' />
-                </button>
+            <div class='portfolio-chat__conversation' id='chat-conversation' hidden>
+              <div class='portfolio-chat__question' id='chat-question'></div>
+              <div class='portfolio-chat__answer' id='chat-response' aria-live='polite'></div>
+              <div class='portfolio-chat__links' id='chat-links'></div>
+            </div>
+            <div class='portfolio-chat__composer'>
+              <form class='portfolio-chat__form' id='chat-form'>
+                <label class='visually-hidden' for='chat-input'>Ask Jesse</label>
+                <div class='portfolio-chat__input-wrap'>
+                  <div class='portfolio-chat__input-glow' aria-hidden='true'></div>
+                  <div class='portfolio-chat__input-shell'>
+                    <input type='text' id='chat-input' placeholder='Ask Jesse' autocomplete='off' />
+                    <button type='submit' class='portfolio-chat__submit' aria-label='Send message'>
+                      <img class='portfolio-chat__submit-icon portfolio-chat__submit-icon--default' src='/images/chat-send-button.svg' alt='' width='32' height='32' />
+                      <img class='portfolio-chat__submit-icon portfolio-chat__submit-icon--active' src='/images/chat-send-button-active.svg' alt='' width='32' height='32' />
+                      <img class='portfolio-chat__submit-icon portfolio-chat__submit-icon--filled' src='/images/chat-send-button-filled.svg' alt='' width='52' height='52' />
+                    </button>
+                  </div>
+                </div>
+              </form>
+              <div class='portfolio-chat__suggestions' id='chat-suggestions' hidden>
+                <button type='button' class='portfolio-chat__suggestion' data-suggestion='Tell me more about your background'>Tell me more</button>
+                <button type='button' class='portfolio-chat__suggestion' data-suggestion='Where have you worked?'>Career history</button>
+                <button type='button' class='portfolio-chat__suggestion' data-suggestion='What are your strengths as a designer?'>Strengths</button>
+                <button type='button' class='portfolio-chat__suggestion' data-suggestion='What projects have you worked on?'>Projects</button>
+                <button type='button' class='portfolio-chat__suggestion' data-suggestion='Do you have any testimonials?'>Testimonials</button>
               </div>
-            </form>
+            </div>
           </div>
         </aside>
         <script>
