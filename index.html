@@ -25,22 +25,36 @@
           <div class='home-projects experimental-bento-projects'>
             <div class='experimental-bento'>
 
-              <article class='bento-cell bento-size-2x1' aria-label='Horizon'></article>
+              <article class='bento-cell bento-size-2x1' aria-label='Horizon'>
+                <video class='bento-cell__video' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/horizon-world-chat.mp4'></video>
+              </article>
               <article class='bento-cell bento-size-1x1' aria-label='Messenger Kids'></article>
               <article class='bento-cell bento-size-1x1' aria-label='Quest VR'></article>
               <article class='bento-cell bento-size-1x1' aria-label='Messenger Kids GIF'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Portal Live'></article>
+              <article class='bento-cell bento-size-1x1' aria-label='Portal Live'>
+                <img class='bento-cell__img' src='/images/home/portal-live.png' alt='Portal Facebook Live interface' />
+              </article>
 
               <article class='bento-cell bento-size-1x2' aria-label='Portal Household'></article>
-              <article class='bento-cell bento-size-2x2' aria-label='Portal'></article>
-              <article class='bento-cell bento-size-2x1' aria-label='Messenger Kids Inbox'></article>
+              <article class='bento-cell bento-size-1x1' aria-label='Placeholder'></article>
+              <article class='bento-cell bento-size-2x2' aria-label='Quest VR'>
+                <video class='bento-cell__video bento-cell__video--fit-height' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/quest-vr/people-tab.mp4'></video>
+              </article>
+              <article class='bento-cell bento-size-2x1' aria-label='Meta Accounts'>
+                <img class='bento-cell__img' src='/images/home/meta-accounts.png' alt='Meta account sign-in across desktop, VR, tablet, and phone' />
+              </article>
 
               <article class='bento-cell bento-size-2x1' aria-label='Life360'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Life360 Prototype'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Life360 Stickers'></article>
+              <article class='bento-cell bento-size-1x1' aria-label='Life360 Quick Messages'>
+                <img class='bento-cell__img' src='/images/home/life360-quick-messages.png' alt='Life360 quick messages icon' />
+              </article>
+              <article class='bento-cell bento-size-1x1' aria-label='Life360 Stickers'>
+                <img class='bento-cell__img' src='/images/home/life360-stickers.png' alt='' />
+              </article>
               <article class='bento-cell bento-size-1x1' aria-label='Life360 Weather'></article>
 
               <article class='bento-cell bento-size-2x1' aria-label='The Wiki Game'></article>
+              <article class='bento-cell bento-size-1x1' aria-label='Placeholder'></article>
               <article class='bento-cell bento-size-1x1' aria-label='The Wiki Game Icon'></article>
 
               <article class='bento-cell bento-size-2x1' aria-label='Fanpics'></article>
@@ -59,13 +73,11 @@
             <div class='portfolio-chat__gradient'></div>
           </div>
           <div class='portfolio-chat__content'>
-            <p class='portfolio-chat__intro' id='chat-intro' aria-live='polite'></p>
             <div class='portfolio-chat__conversation' id='chat-conversation' hidden>
-              <div class='portfolio-chat__question' id='chat-question'></div>
-              <div class='portfolio-chat__answer' id='chat-response' aria-live='polite'></div>
-              <div class='portfolio-chat__links' id='chat-links'></div>
+              <div class='portfolio-chat__thread' id='chat-thread'></div>
             </div>
             <div class='portfolio-chat__composer'>
+              <p class='portfolio-chat__intro' id='chat-intro' aria-live='polite'></p>
               <form class='portfolio-chat__form' id='chat-form'>
                 <label class='visually-hidden' for='chat-input'>Ask Jesse</label>
                 <div class='portfolio-chat__input-wrap'>
@@ -80,7 +92,7 @@
                   </div>
                 </div>
               </form>
-              <div class='portfolio-chat__suggestions' id='chat-suggestions' hidden>
+              <div class='portfolio-chat__suggestions' id='chat-suggestions' aria-hidden='true'>
                 <button type='button' class='portfolio-chat__suggestion' data-suggestion='Tell me more about your background'>Tell me more</button>
                 <button type='button' class='portfolio-chat__suggestion' data-suggestion='Where have you worked?'>Career history</button>
                 <button type='button' class='portfolio-chat__suggestion' data-suggestion='What are your strengths as a designer?'>Strengths</button>
