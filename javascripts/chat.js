@@ -70,9 +70,49 @@ var INTRO_CHUNKS = tokenizeSegment(
 
 function hideIntro() {
   var introEl = document.getElementById('chat-intro');
-  var responseEl = document.getElementById('chat-response');
+  var conversationEl = document.getElementById('chat-conversation');
+  var chatEl = document.getElementById('portfolio-chat');
   if (introEl) introEl.classList.add('is-hidden');
-  if (responseEl) responseEl.hidden = false;
+  if (conversationEl) conversationEl.hidden = false;
+  if (chatEl) chatEl.classList.add('is-responding');
+}
+
+function showUserQuestion(text) {
+  var questionEl = document.getElementById('chat-question');
+  var responseEl = document.getElementById('chat-response');
+  var linksEl = document.getElementById('chat-links');
+  var root = document.querySelector('.experimental-home');
+  hideIntro();
+  if (root) root.classList.add('is-loaded');
+  scrollToTop();
+  if (questionEl) questionEl.textContent = text;
+  if (responseEl) responseEl.innerHTML = '';
+  if (linksEl) linksEl.innerHTML = '';
+}
+
+function syncInputState() {
+  var chatEl = document.getElementById('portfolio-chat');
+  var input = document.getElementById('chat-input');
+  if (!chatEl || !input) return;
+  chatEl.classList.toggle('is-filled', input.value.trim().length > 0);
+}
+
+function setChatFocused(isFocused) {
+  var chatEl = document.getElementById('portfolio-chat');
+  var suggestionsEl = document.getElementById('chat-suggestions');
+  if (!chatEl) return;
+  chatEl.classList.toggle('is-focused', isFocused);
+  if (suggestionsEl) suggestionsEl.hidden = !isFocused;
+  syncInputState();
+}
+
+function replaySuggestionAnimation() {
+  var suggestions = document.querySelectorAll('.portfolio-chat__suggestion');
+  suggestions.forEach(function (button) {
+    button.style.animation = 'none';
+    void button.offsetWidth;
+    button.style.animation = '';
+  });
 }
 
 function getTokenDelay(index, chunk, prevChunk) {
@@ -202,7 +242,6 @@ function showWork(onComplete) {
 
 async function sendMessage(userText) {
   conversationHistory.push({ role: 'user', content: userText });
-  hideIntro();
 
   const response = await fetch('/api/chat', {
     method: 'POST',
@@ -212,6 +251,10 @@ async function sendMessage(userText) {
 
   if (!response.ok) {
     throw new Error(response.status === 429 ? 'Rate limit exceeded. Try again later.' : 'Something went wrong.');
+  }
+
+  if (!response.body) {
+    throw new Error('Something went wrong.');
   }
 
   const reader = response.body.getReader();
@@ -340,26 +383,61 @@ document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('chat-form');
   const input = document.getElementById('chat-input');
   const responseEl = document.getElementById('chat-response');
-  if (!form || !input || !responseEl) return;
+  const chatEl = document.getElementById('portfolio-chat');
+  if (!form || !input || !responseEl || !chatEl) return;
 
   runLoadSequence();
 
-  form.addEventListener('submit', async function (e) {
+  input.addEventListener('input', syncInputState);
+
+  input.addEventListener('focus', function () {
+    setChatFocused(true);
+    replaySuggestionAnimation();
+  });
+
+  input.addEventListener('blur', function () {
+    window.setTimeout(function () {
+      if (!chatEl.contains(document.activeElement)) {
+        setChatFocused(false);
+      }
+    }, 0);
+  });
+
+  document.querySelectorAll('.portfolio-chat__suggestion').forEach(function (button) {
+    button.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+    });
+
+    button.addEventListener('click', function () {
+      input.value = button.getAttribute('data-suggestion') || button.textContent.trim();
+      input.focus();
+      handleChatSubmit();
+    });
+  });
+
+  form.addEventListener('submit', function (e) {
     e.preventDefault();
+    handleChatSubmit();
+  });
+
+  async function handleChatSubmit() {
     const text = input.value.trim();
     if (!text) return;
 
     input.value = '';
     input.disabled = true;
+    setChatFocused(false);
+    showUserQuestion(text);
 
     try {
       await sendMessage(text);
     } catch (err) {
-      hideIntro();
+      showUserQuestion(text);
+      responseEl.innerHTML = '';
       responseEl.textContent = err.message || 'Something went wrong.';
     } finally {
       input.disabled = false;
       input.focus();
     }
-  });
+  }
 });

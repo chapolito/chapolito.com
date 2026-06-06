@@ -4070,6 +4070,12 @@ body:has(.experimental-home),
   color-scheme: dark
 }
 
+.identifier-wrapper.experimental-home>main {
+  position: relative;
+  z-index: 1;
+  padding-bottom: min(374px, 45vh)
+}
+
 .experimental-bento-projects {
   --bento-gap: 16px;
   --bento-margin: 16px;
@@ -4080,7 +4086,8 @@ body:has(.experimental-home),
   opacity: 0;
   overflow-x: clip;
   transform: translateY(32px);
-  transition: opacity 1000ms ease-in, transform 1000ms ease-in
+  transition: opacity 1000ms ease-in, transform 1000ms ease-in;
+  isolation: isolate
 }
 
 .experimental-home.is-loaded .experimental-bento-projects {
@@ -4169,10 +4176,7 @@ body:has(.experimental-home),
   right: 0;
   bottom: 0;
   z-index: 100;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  min-height: min(374px, 45vh);
+  height: min(374px, 45vh);
   pointer-events: none
 }
 
@@ -4189,31 +4193,39 @@ body:has(.experimental-home),
   -webkit-backdrop-filter: blur(31px);
   backdrop-filter: blur(31px);
   -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 100%)
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 35%, #000 100%);
+  transition: -webkit-backdrop-filter 300ms ease, backdrop-filter 300ms ease
 }
 
 .portfolio-chat__gradient {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .6) 100%)
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .6) 100%);
+  transition: background 300ms ease
+}
+
+.portfolio-chat.is-focused .portfolio-chat__gradient,
+.portfolio-chat.is-responding .portfolio-chat__gradient {
+  background: linear-gradient(to bottom, rgba(18, 11, 16, 0) 0%, #080416 100%)
 }
 
 .portfolio-chat__content {
   position: relative;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
   width: 100%;
   max-width: 39rem;
   margin-inline: auto;
-  padding: 0 var(--bento-gutter, 16px) 2.5rem;
+  padding: 0 var(--bento-gutter, 16px) 1.5rem;
+  box-sizing: border-box;
   pointer-events: auto
 }
 
 .portfolio-chat__intro,
-.portfolio-chat__response {
-  width: 100%;
-  margin: 0 0 1.5rem;
-  padding-inline: 28px 16px;
-  box-sizing: border-box;
+.portfolio-chat__answer {
   font-size: .875rem;
   line-height: 1.357;
   color: rgba(255, 255, 255, .9);
@@ -4221,41 +4233,87 @@ body:has(.experimental-home),
   word-break: break-word
 }
 
-.portfolio-chat__intro.is-hidden,
-.portfolio-chat__response[hidden] {
-  display: none
-}
-
 .portfolio-chat__intro strong,
-.portfolio-chat__response strong {
+.portfolio-chat__answer strong {
   color: #fff;
   font-weight: 700
 }
 
-.portfolio-chat__response {
-  max-height: 28vh;
+.portfolio-chat__intro {
+  width: 100%;
+  margin: 0 0 1rem;
+  padding-inline: 28px 16px;
+  box-sizing: border-box
+}
+
+.portfolio-chat__intro.is-hidden,
+.portfolio-chat__conversation[hidden],
+.portfolio-chat__suggestions[hidden] {
+  display: none
+}
+
+.portfolio-chat__conversation {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  margin-bottom: 1rem;
+  padding-inline: 12px 16px;
+  overflow: hidden
+}
+
+.portfolio-chat__question {
+  align-self: flex-end;
+  max-width: 85%;
+  padding: 6px 12px;
+  border: .5px solid rgba(255, 255, 255, .1);
+  border-radius: 12px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, .3)), linear-gradient(90deg, rgba(0, 0, 0, .4), rgba(0, 0, 0, .4));
+  font-size: .875rem;
+  line-height: 1.357;
+  color: rgba(255, 255, 255, .8);
+  word-break: break-word
+}
+
+.portfolio-chat__answer {
+  flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto
 }
 
-.portfolio-chat__response p {
-  margin: 0 0 .5em
+.portfolio-chat__answer p,
+.portfolio-chat__answer ol,
+.portfolio-chat__answer ul,
+.portfolio-chat__answer li,
+.portfolio-chat__answer em {
+  font-size: .875rem;
+  line-height: 1.357;
+  color: rgba(255, 255, 255, .9);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 10px rgba(0, 0, 0, .15);
+  margin-top: 0
 }
 
-.portfolio-chat__response p:last-child {
+.portfolio-chat__answer p {
+  margin-bottom: .5em
+}
+
+.portfolio-chat__answer p:last-child,
+.portfolio-chat__answer p:last-of-type {
   margin-bottom: 0
 }
 
-.portfolio-chat__response ol,
-.portfolio-chat__response ul {
+.portfolio-chat__answer ol,
+.portfolio-chat__answer ul {
   margin: 0 0 .5em;
   padding-left: 1.25em
 }
 
-.portfolio-chat__response li {
+.portfolio-chat__answer li {
   margin-bottom: .35em
 }
 
-.portfolio-chat__response li:last-child {
+.portfolio-chat__answer li:last-child {
   margin-bottom: 0
 }
 
@@ -4263,10 +4321,7 @@ body:has(.experimental-home),
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: flex-start;
-  margin: -.75rem 0 1rem;
-  padding-inline: 28px 16px;
-  box-sizing: border-box
+  justify-content: flex-start
 }
 
 .portfolio-chat__links:empty {
@@ -4278,6 +4333,10 @@ body:has(.experimental-home),
   color: rgba(255, 255, 255, .8);
   text-decoration: underline;
   text-underline-offset: 2px
+}
+
+.portfolio-chat__composer {
+  flex-shrink: 0
 }
 
 .portfolio-chat__form {
@@ -4292,7 +4351,34 @@ body:has(.experimental-home),
   transform: translateY(0)
 }
 
+.portfolio-chat__input-wrap {
+  position: relative
+}
+
+.portfolio-chat__input-glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(100% + 12px);
+  height: 108px;
+  transform: translate(-50%, -46%);
+  border-radius: 36px;
+  background: linear-gradient(135deg, #f3b38e 0%, #d75dce 35%, #5a98fe 70%, #f3b38e 100%);
+  opacity: 0;
+  filter: blur(10px);
+  transition: opacity 300ms ease;
+  pointer-events: none;
+  z-index: 0
+}
+
+.portfolio-chat.is-focused .portfolio-chat__input-glow,
+.portfolio-chat.is-filled .portfolio-chat__input-glow {
+  opacity: .5
+}
+
 .portfolio-chat__input-shell {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -4302,7 +4388,14 @@ body:has(.experimental-home),
   padding: 24px 16px 16px 28px;
   border: 1px solid #fff;
   border-radius: 32px;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .05) 100%), rgba(255, 255, 255, .92)
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .05) 100%), rgba(255, 255, 255, .92);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
+  transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease
+}
+
+.portfolio-chat.is-focused .portfolio-chat__input-shell,
+.portfolio-chat.is-filled .portfolio-chat__input-shell {
+  background: linear-gradient(180deg, rgba(0, 35, 215, 0) 0%, rgba(0, 35, 215, .1) 100%), #fff
 }
 
 .portfolio-chat__input-shell input {
@@ -4313,7 +4406,18 @@ body:has(.experimental-home),
   color: #000;
   font: inherit;
   font-size: 1rem;
-  line-height: 1.5
+  line-height: 1.5;
+  opacity: 1;
+  transition: opacity 300ms ease
+}
+
+.portfolio-chat.is-focused:not(.is-filled) .portfolio-chat__input-shell input {
+  opacity: .7
+}
+
+.portfolio-chat.is-filled .portfolio-chat__input-shell input {
+  color: rgba(0, 0, 0, .8);
+  opacity: 1
 }
 
 .portfolio-chat__input-shell input::placeholder {
@@ -4321,29 +4425,122 @@ body:has(.experimental-home),
 }
 
 .portfolio-chat__input-shell input:focus {
-  outline: none
+  outline: none;
+  opacity: 1
 }
 
 .portfolio-chat__submit {
+  position: relative;
   flex-shrink: 0;
   width: 2rem;
   height: 2rem;
   padding: 0;
   border: none;
   background: transparent;
-  cursor: pointer
+  cursor: pointer;
+  overflow: visible
 }
 
-.portfolio-chat__submit img {
+.portfolio-chat__submit-icon {
   display: block;
   width: 2rem;
-  height: 2rem
+  height: 2rem;
+  transition: opacity 200ms ease
+}
+
+.portfolio-chat__submit-icon--active,
+.portfolio-chat__submit-icon--filled {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  pointer-events: none
+}
+
+.portfolio-chat__submit-icon--active {
+  width: 2rem;
+  height: 2rem;
+  transform: translate(-50%, -50%)
+}
+
+.portfolio-chat__submit-icon--filled {
+  width: 3.25rem;
+  height: 3.25rem;
+  transform: translate(-50%, -50%)
+}
+
+.portfolio-chat.is-focused .portfolio-chat__submit-icon--default,
+.portfolio-chat.is-filled .portfolio-chat__submit-icon--default {
+  opacity: 0
+}
+
+.portfolio-chat.is-focused:not(.is-filled) .portfolio-chat__submit-icon--active {
+  opacity: 1
+}
+
+.portfolio-chat.is-filled .portfolio-chat__submit-icon--active {
+  opacity: 0
+}
+
+.portfolio-chat.is-filled .portfolio-chat__submit-icon--filled {
+  opacity: 1
 }
 
 .portfolio-chat__submit:disabled,
 .portfolio-chat__input-shell input:disabled {
   opacity: .6;
   cursor: wait
+}
+
+.portfolio-chat__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: .75rem;
+  padding-inline: 4px
+}
+
+.portfolio-chat__suggestion {
+  padding: 3px 12px;
+  border: .5px solid rgba(255, 255, 255, .1);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .2) 0%, rgba(255, 255, 255, .04) 100%);
+  color: rgba(255, 255, 255, .8);
+  font: inherit;
+  font-size: .75rem;
+  line-height: 1.5;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: portfolio-chat-suggestion-in 350ms ease forwards
+}
+
+.portfolio-chat__suggestion:nth-child(1) {
+  animation-delay: 40ms
+}
+
+.portfolio-chat__suggestion:nth-child(2) {
+  animation-delay: 80ms
+}
+
+.portfolio-chat__suggestion:nth-child(3) {
+  animation-delay: 120ms
+}
+
+.portfolio-chat__suggestion:nth-child(4) {
+  animation-delay: 160ms
+}
+
+.portfolio-chat__suggestion:nth-child(5) {
+  animation-delay: 200ms
+}
+
+@keyframes portfolio-chat-suggestion-in {
+  to {
+    opacity: 1;
+    transform: translateY(0)
+  }
 }
 
 .visually-hidden {
