@@ -4073,7 +4073,7 @@ body:has(.experimental-home),
 .identifier-wrapper.experimental-home>main {
   position: relative;
   z-index: 1;
-  padding-bottom: min(374px, 45vh)
+  padding-bottom: min(280px, 34vh)
 }
 
 .experimental-bento-projects {
@@ -4126,6 +4126,36 @@ body:has(.experimental-home),
   pointer-events: none
 }
 
+.experimental-bento-projects .bento-cell__img,
+.experimental-bento-projects .bento-cell__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: inherit
+}
+
+.experimental-bento-projects .bento-cell__video--fit-height {
+  inset: auto;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: auto;
+  height: 100%;
+  max-width: none;
+  transform: translateX(-50%);
+  object-fit: cover;
+  object-position: center
+}
+
+.experimental-bento-projects .bento-cell:has(.bento-cell__img),
+.experimental-bento-projects .bento-cell:has(.bento-cell__video) {
+  background: #000;
+  overflow: hidden
+}
+
 @media (hover:hover) and (pointer:fine) {
   .experimental-bento-projects .experimental-bento:has(.bento-cell.is-hovered) .bento-cell {
     opacity: .6
@@ -4167,6 +4197,112 @@ body:has(.experimental-home),
   .experimental-bento-projects .experimental-bento {
     --bento-grid-cols: 6
   }
+
+  /* Desktop: 2-wide tiles only at cols 1–2, 3–4, or 5–6 (never 2–3 or 4–5) */
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(1) {
+    grid-column: 1 / span 2;
+    grid-row: 1
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(2) {
+    grid-column: 3;
+    grid-row: 1
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(3) {
+    grid-column: 4;
+    grid-row: 1
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(4) {
+    grid-column: 5;
+    grid-row: 1
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(5) {
+    grid-column: 6;
+    grid-row: 1
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(6) {
+    grid-column: 1;
+    grid-row: 2 / span 2
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(7) {
+    grid-column: 2;
+    grid-row: 2
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(8) {
+    grid-column: 3 / span 2;
+    grid-row: 2 / span 2
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(9) {
+    grid-column: 5 / span 2;
+    grid-row: 2
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(10) {
+    grid-column: 1 / span 2;
+    grid-row: 4
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(11) {
+    grid-column: 2;
+    grid-row: 3
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(12) {
+    grid-column: 6;
+    grid-row: 3
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(13) {
+    grid-column: 5;
+    grid-row: 3
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(14) {
+    grid-column: 3 / span 2;
+    grid-row: 4
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(15) {
+    grid-column: 5;
+    grid-row: 4
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(16) {
+    grid-column: 6;
+    grid-row: 4
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(17) {
+    grid-column: 5 / span 2;
+    grid-row: 5
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(18) {
+    grid-column: 1;
+    grid-row: 5 / span 2
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(19) {
+    grid-column: 2;
+    grid-row: 6
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(20) {
+    grid-column: 3 / span 2;
+    grid-row: 6
+  }
+
+  .experimental-bento-projects .experimental-bento>.bento-cell:nth-child(21) {
+    grid-column: 5 / span 2;
+    grid-row: 6
+  }
 }
 
 /* Portfolio chat assistant — AI footer */
@@ -4176,8 +4312,16 @@ body:has(.experimental-home),
   right: 0;
   bottom: 0;
   z-index: 100;
-  height: min(374px, 45vh);
+  height: auto;
   pointer-events: none
+}
+
+.portfolio-chat:has(.portfolio-chat__conversation:not([hidden])) {
+  height: min(374px, 45vh)
+}
+
+.portfolio-chat:has(.portfolio-chat__conversation:not([hidden])) .portfolio-chat__content {
+  height: 100%
 }
 
 .portfolio-chat__backdrop {
@@ -4215,19 +4359,21 @@ body:has(.experimental-home),
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: 100%;
   width: 100%;
-  max-width: 39rem;
+  max-width: calc(var(--chat-input-width) + 2 * var(--bento-gutter, 16px));
   margin-inline: auto;
   padding: 0 var(--bento-gutter, 16px) 1.5rem;
   box-sizing: border-box;
-  pointer-events: auto
+  pointer-events: auto;
+  --chat-input-width: 720px;
+  --chat-body-width: calc(var(--chat-input-width) - 2px);
+  --chat-text-inset: 28px
 }
 
 .portfolio-chat__intro,
 .portfolio-chat__answer {
-  font-size: .875rem;
-  line-height: 1.357;
+  font-size: 1rem;
+  line-height: 1.5;
   color: rgba(255, 255, 255, .9);
   text-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 10px rgba(0, 0, 0, .15);
   word-break: break-word
@@ -4239,59 +4385,99 @@ body:has(.experimental-home),
   font-weight: 700
 }
 
-.portfolio-chat__intro {
+.portfolio-chat__composer .portfolio-chat__intro {
+  position: relative;
+  z-index: 2;
   width: 100%;
   margin: 0 0 1rem;
-  padding-inline: 28px 16px;
+  padding-inline: var(--chat-text-inset);
   box-sizing: border-box
 }
 
+.portfolio-chat p {
+  margin-bottom: 0
+}
+
 .portfolio-chat__intro.is-hidden,
-.portfolio-chat__conversation[hidden],
-.portfolio-chat__suggestions[hidden] {
+.portfolio-chat__conversation[hidden] {
   display: none
 }
 
-.portfolio-chat__conversation {
+.portfolio-chat__conversation:not([hidden]) {
   flex: 1 1 auto;
   min-height: 0;
+  width: 100%;
+  max-width: var(--chat-body-width);
+  margin-inline: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 2rem, #000 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 2rem, #000 100%)
+}
+
+.portfolio-chat__thread {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 1.25rem;
+  min-height: 100%;
+  box-sizing: border-box
+}
+
+.portfolio-chat__intro--thread {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  margin: 0;
+  padding-inline: var(--chat-text-inset);
+  box-sizing: border-box
+}
+
+.portfolio-chat__exchange {
   display: flex;
   flex-direction: column;
   gap: .75rem;
-  margin-bottom: 1rem;
-  padding-inline: 12px 16px;
-  overflow: hidden
+  flex-shrink: 0;
+  padding-inline: var(--chat-text-inset);
+  box-sizing: border-box
 }
 
 .portfolio-chat__question {
   align-self: flex-end;
+  flex-shrink: 0;
   max-width: 85%;
   padding: 6px 12px;
   border: .5px solid rgba(255, 255, 255, .1);
   border-radius: 12px;
   background: linear-gradient(90deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, .3)), linear-gradient(90deg, rgba(0, 0, 0, .4), rgba(0, 0, 0, .4));
-  font-size: .875rem;
-  line-height: 1.357;
+  font-size: 1rem;
+  line-height: 1.5;
   color: rgba(255, 255, 255, .8);
   word-break: break-word
 }
 
 .portfolio-chat__answer {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto
+  flex-shrink: 0
 }
 
 .portfolio-chat__answer p,
 .portfolio-chat__answer ol,
 .portfolio-chat__answer ul,
 .portfolio-chat__answer li,
-.portfolio-chat__answer em {
-  font-size: .875rem;
-  line-height: 1.357;
+.portfolio-chat__answer em,
+.portfolio-chat__answer a {
+  font-size: 1rem;
+  line-height: 1.5;
   color: rgba(255, 255, 255, .9);
   text-shadow: 0 1px 1px rgba(0, 0, 0, .2), 0 1px 10px rgba(0, 0, 0, .15);
   margin-top: 0
+}
+
+.portfolio-chat__answer a {
+  color: rgba(255, 255, 255, .95);
+  text-decoration: underline;
+  text-underline-offset: 2px
 }
 
 .portfolio-chat__answer p {
@@ -4321,7 +4507,8 @@ body:has(.experimental-home),
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  justify-content: flex-start
+  justify-content: flex-start;
+  flex-shrink: 0
 }
 
 .portfolio-chat__links:empty {
@@ -4329,40 +4516,48 @@ body:has(.experimental-home),
 }
 
 .portfolio-chat__links a {
-  font-size: .75rem;
+  font-size: .875rem;
   color: rgba(255, 255, 255, .8);
   text-decoration: underline;
   text-underline-offset: 2px
 }
 
 .portfolio-chat__composer {
-  flex-shrink: 0
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex-shrink: 0;
+  width: 100%;
+  max-width: var(--chat-input-width);
+  margin-inline: auto;
+  margin-top: 1rem
 }
 
 .portfolio-chat__form {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  width: 100%;
+  min-height: 100px;
   margin: 0;
   opacity: 0;
-  transform: translateY(12px);
-  transition: opacity 300ms ease-in, transform 300ms ease-in
+  transition: opacity 400ms ease-in
 }
 
 .portfolio-chat__form.is-visible {
-  opacity: 1;
-  transform: translateY(0)
+  opacity: 1
 }
 
 .portfolio-chat__input-wrap {
-  position: relative
+  position: relative;
+  isolation: isolate;
+  min-height: 100px
 }
 
 .portfolio-chat__input-glow {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: calc(100% + 12px);
-  height: 108px;
-  transform: translate(-50%, -46%);
-  border-radius: 36px;
+  inset: -14px;
+  border-radius: 46px;
   background: linear-gradient(135deg, #f3b38e 0%, #d75dce 35%, #5a98fe 70%, #f3b38e 100%);
   opacity: 0;
   filter: blur(10px);
@@ -4377,20 +4572,29 @@ body:has(.experimental-home),
 }
 
 .portfolio-chat__input-shell {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-  height: 100px;
   box-sizing: border-box;
-  padding: 24px 16px 16px 28px;
+  height: 100px;
+  max-height: 50px;
+  overflow: hidden;
+  padding: 24px var(--chat-text-inset) 16px var(--chat-text-inset);
   border: 1px solid #fff;
   border-radius: 32px;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .05) 100%), rgba(255, 255, 255, .92);
   box-shadow: 0 2px 4px rgba(0, 0, 0, .4);
-  transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease
+  transition: max-height 400ms ease-in, background 300ms ease, border-color 300ms ease, box-shadow 300ms ease
+}
+
+.portfolio-chat__form.is-visible .portfolio-chat__input-shell {
+  max-height: 100px
 }
 
 .portfolio-chat.is-focused .portfolio-chat__input-shell,
@@ -4413,6 +4617,13 @@ body:has(.experimental-home),
 
 .portfolio-chat.is-focused:not(.is-filled) .portfolio-chat__input-shell input {
   opacity: .7
+}
+
+@media (hover:hover) and (pointer:fine) {
+  .portfolio-chat.is-focused:not(.is-filled) .portfolio-chat__input-wrap:hover .portfolio-chat__input-shell input,
+  .portfolio-chat__input-wrap:hover .portfolio-chat__input-shell input {
+    opacity: 1
+  }
 }
 
 .portfolio-chat.is-filled .portfolio-chat__input-shell input {
@@ -4493,19 +4704,30 @@ body:has(.experimental-home),
 }
 
 .portfolio-chat__suggestions {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   justify-content: center;
+  min-height: 1.5625rem;
   margin-top: .75rem;
-  padding-inline: 4px
+  padding-inline: 4px;
+  visibility: hidden;
+  pointer-events: none
+}
+
+.portfolio-chat.is-focused .portfolio-chat__suggestions {
+  visibility: visible;
+  pointer-events: auto
 }
 
 .portfolio-chat__suggestion {
   padding: 3px 12px;
-  border: .5px solid rgba(255, 255, 255, .1);
+  border: none;
   border-radius: 12px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, .2) 0%, rgba(255, 255, 255, .04) 100%);
+  background: linear-gradient(180deg, rgba(255, 255, 255, .14) 0%, rgba(255, 255, 255, .08) 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .1);
   color: rgba(255, 255, 255, .8);
   font: inherit;
   font-size: .75rem;

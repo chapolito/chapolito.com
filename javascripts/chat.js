@@ -1,4 +1,31 @@
 const conversationHistory = [];
+let activeExchange = null;
+
+function createExchange(questionText) {
+  var thread = document.getElementById('chat-thread');
+  if (!thread) return null;
+
+  var article = document.createElement('article');
+  article.className = 'portfolio-chat__exchange';
+
+  var answerEl = document.createElement('div');
+  answerEl.className = 'portfolio-chat__answer';
+  answerEl.setAttribute('aria-live', 'polite');
+
+  var linksEl = document.createElement('div');
+  linksEl.className = 'portfolio-chat__links';
+
+  var questionEl = document.createElement('div');
+  questionEl.className = 'portfolio-chat__question';
+  questionEl.textContent = questionText;
+
+  article.appendChild(questionEl);
+  article.appendChild(answerEl);
+  article.appendChild(linksEl);
+  thread.appendChild(article);
+
+  return { article: article, answerEl: answerEl, linksEl: linksEl, questionEl: questionEl };
+}
 
 function splitWordIntoSubtokens(word) {
   var apostrophe = word.indexOf("'");
@@ -68,26 +95,34 @@ var INTRO_CHUNKS = tokenizeSegment(
   false
 ).concat(tokenizeSegment(' Would you like to interview me?', true));
 
-function hideIntro() {
+function persistIntroInThread() {
   var introEl = document.getElementById('chat-intro');
+  var thread = document.getElementById('chat-thread');
+  if (!introEl || !thread || introEl.dataset.persisted === 'true') return;
+  thread.insertBefore(introEl, thread.firstChild);
+  introEl.classList.add('portfolio-chat__intro--thread');
+  introEl.dataset.persisted = 'true';
+}
+
+function showConversationPanel() {
   var conversationEl = document.getElementById('chat-conversation');
   var chatEl = document.getElementById('portfolio-chat');
-  if (introEl) introEl.classList.add('is-hidden');
+  persistIntroInThread();
   if (conversationEl) conversationEl.hidden = false;
   if (chatEl) chatEl.classList.add('is-responding');
 }
 
 function showUserQuestion(text) {
-  var questionEl = document.getElementById('chat-question');
-  var responseEl = document.getElementById('chat-response');
-  var linksEl = document.getElementById('chat-links');
+  var thread = document.getElementById('chat-thread');
   var root = document.querySelector('.experimental-home');
-  hideIntro();
+  var isFirstExchange = !thread || thread.children.length === 0;
+
+  showConversationPanel();
   if (root) root.classList.add('is-loaded');
-  scrollToTop();
-  if (questionEl) questionEl.textContent = text;
-  if (responseEl) responseEl.innerHTML = '';
-  if (linksEl) linksEl.innerHTML = '';
+  if (isFirstExchange) scrollToTop();
+
+  activeExchange = createExchange(text);
+  requestAnimationFrame(scrollConversationToBottom);
 }
 
 function syncInputState() {
@@ -102,7 +137,7 @@ function setChatFocused(isFocused) {
   var suggestionsEl = document.getElementById('chat-suggestions');
   if (!chatEl) return;
   chatEl.classList.toggle('is-focused', isFocused);
-  if (suggestionsEl) suggestionsEl.hidden = !isFocused;
+  if (suggestionsEl) suggestionsEl.setAttribute('aria-hidden', isFocused ? 'false' : 'true');
   syncInputState();
 }
 
@@ -116,12 +151,20 @@ function replaySuggestionAnimation() {
 }
 
 function getTokenDelay(index, chunk, prevChunk) {
-  if (index < 10) {
-    return 12 + Math.floor(Math.random() * 28);
+  if (chunk.text === '.' && index === 6) {
+    return 600;
+  }
+
+  if (chunk.text === '.' && index === 43) {
+    return 400;
+  }
+
+  if (index <= 6) {
+    return 60 + Math.floor(Math.random() * 50);
   }
 
   if (index < 18) {
-    return 24 + Math.floor(Math.random() * 40);
+    return 28 + Math.floor(Math.random() * 36);
   }
 
   if (prevChunk && /^[.?!]$/.test(prevChunk.text)) {
@@ -189,19 +232,44 @@ function showInput(onComplete) {
 
   function onFormTransitionEnd(e) {
     if (e.target !== form) return;
-    if (e.propertyName !== 'opacity' && e.propertyName !== 'transform') return;
+    if (e.propertyName !== 'opacity') return;
     form.removeEventListener('transitionend', onFormTransitionEnd);
     finish();
   }
 
   form.addEventListener('transitionend', onFormTransitionEnd);
-  window.setTimeout(finish, 350);
+  window.setTimeout(finish, 450);
 }
 
 function scrollToTop() {
   window.scrollTo(0, 0);
   document.documentElement.scrollTop = 0;
   document.body.scrollTop = 0;
+}
+
+function scrollConversationToBottom() {
+  var conversationEl = document.getElementById('chat-conversation');
+  if (!conversationEl || conversationEl.hidden) return;
+  conversationEl.scrollTop = conversationEl.scrollHeight;
+}
+
+function initConversationScroll() {
+  var conversationEl = document.getElementById('chat-conversation');
+  if (!conversationEl) return;
+
+  conversationEl.addEventListener('wheel', function (e) {
+    if (conversationEl.hidden) return;
+
+    var maxScroll = Math.max(0, conversationEl.scrollHeight - conversationEl.clientHeight);
+    if (maxScroll <= 0) return;
+
+    var atTop = conversationEl.scrollTop <= 0;
+    var atBottom = conversationEl.scrollTop + conversationEl.clientHeight >= conversationEl.scrollHeight - 1;
+
+    if ((e.deltaY < 0 && atTop) || (e.deltaY > 0 && atBottom)) {
+      e.preventDefault();
+    }
+  }, { passive: false });
 }
 
 function showWork(onComplete) {
@@ -257,12 +325,16 @@ async function sendMessage(userText) {
     throw new Error('Something went wrong.');
   }
 
+  if (!activeExchange) {
+    throw new Error('Something went wrong.');
+  }
+
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let fullText = '';
 
-  const responseEl = document.getElementById('chat-response');
-  const linksEl = document.getElementById('chat-links');
+  const responseEl = activeExchange.answerEl;
+  const linksEl = activeExchange.linksEl;
   responseEl.innerHTML = '';
   linksEl.innerHTML = '';
 
@@ -274,6 +346,7 @@ async function sendMessage(userText) {
     const { text, links } = parseLinks(fullText);
     responseEl.innerHTML = renderMarkdown(text);
     renderLinks(links, linksEl);
+    scrollConversationToBottom();
   }
 
   conversationHistory.push({ role: 'assistant', content: fullText });
@@ -314,12 +387,29 @@ function preprocessMarkdown(text) {
   return text.replace(/(?<=\S)\s+(?=\d+\.\s)/g, '\n');
 }
 
+function sanitizeLinkUrl(url) {
+  var trimmed = url.trim();
+  if (/^https?:\/\//i.test(trimmed) || /^mailto:/i.test(trimmed)) {
+    return trimmed.replace(/"/g, '&quot;');
+  }
+  return null;
+}
+
+function renderInlineMarkdown(text) {
+  return escapeHtml(preprocessMarkdown(text))
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, function (_, label, url) {
+      var safeUrl = sanitizeLinkUrl(url);
+      if (!safeUrl) return '[' + label + '](' + url + ')';
+      return '<a href="' + safeUrl + '">' + label + '</a>';
+    })
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+}
+
 function renderMarkdown(text) {
   if (!text) return '';
 
-  const html = escapeHtml(preprocessMarkdown(text))
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/(?<!\*)\*([^*\n]+)\*(?!\*)/g, '<em>$1</em>');
+  const html = renderInlineMarkdown(text);
 
   const lines = html.split('\n');
   const blocks = [];
@@ -372,21 +462,22 @@ function runLoadSequence() {
 
   playIntro(function () {
     window.setTimeout(function () {
-      showWork(function () {
-        showInput();
+      showInput(function () {
+        showWork();
       });
-    }, 400);
+    }, 200);
   });
 }
 
 document.addEventListener('DOMContentLoaded', function () {
   const form = document.getElementById('chat-form');
   const input = document.getElementById('chat-input');
-  const responseEl = document.getElementById('chat-response');
+  const threadEl = document.getElementById('chat-thread');
   const chatEl = document.getElementById('portfolio-chat');
-  if (!form || !input || !responseEl || !chatEl) return;
+  if (!form || !input || !threadEl || !chatEl) return;
 
   runLoadSequence();
+  initConversationScroll();
 
   input.addEventListener('input', syncInputState);
 
@@ -417,6 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   form.addEventListener('submit', function (e) {
     e.preventDefault();
+    e.stopPropagation();
     handleChatSubmit();
   });
 
@@ -432,9 +524,10 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
       await sendMessage(text);
     } catch (err) {
-      showUserQuestion(text);
-      responseEl.innerHTML = '';
-      responseEl.textContent = err.message || 'Something went wrong.';
+      if (activeExchange) {
+        activeExchange.answerEl.textContent = err.message || 'Something went wrong.';
+        scrollConversationToBottom();
+      }
     } finally {
       input.disabled = false;
       input.focus();
