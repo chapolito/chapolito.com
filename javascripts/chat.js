@@ -93,7 +93,7 @@ function tokenizeSegment(text, bold) {
 var INTRO_CHUNKS = tokenizeSegment(
   "Hi, I'm Jesse. After 20 years designing consumer products, including nine at Meta, I'm sidestepping to focus on consumer AI. ",
   false
-).concat(tokenizeSegment(' Would you like to interview me?', true));
+).concat(tokenizeSegment(' What would you like to know?', true));
 
 function persistIntroInThread() {
   var introEl = document.getElementById('chat-intro');
@@ -125,10 +125,39 @@ function showUserQuestion(text) {
   requestAnimationFrame(scrollConversationToBottom);
 }
 
+function getTextareaMaxHeight(textarea) {
+  var shell = textarea.closest('.portfolio-chat__input-shell');
+  if (!shell) return null;
+  var shellStyles = window.getComputedStyle(shell);
+  return shell.clientHeight
+    - parseFloat(shellStyles.paddingTop)
+    - parseFloat(shellStyles.paddingBottom);
+}
+
+function syncTextareaHeight(textarea) {
+  if (!textarea) return;
+  var maxHeight = getTextareaMaxHeight(textarea);
+  if (maxHeight == null) return;
+
+  textarea.style.height = 'auto';
+  var scrollHeight = textarea.scrollHeight;
+
+  if (scrollHeight <= maxHeight) {
+    textarea.style.height = scrollHeight + 'px';
+    textarea.style.overflowY = 'hidden';
+    textarea.scrollTop = 0;
+  } else {
+    textarea.style.height = maxHeight + 'px';
+    textarea.style.overflowY = 'auto';
+    textarea.scrollTop = textarea.scrollHeight;
+  }
+}
+
 function syncInputState() {
   var chatEl = document.getElementById('portfolio-chat');
   var input = document.getElementById('chat-input');
   if (!chatEl || !input) return;
+  syncTextareaHeight(input);
   chatEl.classList.toggle('is-filled', input.value.trim().length > 0);
 }
 
@@ -139,6 +168,45 @@ function setChatFocused(isFocused) {
   chatEl.classList.toggle('is-focused', isFocused);
   if (suggestionsEl) suggestionsEl.setAttribute('aria-hidden', isFocused ? 'false' : 'true');
   syncInputState();
+  if (isFocused) {
+    requestAnimationFrame(fitSuggestionPills);
+  }
+}
+
+var mobileSuggestionsMq = window.matchMedia('(max-width: 47.99em)');
+
+function fitSuggestionPills() {
+  var container = document.getElementById('chat-suggestions');
+  if (!container) return;
+
+  var pills = container.querySelectorAll('.portfolio-chat__suggestion');
+  pills.forEach(function (pill) {
+    pill.hidden = false;
+  });
+
+  if (!mobileSuggestionsMq.matches) return;
+
+  var chatEl = document.getElementById('portfolio-chat');
+  if (!chatEl || !chatEl.classList.contains('is-focused')) return;
+
+  var styles = window.getComputedStyle(container);
+  var available = container.clientWidth
+    - parseFloat(styles.paddingLeft)
+    - parseFloat(styles.paddingRight);
+  var gap = parseFloat(styles.gap) || parseFloat(styles.columnGap) || 8;
+  var used = 0;
+
+  pills.forEach(function (pill, index) {
+    var pillWidth = pill.getBoundingClientRect().width;
+    var needed = pillWidth + (index > 0 ? gap : 0);
+
+    if (used + needed <= available + 0.5) {
+      pill.hidden = false;
+      used += needed;
+    } else {
+      pill.hidden = true;
+    }
+  });
 }
 
 function replaySuggestionAnimation() {
@@ -148,6 +216,7 @@ function replaySuggestionAnimation() {
     void button.offsetWidth;
     button.style.animation = '';
   });
+  requestAnimationFrame(fitSuggestionPills);
 }
 
 function getTokenDelay(index, chunk, prevChunk) {
@@ -479,7 +548,36 @@ document.addEventListener('DOMContentLoaded', function () {
   runLoadSequence();
   initConversationScroll();
 
+  var resizeSuggestionTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeSuggestionTimer);
+    resizeSuggestionTimer = window.setTimeout(fitSuggestionPills, 100);
+  });
+
+  if (mobileSuggestionsMq.addEventListener) {
+    mobileSuggestionsMq.addEventListener('change', fitSuggestionPills);
+  } else if (mobileSuggestionsMq.addListener) {
+    mobileSuggestionsMq.addListener(fitSuggestionPills);
+  }
+
+  var inputShell = document.querySelector('.portfolio-chat__input-shell');
+
   input.addEventListener('input', syncInputState);
+
+  if (inputShell) {
+    inputShell.addEventListener('mousedown', function (e) {
+      if (e.target.closest('.portfolio-chat__submit')) return;
+      e.preventDefault();
+      input.focus();
+    });
+  }
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleChatSubmit();
+    }
+  });
 
   input.addEventListener('focus', function () {
     setChatFocused(true);
@@ -517,7 +615,11 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!text) return;
 
     input.value = '';
+    input.style.height = 'auto';
+    input.style.overflowY = 'hidden';
+    input.scrollTop = 0;
     input.disabled = true;
+    syncInputState();
     setChatFocused(false);
     showUserQuestion(text);
 
