@@ -1276,7 +1276,7 @@ header.is-scrolled {
   display: block;
   width: 1.375rem;
   height: 2px;
-  background-color: #9AA5B4;
+  background-color: rgba(0, 0, 0, 0.6);
   border-radius: 1px
 }
 
@@ -3757,6 +3757,19 @@ html.horizon-page #main {
   display: block
 }
 
+.horizon-case-study .horizon-media>[class*='col-']:not(.caption) {
+  -moz-border-radius: 40px;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  overflow: hidden
+}
+
+.horizon-case-study .horizon-media video {
+  -moz-border-radius: 40px;
+  -webkit-border-radius: 40px;
+  border-radius: 40px
+}
+
 .horizon-case-study .highlights-label {
   margin-bottom: 0.25rem
 }
@@ -3821,6 +3834,19 @@ html.horizon-page #main {
 
 .quest-vr-case-study .quest-vr-media {
   margin-top: 0
+}
+
+.quest-vr-case-study .quest-vr-media>[class*='col-']:not(.caption) {
+  -moz-border-radius: 40px;
+  -webkit-border-radius: 40px;
+  border-radius: 40px;
+  overflow: hidden
+}
+
+.quest-vr-case-study .quest-vr-media video {
+  -moz-border-radius: 40px;
+  -webkit-border-radius: 40px;
+  border-radius: 40px
 }
 
 .quest-for-business-case-study .quest-for-business-hero-image {
