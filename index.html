@@ -16,7 +16,6 @@
       window.jQuery || document.write('<script src="/javascripts/vendor/jquery-2.2.0.min.js"><\/script>')
     </script>
     <script src="/javascripts/all.js" type="text/javascript"></script>
-    <script src="/javascripts/chat.js" type="text/javascript"></script>
   </head>
   <body>
     <div id='main'>
@@ -83,39 +82,32 @@
             </div>
           </div>
         </main>
-        <aside class='portfolio-chat' id='portfolio-chat' aria-label='Portfolio assistant'>
+        <aside class='portfolio-chat experimental-home-footer'>
           <div class='portfolio-chat__backdrop' aria-hidden='true'>
-            <div class='portfolio-chat__blur'></div>
+            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--1'></div>
+            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--2'></div>
+            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--3'></div>
+            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--4'></div>
+            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--5'></div>
             <div class='portfolio-chat__gradient'></div>
           </div>
           <div class='portfolio-chat__content'>
-            <div class='portfolio-chat__conversation' id='chat-conversation' hidden>
-              <div class='portfolio-chat__thread' id='chat-thread'></div>
+            <div class='experimental-home-footer__identity'>
+              <a class='experimental-home-footer__logo' href='/'>
+                <img src='/images/chapolito-logo-footer.svg' alt='Chapolito' width='97' height='31' />
+              </a>
+              <p class='experimental-home-footer__details'>
+                <span class='experimental-home-footer__name'>Jesse O'Chapo</span>
+                <span class='experimental-home-footer__sep' aria-hidden='true'>·</span>
+                <span class='experimental-home-footer__title'>Product Designer</span>
+                <span class='experimental-home-footer__sep' aria-hidden='true'>·</span>
+                <span class='experimental-home-footer__location'>Santa Cruz, CA</span>
+              </p>
             </div>
-            <div class='portfolio-chat__composer'>
-              <p class='portfolio-chat__intro' id='chat-intro' aria-live='polite'></p>
-              <form class='portfolio-chat__form' id='chat-form'>
-                <label class='visually-hidden' for='chat-input'>Ask Jesse</label>
-                <div class='portfolio-chat__input-wrap'>
-                  <div class='portfolio-chat__input-glow' aria-hidden='true'></div>
-                  <div class='portfolio-chat__input-shell'>
-                    <textarea id='chat-input' placeholder='Ask Jesse' autocomplete='off' rows='1'></textarea>
-                    <button type='submit' class='portfolio-chat__submit' aria-label='Send message'>
-                      <img class='portfolio-chat__submit-icon portfolio-chat__submit-icon--default' src='/images/chat-send-button.svg' alt='' width='32' height='32' />
-                      <img class='portfolio-chat__submit-icon portfolio-chat__submit-icon--active' src='/images/chat-send-button-active.svg' alt='' width='32' height='32' />
-                      <img class='portfolio-chat__submit-icon portfolio-chat__submit-icon--filled' src='/images/chat-send-button-filled.svg' alt='' width='52' height='52' />
-                    </button>
-                  </div>
-                </div>
-              </form>
-              <div class='portfolio-chat__suggestions' id='chat-suggestions' aria-hidden='true'>
-                <button type='button' class='portfolio-chat__suggestion' data-suggestion='Tell me more about your background'>Tell me more</button>
-                <button type='button' class='portfolio-chat__suggestion' data-suggestion='Where have you worked?'>Career history</button>
-                <button type='button' class='portfolio-chat__suggestion' data-suggestion='What are your strengths as a designer?'>Strengths</button>
-                <button type='button' class='portfolio-chat__suggestion' data-suggestion='What projects have you worked on?'>Projects</button>
-                <button type='button' class='portfolio-chat__suggestion' data-suggestion='Do you have any testimonials?'>Testimonials</button>
-              </div>
-            </div>
+            <nav class='experimental-home-footer__nav' aria-label='Site'>
+              <a class='experimental-home-footer__nav-link is-active' href='/'>Portfolio</a>
+              <a class='experimental-home-footer__nav-link' href='/about'>About</a>
+            </nav>
           </div>
         </aside>
         <script>
@@ -125,6 +117,15 @@
           })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
           ga('create', 'UA-4247086-1', 'auto');
           ga('send', 'pageview');
+        </script>
+        <script>
+          document.addEventListener('DOMContentLoaded', function () {
+            var root = document.querySelector('.experimental-home');
+            if (!root) return;
+            requestAnimationFrame(function () {
+              root.classList.add('is-loaded');
+            });
+          });
         </script>
         <script>
           (function () {

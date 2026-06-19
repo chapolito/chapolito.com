@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jesse O'Chapo — Work</title>
+    <link rel="stylesheet" href="shared/tokens.css" />
+    <link rel="stylesheet" href="shared/project.css" />
+    <link rel="stylesheet" href="shared/dock.css" />
+    <link rel="stylesheet" href="shared/detail-view.css" />
+  </head>
+  <body class="u-grain">
+    <div class="u-glow" aria-hidden="true"></div>
+
+    <main class="detail-page" id="page">
+      <button class="detail-back detail-view__back" id="close" type="button" aria-label="Back to home">
+        <svg class="detail-back__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="detail-back__label">Back to Home</span>
+      </button>
+      <div class="pj-doc detail-split" id="doc"></div>
+    </main>
+
+    <aside class="dock" aria-label="Site">
+      <div class="dock__backdrop" aria-hidden="true">
+        <div class="dock__blur dock__blur--1"></div>
+        <div class="dock__blur dock__blur--2"></div>
+        <div class="dock__blur dock__blur--3"></div>
+        <div class="dock__blur dock__blur--4"></div>
+        <div class="dock__blur dock__blur--5"></div>
+        <div class="dock__gradient"></div>
+      </div>
+      <div class="dock__content">
+        <a class="dock__logo" id="dock-home" href="v1/" aria-label="Chapolito">
+          <img src="../images/chapolito-logo-footer.svg" alt="Chapolito" width="97" height="31" />
+        </a>
+        <p class="dock__details">
+          <span class="dock__name">Jesse O'Chapo</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__title">Principal Product Designer</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__loc">Santa Cruz, CA</span>
+        </p>
+        <nav class="dock__nav" aria-label="Site navigation">
+          <a class="dock__link is-active" id="dock-portfolio" href="v1/">Portfolio</a>
+          <a class="dock__link" href="about/">About</a>
+        </nav>
+      </div>
+    </aside>
+
+    <script src="shared/projects.js"></script>
+    <script src="shared/render.js"></script>
+    <script>
+      (function () {
+        var params = new URLSearchParams(location.search);
+        var id = params.get("id");
+        var from = params.get("from") || "v1";
+        var home = from + "/";
+        var doc = document.getElementById("doc");
+        var closeBtn = document.getElementById("close");
+
+        document.getElementById("dock-home").href = home;
+        document.getElementById("dock-portfolio").href = home;
+
+        if (from === "v1" && id && window.getProject(id)) {
+          location.replace("/concepts/v1/" + encodeURIComponent(id) + "/");
+          return;
+        }
+
+        closeBtn.addEventListener("click", function () {
+          if (window.history.length > 1) history.back();
+          else location.href = home;
+        });
+
+        var p = window.getProject(id);
+        if (!p) {
+          doc.className = "pg-missing";
+          doc.innerHTML =
+            "<p style='padding:22vh var(--pad);text-align:center;color:var(--ink-mut)'>That project isn't here. <a href='" +
+            home +
+            "' style='color:var(--pp)'>Back to all work</a></p>";
+          return;
+        }
+
+        document.title = p.title + " · Jesse O'Chapo";
+        window.renderProject(doc, p);
+        window.initInview(doc);
+        doc.querySelectorAll(".pj-sec, .pj-cta").forEach(function (n) {
+          n.classList.add("reveal");
+        });
+        window.initReveal(doc);
+
+        requestAnimationFrame(function () {
+          document.body.classList.add("is-detail-enter");
+        });
+      })();
+    </script>
+  </body>
+</html>

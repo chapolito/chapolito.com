@@ -1,0 +1,24 @@
+/* Neue Plak Wide Bold — Figma: family "Neue Plak", style "Wide Bold".
+   The Wide cut is a separate face; map it explicitly so the browser
+   never synthesizes bold from regular-width Plak. */
+@font-face {
+  font-family: "Neue Plak Wide";
+  src:
+    local("Neue Plak Wide Bold"),
+    local("NeuePlak-WideBold"),
+    local("Neue Plak Wide"),
+    local("NeuePlak-Wide");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Neue Plak Wide";
+  src:
+    local("Neue Plak Wide Bold"),
+    local("NeuePlak-WideBold");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
