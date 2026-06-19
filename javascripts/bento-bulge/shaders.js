@@ -15,10 +15,6 @@ uniform vec2 uCursorCenter;
 uniform vec2 uCursorRadius;
 uniform float uCursorStrength;
 uniform float uCursorWeight;
-uniform float uOrganicMix;
-uniform float uOrganicSpeed;
-uniform float uOrganicScale;
-uniform float uTime;
 uniform float uProjectSpread;
 uniform float uCursorSpread;
 uniform float uHillFlatness;
@@ -43,18 +39,10 @@ float hillRadialNorm(vec2 uv, vec2 center, vec2 radius, float spreadScale) {
   return clamp(length(d), 0.0, 1.0);
 }
 
-float organicNoise(vec2 p, float t) {
-  float a = sin(p.x * uOrganicScale * 1.7 + t * 0.31) * sin(p.y * uOrganicScale * 1.3 + t * 0.27);
-  float b = sin(p.x * uOrganicScale * 0.9 - t * 0.19 + 1.4) * sin(p.y * uOrganicScale * 1.1 + t * 0.23 + 0.8);
-  return (a + b) * 0.5;
-}
-
 float heightField(vec2 uv) {
   float project = smoothHill(uv, uProjectCenter, uProjectRadius, uProjectSpread) * uProjectStrength;
   float cursor = smoothHill(uv, uCursorCenter, uCursorRadius, uCursorSpread * 1.15) * uCursorStrength;
-  float interactive = project * uProjectWeight + cursor * uCursorWeight;
-  float organic = organicNoise(uv, uTime * uOrganicSpeed) * uOrganicMix * interactive;
-  return interactive + organic;
+  return project * uProjectWeight + cursor * uCursorWeight;
 }
 
 void main() {
@@ -106,23 +94,9 @@ uniform sampler2D uVideo5;
 uniform sampler2D uVideo6;
 uniform sampler2D uVideo7;
 
-uniform float uProjectWeight;
-uniform float uCursorWeight;
-uniform vec2 uProjectCenter;
-uniform vec2 uProjectRadius;
-uniform float uProjectStrength;
-uniform vec2 uCursorCenter;
-uniform vec2 uCursorRadius;
-uniform float uCursorStrength;
-uniform float uOrganicMix;
-uniform float uOrganicSpeed;
-uniform float uOrganicScale;
-uniform float uTime;
-uniform float uProjectSpread;
-uniform float uCursorSpread;
-uniform float uHillFlatness;
 uniform float uDimOpacity;
 uniform float uCellDimAmount[${MAX_CELLS}];
+uniform float uCellVeilFromTop[${MAX_CELLS}];
 uniform float uOverlayDim;
 uniform float uShowWireframe;
 uniform float uSubdivisions;
@@ -130,33 +104,6 @@ uniform float uSubdivisions;
 varying vec2 vUv;
 varying float vHeight;
 varying float vBulgeAmount;
-
-// Raised cosine dome — zero slope at peak and at falloff edge, no hard plateau.
-float smoothHill(vec2 p, vec2 center, vec2 radius, float spreadScale) {
-  vec2 d = (p - center) / max(radius * spreadScale, vec2(0.0001));
-  float r = clamp(length(d), 0.0, 1.0);
-  float h = 0.5 * (1.0 + cos(r * 3.14159265));
-  return pow(h, max(uHillFlatness, 0.3));
-}
-
-float hillRadialNorm(vec2 uv, vec2 center, vec2 radius, float spreadScale) {
-  vec2 d = (uv - center) / max(radius * spreadScale, vec2(0.0001));
-  return clamp(length(d), 0.0, 1.0);
-}
-
-float organicNoise(vec2 p, float t) {
-  float a = sin(p.x * uOrganicScale * 1.7 + t * 0.31) * sin(p.y * uOrganicScale * 1.3 + t * 0.27);
-  float b = sin(p.x * uOrganicScale * 0.9 - t * 0.19 + 1.4) * sin(p.y * uOrganicScale * 1.1 + t * 0.23 + 0.8);
-  return (a + b) * 0.5;
-}
-
-float heightField(vec2 uv) {
-  float project = smoothHill(uv, uProjectCenter, uProjectRadius, uProjectSpread) * uProjectStrength;
-  float cursor = smoothHill(uv, uCursorCenter, uCursorRadius, uCursorSpread * 1.15) * uCursorStrength;
-  float interactive = project * uProjectWeight + cursor * uCursorWeight;
-  float organic = organicNoise(uv, uTime * uOrganicSpeed) * uOrganicMix * interactive;
-  return interactive + organic;
-}
 
 float sdRoundedBox(vec2 p, vec2 b, float r) {
   vec2 q = abs(p) - b + vec2(r);
@@ -218,11 +165,14 @@ vec3 sampleVideoSlot(int slot, vec2 mediaUV) {
   return texture2D(uVideo7, mediaUV).rgb;
 }
 
-vec3 applyTileVeil(vec3 color, vec2 local) {
+vec3 applyLegibilityVeil(vec3 color, vec2 local, float strength, float fromTop) {
+  if (strength < 0.001) return color;
   float angle = 0.2617993877991494;
-  float t = clamp(local.x * sin(angle) + (1.0 - local.y) * cos(angle), 0.0, 1.0);
-  float veil = mix(0.72, 0.0, smoothstep(0.0, 0.5, t)) * 0.18;
-  return color * (1.0 - veil);
+  float t = fromTop > 0.5
+    ? clamp(local.x * sin(angle) + local.y * cos(angle), 0.0, 1.0)
+    : clamp(local.x * sin(angle) + (1.0 - local.y) * cos(angle), 0.0, 1.0);
+  float mask = mix(0.72, 0.0, smoothstep(0.0, 0.5, t));
+  return color * (1.0 - mask * strength);
 }
 
 void main() {
@@ -249,7 +199,6 @@ void main() {
     } else {
       color = sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0));
     }
-    color = applyTileVeil(color, local);
     alpha = 1.0;
   } else if (uUseAtlas > 0.5) {
     vec4 atlasSample = texture2D(uAtlas, uv);
@@ -260,6 +209,13 @@ void main() {
     if (idx < 0) discard;
     color = fakeCellColor(uv);
     alpha = 1.0;
+  }
+
+  if (idx >= 0) {
+    vec4 rect = uCellRects[idx];
+    vec2 local = (uv - rect.xy) / max(rect.zw, vec2(0.0001));
+    float veilStrength = vBulgeAmount > 0.001 ? uCellDimAmount[idx] : 0.0;
+    color = applyLegibilityVeil(color, local, veilStrength, uCellVeilFromTop[idx]);
   }
 
   float bulge = vBulgeAmount;

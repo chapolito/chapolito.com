@@ -13,6 +13,76 @@
   position: relative;
 }
 
+/* Full-viewport grid — no scroll; top and bottom bands split remaining height 50/50 */
+.bento-bulge-page.is-home {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.bento-bulge-page.is-home .stage {
+  height: 100%;
+  overflow: hidden;
+}
+
+.bento-bulge-page.is-home .home-portfolio {
+  height: 100%;
+  padding-bottom: 0;
+}
+
+.bento-bulge-page .grid {
+  box-sizing: border-box;
+  height: 100vh;
+  padding: 4px;
+  gap: 4px;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  grid-auto-rows: unset;
+}
+
+.bento-bulge-page .grid .tile[data-id="quest-people"]     { grid-column: 1 / 4; grid-row: 1; }
+.bento-bulge-page .grid .tile[data-id="horizon-chat"]     { grid-column: 4 / 7; grid-row: 1; }
+.bento-bulge-page .grid .tile[data-id="horizon-mobile"]   { grid-column: 1 / 3; grid-row: 2; }
+.bento-bulge-page .grid .tile[data-id="portal-voice"]     { grid-column: 3 / 5; grid-row: 2; }
+.bento-bulge-page .grid .tile[data-id="portal-household"] { grid-column: 5 / 7; grid-row: 2; }
+
+.bento-bulge-page .grid .tile {
+  min-height: 0;
+  min-width: 0;
+}
+
+@media (max-width: 1080px) {
+  .bento-bulge-page .grid {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    grid-auto-rows: unset;
+  }
+
+  .bento-bulge-page .grid .tile[data-id] {
+    grid-column: unset;
+    grid-row: unset;
+    aspect-ratio: unset;
+  }
+
+  .bento-bulge-page .grid .tile[data-id="quest-people"]     { grid-column: 1 / 4; grid-row: 1; }
+  .bento-bulge-page .grid .tile[data-id="horizon-chat"]     { grid-column: 4 / 7; grid-row: 1; }
+  .bento-bulge-page .grid .tile[data-id="horizon-mobile"]   { grid-column: 1 / 3; grid-row: 2; }
+  .bento-bulge-page .grid .tile[data-id="portal-voice"]     { grid-column: 3 / 5; grid-row: 2; }
+  .bento-bulge-page .grid .tile[data-id="portal-household"] { grid-column: 5 / 7; grid-row: 2; }
+}
+
+@media (max-width: 600px) {
+  .bento-bulge-page .grid {
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .bento-bulge-page .grid .tile[data-id="quest-people"]     { grid-column: 1 / 4; grid-row: 1; }
+  .bento-bulge-page .grid .tile[data-id="horizon-chat"]     { grid-column: 4 / 7; grid-row: 1; }
+  .bento-bulge-page .grid .tile[data-id="horizon-mobile"]   { grid-column: 1 / 3; grid-row: 2; }
+  .bento-bulge-page .grid .tile[data-id="portal-voice"]     { grid-column: 3 / 5; grid-row: 2; }
+  .bento-bulge-page .grid .tile[data-id="portal-household"] { grid-column: 5 / 7; grid-row: 2; }
+}
+
 .experimental-bento__surface,
 .grid--bulge .experimental-bento__surface {
   position: absolute;
@@ -94,11 +164,6 @@
   .bento-bulge-page .grid.grid--bulge-active .tile .tile__media video,
   .bento-bulge-page .grid.grid--bulge-active .tile .tile__media img {
     transform: none;
-  }
-
-  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__veil,
-  .bento-bulge-page .grid.grid--bulge-active .tile .tile__veil {
-    opacity: 0;
   }
 
   /* Overlay — dim WebGL canvas + tile labels (was 12%; bumped for visibility) */
@@ -208,15 +273,47 @@
 }
 
 .bento-bulge-page .tile__label {
-  pointer-events: none;
-  position: relative;
+  position: absolute;
+  left: clamp(14px, 1vw, 20px);
+  right: clamp(14px, 1vw, 20px);
+  bottom: clamp(12px, 1vw, 18px);
   z-index: 6;
-  transition: opacity 180ms ease;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(5px);
+  transition:
+    opacity var(--d-2, 180ms) var(--e-out, ease),
+    transform var(--d-2, 180ms) var(--e-out, ease),
+    filter var(--d-2, 180ms) var(--e-out, ease);
+}
+
+/* Bottom row — labels top-left (WebGL bulge reads upward from bottom edge) */
+.bento-bulge-page .grid .tile[data-id="horizon-mobile"] .tile__label,
+.bento-bulge-page .grid .tile[data-id="portal-voice"] .tile__label,
+.bento-bulge-page .grid .tile[data-id="portal-household"] .tile__label {
+  top: clamp(12px, 1vw, 18px);
+  bottom: auto;
+  transform: translateY(-10px);
+}
+
+/* Legibility gradients render in WebGL — hide DOM veils */
+.bento-bulge-page .grid.grid--bulge-active .tile .tile__veil {
+  display: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .bento-bulge-page .grid.grid--bulge-active:has(.tile.is-bulge-hovered) .tile:not(.is-bulge-hovered) .tile__label {
-    opacity: var(--bento-dim-opacity, 0.6);
+  .bento-bulge-page .grid.grid--bulge-active .tile.is-bulge-hovered,
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover {
+    z-index: 6;
+  }
+
+  .bento-bulge-page .grid.grid--bulge-active .tile.is-bulge-hovered .tile__label,
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__label,
+  .bento-bulge-page .grid.grid--bulge-active .tile.is-pressed .tile__label {
+    opacity: 1;
+    transform: none;
+    filter: none;
   }
 }
 

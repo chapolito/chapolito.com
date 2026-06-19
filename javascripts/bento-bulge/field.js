@@ -20,7 +20,6 @@ export function createBulgeField(params) {
     cursorRadius: { x: 0.05, y: 0.05 },
     cursorStrength: 0,
     bulgeAmount: 0,
-    time: 0,
     targetProjectCenter: { x: 0.5, y: 0.5 },
     targetProjectRadius: { x: 0.1, y: 0.1 },
     targetProjectStrength: 0,
@@ -101,8 +100,6 @@ export function updateBulgeField(field, params, dt) {
   for (let i = 0; i < field.cellDimAmounts.length; i++) {
     field.cellDimAmounts[i] = damp(field.cellDimAmounts[i], field.cellDimTargets[i], dimMorph, dt);
   }
-
-  field.time += dt;
 }
 
 export function isDimMorphing(field) {

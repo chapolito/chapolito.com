@@ -59,7 +59,11 @@ export function measureCells(container, dpr, options = {}) {
       hasVideo: Boolean(video),
       fitHeight,
       img,
-      video
+      video,
+      veilFromTop:
+        el.dataset.id === "horizon-mobile" ||
+        el.dataset.id === "portal-voice" ||
+        el.dataset.id === "portal-household"
     };
   });
 

@@ -225,8 +225,7 @@ export function initBentoBulge(options = {}) {
       isFieldMorphing(field) ||
       isDimMorphing(field) ||
       field.bulgeAmount > 0.01 ||
-      field.projectStrength > 0.01 ||
-      params.enableIdleOrganic
+      field.projectStrength > 0.01
     );
   }
 
@@ -310,10 +309,6 @@ export function initBentoBulge(options = {}) {
 
     const dt = Math.min((now - lastTime) / 1000, 0.05);
     lastTime = now;
-
-    if (!params.enableIdleOrganic && field.bulgeAmount < 0.01) {
-      field.time = 0;
-    }
 
     updateBulgeField(field, params, dt);
 

@@ -41,7 +41,8 @@ export function buildV1Grid(grid, projects) {
     }
 
     surface.appendChild(media);
-    surface.appendChild(document.createElement("div")).className = "tile__veil";
+    tile.appendChild(surface);
+    tile.appendChild(document.createElement("div")).className = "tile__veil";
 
     var label = document.createElement("div");
     label.className = "tile__label";
@@ -53,9 +54,8 @@ export function buildV1Grid(grid, projects) {
     title.textContent = p.title;
     label.appendChild(prod);
     label.appendChild(title);
-    surface.appendChild(label);
+    tile.appendChild(label);
 
-    tile.appendChild(surface);
     grid.appendChild(tile);
   });
 }

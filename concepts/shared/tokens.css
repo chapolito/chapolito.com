@@ -18,6 +18,10 @@
   --bg-3: #211b2c;
   --plum: #2a2130;
 
+  /* home vignette (Figma Website background — node 2407:46675) */
+  --home-vignette-mid: #151118;
+  --home-vignette-deep: #0a080c;
+
   /* ink */
   --ink: #ffffff;
   --ink-dim: #c4bed2;
@@ -136,7 +140,7 @@ button { font: inherit; }
   filter: blur(6px);
 }
 
-/* film grain (matches case-study deck feel) */
+/* film grain — PNG tile (SVG feTurbulence data-URIs don't paint as CSS backgrounds) */
 .u-grain::before,
 .u-grain::after {
   content: "";
@@ -144,19 +148,19 @@ button { font: inherit; }
   inset: 0;
   z-index: 9998;
   pointer-events: none;
+  background-image: url("/images/home-grain-tile.png");
+  background-repeat: repeat;
 }
 .u-grain::before {
-  opacity: 0.07;
+  opacity: 0.4;
   mix-blend-mode: overlay;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.78' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 180px 180px;
+  background-size: 200px 200px;
 }
 .u-grain::after {
   z-index: 9999;
-  opacity: 0.045;
+  opacity: 0.22;
   mix-blend-mode: soft-light;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.35' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)'/%3E%3C/svg%3E");
-  background-size: 96px 96px;
+  background-size: 120px 120px;
 }
 
 /* chapolito wordmark (continuity with the live site) */
