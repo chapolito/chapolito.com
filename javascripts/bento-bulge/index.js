@@ -7,12 +7,30 @@ import {
   isFieldMorphing,
   isDimMorphing
 } from "./field.js";
-import { createTextureManager, isVideoReady } from "./textures.js";
+import { createTextureManager } from "./textures.js";
 import { createSurface } from "./surface.js";
 import { createDialkit, initParams } from "./dialkit.js";
 import { createCustomCursor } from "./cursor.js";
+import { getEffectiveDpr } from "./dpr.js";
+import { createPerfMonitor, isPerfEnabled, noopPerf } from "./perf.js";
 
 let instance = null;
+let whenReadyResolve = null;
+
+const whenReadyPromise = new Promise((resolve) => {
+  whenReadyResolve = resolve;
+});
+
+export function getBulgeWhenReady() {
+  return whenReadyPromise;
+}
+
+function resolveWhenReady(api) {
+  if (whenReadyResolve) {
+    whenReadyResolve(api);
+    whenReadyResolve = null;
+  }
+}
 
 function canUseWebGL(params) {
   if (params.forceWebGL) return { ok: true };
@@ -47,12 +65,35 @@ function clearDomLayers(layout) {
   });
 }
 
+function promoteGridVideos(layout) {
+  const cells = layout.cells
+    .filter((cell) => cell.hasVideo && cell.video)
+    .sort((a, b) => b.width * b.height - a.width * a.height);
+
+  const immediate = 3;
+  const staggerMs = 100;
+
+  cells.forEach((cell, index) => {
+    const video = cell.video;
+    const start = () => {
+      video.preload = "auto";
+      video.play().catch(() => {});
+    };
+    if (index < immediate) {
+      start();
+    } else {
+      window.setTimeout(start, (index - immediate) * staggerMs + 500);
+    }
+  });
+}
+
 export function initBentoBulge(options = {}) {
   if (instance) instance.dispose();
 
   const bento = document.querySelector(options.bento || "#grid");
   const projectsEl = document.querySelector(options.projects || "#portfolio");
   const hoverClass = options.hoverClass || "is-bulge-hovered";
+  const onReady = options.onReady || (() => {});
   const cellOpts = {
     cellSelector: options.cellSelector || ".tile",
     imgSelector: options.imgSelector || ".tile__media img",
@@ -61,11 +102,14 @@ export function initBentoBulge(options = {}) {
 
   if (!bento || !projectsEl) {
     console.warn("[bento-bulge] missing grid container");
+    resolveWhenReady(null);
+    onReady(null);
     return null;
   }
 
   const params = initParams();
   params.cornerRadius = options.cornerRadius ?? params.cornerRadius ?? 8;
+  const perf = isPerfEnabled() ? createPerfMonitor() : noopPerf;
 
   const customCursor = createCustomCursor();
   let onParamsChange = function () {};
@@ -75,10 +119,13 @@ export function initBentoBulge(options = {}) {
     console.info("[bento-bulge] fallback:", capability.reason);
     const dialkit = createDialkit(document.body, params, () => onParamsChange());
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
-    return { dispose: () => { customCursor.dispose(); dialkit.dispose(); }, params };
+    const fallbackApi = { dispose: () => { customCursor.dispose(); dialkit.dispose(); perf.dispose(); }, params };
+    resolveWhenReady(fallbackApi);
+    onReady(fallbackApi);
+    return fallbackApi;
   }
 
-  const dpr = Math.min(window.devicePixelRatio || 1, params.dprCap ?? 2);
+  const dpr = getEffectiveDpr(params);
   let layout = measureCells(bento, dpr, cellOpts);
 
   if (layout.width < 1 || layout.height < 1) {
@@ -91,15 +138,19 @@ export function initBentoBulge(options = {}) {
     }
     console.warn("[bento-bulge] grid has no measurable size");
     const dialkit = createDialkit(document.body, params, () => onParamsChange());
-    return { dispose: () => { customCursor.dispose(); dialkit.dispose(); }, params, dialkit };
+    const failApi = { dispose: () => { customCursor.dispose(); dialkit.dispose(); perf.dispose(); }, params, dialkit };
+    resolveWhenReady(failApi);
+    onReady(failApi);
+    return failApi;
   }
 
-  const dialkit = createDialkit(document.body, params, () => onParamsChange());
+  promoteGridVideos(layout);
 
+  const dialkit = createDialkit(document.body, params, () => onParamsChange());
   const field = createBulgeField(params);
-  bento.classList.add("grid--bulge-active");
   const textureManager = createTextureManager(params.cornerRadius);
-  const initialVideoState = textureManager.syncVideoSlots(layout, params.enableVideos);
+  const maxVideos = () => params.maxConcurrentVideoTextures;
+  const initialVideoState = textureManager.syncVideoSlots(layout, params.enableVideos, maxVideos());
   textureManager.rebuildStatic(layout, dpr);
 
   let surface;
@@ -108,33 +159,175 @@ export function initBentoBulge(options = {}) {
   } catch (err) {
     console.error("[bento-bulge] WebGL surface failed:", err);
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
-    return { dispose: () => { customCursor.dispose(); dialkit.dispose(); }, params, dialkit };
+    const failApi = { dispose: () => { customCursor.dispose(); dialkit.dispose(); perf.dispose(); }, params, dialkit };
+    resolveWhenReady(failApi);
+    onReady(failApi);
+    return failApi;
   }
-
-  layout.cells.forEach((cell) => {
-    if (cell.img && !cell.img.complete) {
-      cell.img.addEventListener("load", () => {
-        textureManager.rebuildStatic(layout, dpr);
-        surface.render();
-      }, { once: true });
-    }
-    if (cell.video && cell.video.readyState < 2) {
-      cell.video.addEventListener("loadeddata", () => {
-        const videoState = textureManager.syncVideoSlotsAndAtlas(layout, dpr, params.enableVideos);
-        surface.updateVideoSlots(videoState);
-        surface.render();
-      }, { once: true });
-    }
-  });
 
   let activeCellData = null;
   let hoveredTileEl = null;
   let pointerInside = false;
   let overlayOpen = false;
-  let rafId = 0;
+  let rafScheduled = false;
+  let needsRender = false;
   let lastTime = performance.now();
   let running = true;
   let slowFrames = 0;
+  let handoffDone = false;
+  let readyFired = false;
+  let tabVisible = document.visibilityState === "visible";
+  let gridVisible = true;
+  let cachedRect = null;
+  let cachedRectTime = 0;
+
+  function isSystemActive() {
+    return running && tabVisible && gridVisible;
+  }
+
+  function getBentoRect() {
+    const now = performance.now();
+    if (!cachedRect || now - cachedRectTime > 32) {
+      cachedRect = bento.getBoundingClientRect();
+      cachedRectTime = now;
+    }
+    return cachedRect;
+  }
+
+  function invalidateRectCache() {
+    cachedRect = null;
+  }
+
+  function markDirty() {
+    if (!isSystemActive()) return;
+    if (needsRender) perf.recordCoalesce();
+    needsRender = true;
+    perf.recordDirty();
+    scheduleFrame();
+  }
+
+  function scheduleFrame() {
+    if (rafScheduled) return;
+    rafScheduled = true;
+    requestAnimationFrame(tick);
+  }
+
+  function wantsContinuousRender() {
+    if (overlayOpen) {
+      return (
+        isFieldMorphing(field) ||
+        field.bulgeAmount > 0.01 ||
+        field.projectStrength > 0.01
+      );
+    }
+    return (
+      pointerInside ||
+      isFieldMorphing(field) ||
+      isDimMorphing(field) ||
+      field.bulgeAmount > 0.01 ||
+      field.projectStrength > 0.01 ||
+      params.enableIdleOrganic
+    );
+  }
+
+  function pauseGridVideos() {
+    layout.cells.forEach((cell) => {
+      if (cell.video && !cell.video.paused) cell.video.pause();
+    });
+  }
+
+  function resumeGridVideos() {
+    if (!params.enableVideos) return;
+    layout.cells.forEach((cell) => {
+      if (cell.video && cell.video.paused) cell.video.play().catch(() => {});
+    });
+    markDirty();
+  }
+
+  function performHandoff() {
+    if (handoffDone) return;
+    handoffDone = true;
+    bento.classList.add("grid--bulge-active");
+    surface.canvas.classList.add("is-bulge-surface-ready");
+  }
+
+  function fireReady() {
+    if (readyFired) return;
+    readyFired = true;
+    performHandoff();
+    resolveWhenReady(api);
+    onReady(api);
+  }
+
+  function checkHandoff() {
+    if (handoffDone || readyFired) return;
+    const hasVideoTiles = layout.cells.some((cell) => cell.hasVideo);
+    const videosOk =
+      !hasVideoTiles ||
+      !params.enableVideos ||
+      textureManager.getSlotCount() > 0;
+    if (textureManager.hasAtlas() && videosOk) {
+      fireReady();
+    }
+  }
+
+  function drawFrame() {
+    if (!overlayOpen) {
+      const videoState = textureManager.syncVideoSlotsAndAtlas(
+        layout,
+        dpr,
+        params.enableVideos,
+        maxVideos()
+      );
+      surface.updateVideoSlots(videoState);
+    }
+    surface.updateFromField(field, params);
+    const frameStart = performance.now();
+    surface.render();
+    const frameMs = performance.now() - frameStart;
+    perf.recordRender(frameMs);
+    perf.update({
+      videos: layout.cells.filter((c) => c.hasVideo && c.video && !c.video.paused).length,
+      slots: textureManager.getSlotCount()
+    });
+
+    if (frameMs > 20) {
+      slowFrames += 1;
+      if (slowFrames >= 3 && params.maxConcurrentVideoTextures > 2) {
+        params.maxConcurrentVideoTextures = Math.max(2, params.maxConcurrentVideoTextures - 1);
+        slowFrames = 0;
+      }
+    } else {
+      slowFrames = 0;
+    }
+
+    checkHandoff();
+  }
+
+  function tick(now) {
+    rafScheduled = false;
+    if (!running || !isSystemActive()) return;
+
+    const dt = Math.min((now - lastTime) / 1000, 0.05);
+    lastTime = now;
+
+    if (!params.enableIdleOrganic && field.bulgeAmount < 0.01) {
+      field.time = 0;
+    }
+
+    updateBulgeField(field, params, dt);
+
+    const continuous = wantsContinuousRender();
+    const shouldDraw = continuous || needsRender;
+    if (!shouldDraw) return;
+
+    drawFrame();
+    needsRender = false;
+
+    if (continuous) {
+      scheduleFrame();
+    }
+  }
 
   function applyDimOpacityVar() {
     bento.style.setProperty("--bento-dim-opacity", String(params.dimOpacity));
@@ -144,8 +337,7 @@ export function initBentoBulge(options = {}) {
     dialkit.persist();
     applyDimOpacityVar();
     remeasure();
-    surface.updateFromField(field, params);
-    surface.render();
+    markDirty();
   }
 
   onParamsChange = handleParamsChange;
@@ -153,8 +345,14 @@ export function initBentoBulge(options = {}) {
 
   function remeasure() {
     layout = measureCells(bento, dpr, cellOpts);
+    invalidateRectCache();
     surface.resize(layout);
-    const videoState = textureManager.syncVideoSlotsAndAtlas(layout, dpr, params.enableVideos);
+    const videoState = textureManager.syncVideoSlotsAndAtlas(
+      layout,
+      dpr,
+      params.enableVideos,
+      maxVideos()
+    );
     surface.updateVideoSlots(videoState);
     surface.updateFromField(field, params);
   }
@@ -172,18 +370,12 @@ export function initBentoBulge(options = {}) {
     syncHoveredTileClass(null);
     setCellTarget(field, null, params, layout);
     setCursorTarget(field, { x: 0.5, y: 0.5 }, null, params, layout);
-    /* CSS owns overlay dim on the canvas; keep shader at full alpha to avoid double-dimming */
     surface.setOverlayDim(1);
     surface.canvas.style.opacity = open ? String(overlayDimAmount()) : "1";
     surface.updateFromField(field, params);
-    surface.render();
-    if (open) {
-      startLoop();
-    } else {
-      remeasure();
-      surface.render();
-      startLoop();
-    }
+    markDirty();
+    scheduleFrame();
+    if (!open) remeasure();
   }
 
   function syncHoveredTileClass(hit) {
@@ -196,7 +388,7 @@ export function initBentoBulge(options = {}) {
 
   function onPointerMove(event) {
     if (overlayOpen) return;
-    const containerRect = bento.getBoundingClientRect();
+    const containerRect = getBentoRect();
     const inside =
       event.clientX >= containerRect.left &&
       event.clientX <= containerRect.right &&
@@ -230,104 +422,87 @@ export function initBentoBulge(options = {}) {
     setCellTarget(field, null, params, layout);
   }
 
-  function tick(now) {
-    if (!running) return;
-    const dt = Math.min((now - lastTime) / 1000, 0.05);
-    lastTime = now;
-
-    if (!params.enableIdleOrganic && field.bulgeAmount < 0.01) {
-      field.time = 0;
-    }
-
-    updateBulgeField(field, params, dt);
-
-    if (overlayOpen) {
-      surface.updateFromField(field, params);
-      surface.render();
-
-      const settling =
-        isFieldMorphing(field) ||
-        field.bulgeAmount > 0.01 ||
-        field.projectStrength > 0.01;
-
-      if (settling) {
-        rafId = requestAnimationFrame(tick);
-      } else {
-        rafId = 0;
-      }
-      return;
-    }
-
-    const videoState = textureManager.syncVideoSlotsAndAtlas(layout, dpr, params.enableVideos);
-    surface.updateVideoSlots(videoState);
-    surface.updateFromField(field, params);
-
-    const frameStart = performance.now();
-    surface.render();
-    const frameMs = performance.now() - frameStart;
-
-    if (frameMs > 20) {
-      slowFrames += 1;
-      if (slowFrames >= 3 && params.maxConcurrentVideoTextures > 2) {
-        params.maxConcurrentVideoTextures = Math.max(2, params.maxConcurrentVideoTextures - 1);
-        slowFrames = 0;
-      }
-    } else {
-      slowFrames = 0;
-    }
-
-    const animating =
-      pointerInside ||
-      isFieldMorphing(field) ||
-      isDimMorphing(field) ||
-      field.bulgeAmount > 0.01 ||
-      field.projectStrength > 0.01 ||
-      params.enableIdleOrganic;
-
-    const needsVideoRefresh =
-      params.enableVideos &&
-      layout.cells.some((c) => c.hasVideo && c.video && (!isVideoReady(c.video) || !c.video.paused));
-
-    if (animating || needsVideoRefresh) {
-      rafId = requestAnimationFrame(tick);
-    } else {
-      rafId = 0;
-    }
-  }
-
-  function startLoop() {
-    if (!rafId) {
-      lastTime = performance.now();
-      rafId = requestAnimationFrame(tick);
-    }
-  }
-
-  function onResize() {
-    remeasure();
-    startLoop();
-  }
-
-  let resizeTimer;
-  function onResizeDebounced() {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(onResize, 120);
-  }
-
   function onPointerMoveWrapped(event) {
     if (overlayOpen) return;
     onPointerMove(event);
-    startLoop();
+    markDirty();
+    scheduleFrame();
   }
 
   function onPointerLeaveWrapped() {
     if (overlayOpen) return;
     onPointerLeave();
+    markDirty();
+    scheduleFrame();
   }
+
+  function onVisibilityChange() {
+    tabVisible = document.visibilityState === "visible";
+    if (tabVisible) {
+      resumeGridVideos();
+      markDirty();
+      scheduleFrame();
+    } else {
+      pauseGridVideos();
+      rafScheduled = false;
+    }
+  }
+
+  function onResizeDebounced() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      remeasure();
+      markDirty();
+      scheduleFrame();
+    }, 120);
+  }
+
+  let resizeTimer;
+
+  layout.cells.forEach((cell) => {
+    if (cell.img && !cell.img.complete) {
+      cell.img.addEventListener("load", () => {
+        textureManager.scheduleRebuild(layout, dpr);
+        markDirty();
+      }, { once: true });
+    }
+    if (cell.video && cell.video.readyState < 2) {
+      cell.video.addEventListener("loadeddata", () => {
+        const videoState = textureManager.syncVideoSlotsAndAtlas(
+          layout,
+          dpr,
+          params.enableVideos,
+          maxVideos()
+        );
+        surface.updateVideoSlots(videoState);
+        markDirty();
+      }, { once: true });
+    }
+  });
+
+  textureManager.bindVideoFrameWatchers(layout.cells, markDirty);
 
   document.addEventListener("pointermove", onPointerMoveWrapped, { passive: true });
   document.documentElement.addEventListener("mouseleave", onPointerLeaveWrapped);
+  document.addEventListener("visibilitychange", onVisibilityChange);
   window.addEventListener("resize", onResizeDebounced);
   window.addEventListener("pagehide", dispose);
+
+  const gridObserver = new IntersectionObserver(
+    (entries) => {
+      gridVisible = entries.some((entry) => entry.isIntersecting);
+      if (gridVisible) {
+        resumeGridVideos();
+        markDirty();
+        scheduleFrame();
+      } else {
+        pauseGridVideos();
+        rafScheduled = false;
+      }
+    },
+    { threshold: 0.1 }
+  );
+  gridObserver.observe(bento);
 
   const resizeObserver = new ResizeObserver(onResizeDebounced);
   resizeObserver.observe(bento);
@@ -335,36 +510,47 @@ export function initBentoBulge(options = {}) {
   function dispose() {
     if (!running) return;
     running = false;
-    cancelAnimationFrame(rafId);
+    rafScheduled = false;
     document.removeEventListener("pointermove", onPointerMoveWrapped);
     document.documentElement.removeEventListener("mouseleave", onPointerLeaveWrapped);
+    document.removeEventListener("visibilitychange", onVisibilityChange);
     window.removeEventListener("resize", onResizeDebounced);
     window.removeEventListener("pagehide", dispose);
+    gridObserver.disconnect();
     resizeObserver.disconnect();
+    clearTimeout(resizeTimer);
     clearDomLayers(layout);
     textureManager.dispose();
     surface.dispose();
     customCursor.dispose();
     dialkit.dispose();
+    perf.dispose();
     bento.classList.remove("grid--bulge-active");
     if (instance === api) instance = null;
   }
 
   surface.updateFromField(field, params);
-  surface.canvas.style.opacity = "1";
   surface.updateVideoSlots(initialVideoState);
-  surface.render();
-  startLoop();
+  needsRender = true;
+  scheduleFrame();
 
   const api = {
     dispose,
     params,
     remeasure,
     setOverlayOpen,
-    onParamsChange: handleParamsChange
+    onParamsChange: handleParamsChange,
+    whenReady: whenReadyPromise
   };
   instance = api;
   window.BentoBulge = api;
+
+  window.setTimeout(() => {
+    if (readyFired) return;
+    if (!textureManager.hasAtlas()) return;
+    fireReady();
+  }, 2500);
+
   return api;
 }
 

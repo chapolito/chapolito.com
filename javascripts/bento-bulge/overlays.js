@@ -46,11 +46,18 @@ export function initBentoBulgeOverlays(options = {}) {
   }
 
   function completeInitialHomeEnter() {
-    requestAnimationFrame(() => {
-      document.body.classList.remove("is-home-pending");
-      document.body.classList.add("is-home-enter");
-      window.setTimeout(markHomeReady, TX_IN + TX_DELAY);
-    });
+    const run = () => {
+      requestAnimationFrame(() => {
+        document.body.classList.remove("is-home-pending");
+        document.body.classList.add("is-home-enter");
+        window.setTimeout(markHomeReady, TX_IN + TX_DELAY);
+      });
+    };
+    if (options.whenBulgeReady) {
+      options.whenBulgeReady.then(run).catch(run);
+    } else {
+      run();
+    }
   }
 
   function idFromLocation() {

@@ -180,6 +180,13 @@ export function createTextureManager(cornerRadius = 8) {
   texture.magFilter = THREE.LinearFilter;
 
   const videoTextures = new Map();
+  const frameUnwatchers = [];
+  let lastCellSlots = new Float32Array(MAX_CELLS);
+  lastCellSlots.fill(-1);
+  let atlasBuilt = false;
+  let lastSlotCount = 0;
+  let rebuildRaf = 0;
+  let pendingRebuild = null;
 
   function ensureVideoTexture(cell) {
     if (!isVideoReady(cell.video)) return null;
@@ -193,7 +200,7 @@ export function createTextureManager(cornerRadius = 8) {
     return tex;
   }
 
-  function buildVideoSlots(layout, enableVideos) {
+  function buildVideoSlots(layout, enableVideos, maxConcurrent = MAX_VIDEO_SLOTS) {
     const slots = [];
     const cellSlots = new Float32Array(MAX_CELLS);
     cellSlots.fill(-1);
@@ -202,31 +209,89 @@ export function createTextureManager(cornerRadius = 8) {
       return { slots, cellSlots };
     }
 
-    layout.cells.forEach((cell) => {
-      if (!cell.hasVideo || !cell.video || slots.length >= MAX_VIDEO_SLOTS) return;
-      if (!isVideoReady(cell.video)) return;
+    const limit = Math.min(Math.max(1, maxConcurrent), MAX_VIDEO_SLOTS);
+    const candidates = layout.cells
+      .filter((cell) => cell.hasVideo && cell.video && isVideoReady(cell.video))
+      .sort((a, b) => b.width * b.height - a.width * a.height);
 
-      const texture = ensureVideoTexture(cell);
-      if (!texture) return;
+    for (const cell of candidates) {
+      if (slots.length >= limit) break;
+
+      const tex = ensureVideoTexture(cell);
+      if (!tex) continue;
 
       const video = cell.video;
       const slot = slots.length;
       slots.push({
         slot,
         cellIndex: cell.index,
-        texture,
+        texture: tex,
         fitContain: cell.fitHeight ? 1 : 0,
         width: video.videoWidth,
         height: video.videoHeight
       });
       cellSlots[cell.index] = slot;
-    });
+    }
 
     return { slots, cellSlots };
   }
 
-  let lastCellSlots = new Float32Array(MAX_CELLS);
-  lastCellSlots.fill(-1);
+  function rebuildStaticNow(layout, dpr, cellSlots = lastCellSlots) {
+    const w = Math.max(1, Math.floor(layout.width * dpr));
+    const h = Math.max(1, Math.floor(layout.height * dpr));
+    canvas.width = w;
+    canvas.height = h;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, layout.width, layout.height);
+
+    layout.cells.forEach((cell) => {
+      drawStaticCell(ctx, cell, radius, cellSlots);
+    });
+
+    texture.needsUpdate = true;
+    atlasBuilt = true;
+  }
+
+  function scheduleRebuild(layout, dpr, cellSlots = lastCellSlots) {
+    pendingRebuild = { layout, dpr, cellSlots };
+    if (rebuildRaf) return;
+    rebuildRaf = requestAnimationFrame(() => {
+      rebuildRaf = 0;
+      if (!pendingRebuild) return;
+      const { layout: l, dpr: d, cellSlots: slots } = pendingRebuild;
+      pendingRebuild = null;
+      rebuildStaticNow(l, d, slots);
+    });
+  }
+
+  function bindVideoFrameWatchers(cells, onFrame) {
+    frameUnwatchers.forEach((stop) => stop());
+    frameUnwatchers.length = 0;
+
+    cells
+      .filter((cell) => cell.hasVideo && cell.video)
+      .forEach((cell) => {
+        const video = cell.video;
+
+        if (typeof video.requestVideoFrameCallback === "function") {
+          let active = true;
+          const loop = () => {
+            if (!active) return;
+            onFrame();
+            video.requestVideoFrameCallback(loop);
+          };
+          video.requestVideoFrameCallback(loop);
+          frameUnwatchers.push(() => {
+            active = false;
+          });
+          return;
+        }
+
+        const handler = () => onFrame();
+        video.addEventListener("timeupdate", handler);
+        frameUnwatchers.push(() => video.removeEventListener("timeupdate", handler));
+      });
+  }
 
   return {
     canvas,
@@ -234,38 +299,44 @@ export function createTextureManager(cornerRadius = 8) {
     emptyTexture,
 
     rebuildStatic(layout, dpr, cellSlots = lastCellSlots) {
-      const w = Math.max(1, Math.floor(layout.width * dpr));
-      const h = Math.max(1, Math.floor(layout.height * dpr));
-      canvas.width = w;
-      canvas.height = h;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, layout.width, layout.height);
-
-      layout.cells.forEach((cell) => {
-        drawStaticCell(ctx, cell, radius, cellSlots);
-      });
-
-      texture.needsUpdate = true;
+      rebuildStaticNow(layout, dpr, cellSlots);
     },
 
-    syncVideoSlots(layout, enableVideos) {
-      const state = buildVideoSlots(layout, enableVideos);
+    scheduleRebuild,
+
+    hasAtlas() {
+      return atlasBuilt;
+    },
+
+    getSlotCount() {
+      return lastSlotCount;
+    },
+
+    bindVideoFrameWatchers,
+
+    syncVideoSlots(layout, enableVideos, maxConcurrent = MAX_VIDEO_SLOTS) {
+      const state = buildVideoSlots(layout, enableVideos, maxConcurrent);
       lastCellSlots = state.cellSlots;
+      lastSlotCount = state.slots.length;
       return state;
     },
 
-    syncVideoSlotsAndAtlas(layout, dpr, enableVideos) {
+    syncVideoSlotsAndAtlas(layout, dpr, enableVideos, maxConcurrent = MAX_VIDEO_SLOTS) {
       const prev = lastCellSlots;
-      const state = buildVideoSlots(layout, enableVideos);
+      const state = buildVideoSlots(layout, enableVideos, maxConcurrent);
       const changed = state.cellSlots.some((slot, i) => slot !== prev[i]);
       lastCellSlots = state.cellSlots;
+      lastSlotCount = state.slots.length;
       if (changed) {
-        this.rebuildStatic(layout, dpr, state.cellSlots);
+        scheduleRebuild(layout, dpr, state.cellSlots);
       }
       return state;
     },
 
     dispose() {
+      if (rebuildRaf) cancelAnimationFrame(rebuildRaf);
+      frameUnwatchers.forEach((stop) => stop());
+      frameUnwatchers.length = 0;
       videoTextures.forEach((tex) => tex.dispose());
       videoTextures.clear();
       texture.dispose();

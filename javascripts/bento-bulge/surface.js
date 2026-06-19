@@ -1,5 +1,6 @@
 import * as THREE from "/javascripts/vendor/three.module.min.js";
 import { vertexShader, fragmentShader, MAX_CELLS, MAX_VIDEO_SLOTS } from "./shaders.js";
+import { getEffectiveDpr, shouldUseAntialias } from "./dpr.js";
 
 function createCellUniforms(cells) {
   const rects = [];
@@ -15,7 +16,7 @@ function createCellUniforms(cells) {
 }
 
 export function createSurface(bento, layout, params, atlasTexture, emptyTexture) {
-  const dpr = Math.min(window.devicePixelRatio || 1, params.dprCap ?? 2);
+  const dpr = getEffectiveDpr(params);
   const width = layout.width;
   const height = layout.height;
 
@@ -27,7 +28,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: true,
+    antialias: shouldUseAntialias(dpr),
     premultipliedAlpha: false,
     powerPreference: "high-performance"
   });

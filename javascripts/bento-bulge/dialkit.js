@@ -1,6 +1,6 @@
 import GUI from "/javascripts/vendor/lil-gui.esm.min.js";
 
-const STORAGE_KEY = "bento-bulge-params-v9";
+const STORAGE_KEY = "bento-bulge-params-v10";
 
 export const defaultParams = {
   maxDisplacementRatio: 0.012,
@@ -15,11 +15,11 @@ export const defaultParams = {
   screenBulgeScale: 6,
   dimOpacity: 0.65,
   dimMorphSpeed: 1.75,
-  organicMix: 0.27,
+  organicMix: 0,
   organicSpeed: 1.2,
   organicScale: 3.5,
   enableIdleOrganic: false,
-  subdivisions: 32,
+  subdivisions: 20,
   enablePerspective: false,
   showFakeGrid: false,
   useRealTextures: true,
@@ -30,7 +30,7 @@ export const defaultParams = {
   maxConcurrentVideoTextures: 6,
   cornerRadius: 8,
   enableVideos: true,
-  dprCap: 2
+  dprCap: 1.5
 };
 
 function loadParams() {
