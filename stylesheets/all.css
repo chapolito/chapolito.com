@@ -4156,8 +4156,12 @@ body:has(.experimental-home),
 }
 
 @media (hover:hover) and (pointer:fine) {
+  .experimental-bento-projects {
+    --bento-dim-opacity: 0.6
+  }
+
   .experimental-bento-projects .experimental-bento:has(.bento-cell.is-hovered) .bento-cell {
-    opacity: .6
+    opacity: var(--bento-dim-opacity, 0.6)
   }
 
   .experimental-bento-projects .experimental-bento:has(.bento-cell.is-hovered) .bento-cell.is-hovered {
@@ -4554,4 +4558,85 @@ p.experimental-home-footer__details {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0
+}
+
+/* Bento bulge — WebGL surface + dialkit (concepts/bento-bulge) */
+.experimental-bento.experimental-bento--bulge {
+  position: relative
+}
+
+.experimental-bento__surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 2;
+  background: transparent
+}
+
+.bento-bulge-dialkit {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 200;
+  font-family: 'Karla', 'Alegreya', sans-serif
+}
+
+.bento-bulge-dialkit__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(12, 12, 12, 0.82);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: border-color 150ms ease, background 150ms ease
+}
+
+.bento-bulge-dialkit__toggle:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(20, 20, 20, 0.92)
+}
+
+.bento-bulge-dialkit__toggle[aria-expanded="true"] {
+  border-color: rgba(255, 255, 255, 0.4)
+}
+
+.bento-bulge-dialkit__panel {
+  margin-top: 8px;
+  max-height: min(78vh, 720px);
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px)
+}
+
+.bento-bulge-dialkit__panel .lil-gui {
+  --width: 280px;
+  --name-width: 48%;
+  --background-color: transparent;
+  --widget-color: rgba(255, 255, 255, 0.08);
+  --hover-color: rgba(255, 255, 255, 0.12);
+  --focus-color: rgba(255, 255, 255, 0.16);
+  --number-color: #fff;
+  --string-color: #fff;
+  font-family: 'Karla', sans-serif
+}
+
+.bento-bulge-home .experimental-home-footer__nav {
+  gap: 1.25rem
 }

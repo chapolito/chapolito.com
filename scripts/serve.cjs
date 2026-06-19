@@ -3,6 +3,7 @@
  * Static server with directory index support (like S3/Apache).
  * SmoothState fetches paths like /about — needs /about/index.html.
  * Concept v1 project URLs (/concepts/v1/{id}/) fall back to v1 shell.
+ * Bento-bulge project URLs use generated copies under concepts/bento-bulge/{id}/.
  */
 const http = require("http");
 const fs = require("fs");
@@ -57,6 +58,12 @@ function resolveFile(pathname) {
     if (fs.existsSync(projectIndex)) return projectIndex;
     const v1Index = path.join(root, "concepts/v1/index.html");
     if (fs.existsSync(v1Index)) return v1Index;
+  }
+
+  const bentoBulgeProject = stripped.match(/^\/concepts\/bento-bulge\/([^/]+)$/);
+  if (bentoBulgeProject && bentoBulgeProject[1] !== "index.html") {
+    const bentoIndex = path.join(root, "concepts/bento-bulge/index.html");
+    if (fs.existsSync(bentoIndex)) return bentoIndex;
   }
 
   return null;

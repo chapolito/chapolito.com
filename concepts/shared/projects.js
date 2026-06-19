@@ -295,7 +295,7 @@ window.PROJECTS = [
     orientation: "portrait",
     hover: "iris",
     overlay: "float",
-    tile: { type: "video", src: "/images/life360/closing-the-loop.mp4", fit: "contain" },
+    tile: { type: "video", src: "/images/life360/closing-the-loop.mp4", fit: "cover" },
     detail: {
       lede:
         "At Life360 I designed family messaging and a delightful weather layer, closing the loop on 'where is everyone and are they okay?'",

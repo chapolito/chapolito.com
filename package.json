@@ -4,11 +4,15 @@
   "type": "module",
   "scripts": {
     "generate:v1-routes": "node scripts/generate-v1-routes.cjs",
-    "start": "node scripts/generate-v1-routes.cjs && node scripts/serve.cjs",
+    "generate:bento-bulge-routes": "node scripts/generate-bento-bulge-routes.cjs",
+    "vendor:three": "cp node_modules/three/build/three.core.min.js node_modules/three/build/three.module.min.js javascripts/vendor/",
+    "start": "node scripts/generate-v1-routes.cjs && node scripts/generate-bento-bulge-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
     "serve": "npm run start"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
-    "agentation": "^3.0.2"
+    "agentation": "^3.0.2",
+    "lil-gui": "^0.21.0",
+    "three": "^0.184.0"
   }
 }
