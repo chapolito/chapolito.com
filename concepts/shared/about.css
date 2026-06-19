@@ -1,0 +1,156 @@
+/* ------------------------------------------------------------------
+   About page — concept theme (matches v1 editorial bento)
+------------------------------------------------------------------ */
+.about-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: clamp(48px, 8vw, 96px) var(--pad) 116px;
+}
+
+.about-page.about-overlay {
+  min-height: 0;
+  width: 100%;
+  padding: clamp(72px, 10vw, 112px) var(--pad) var(--dock-h);
+  box-sizing: border-box;
+}
+
+.about {
+  --about-text-primary: rgba(255, 255, 255, 1);
+  --about-text-secondary: rgba(255, 255, 255, 0.8);
+  --about-text-tertiary: rgba(255, 255, 255, 0.6);
+  width: min(100%, 960px);
+  margin: 0 auto;
+  color: var(--about-text-primary);
+}
+
+.about-page.about-overlay .about {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.about-page.about-overlay.is-revealed .about,
+.about-page.about-overlay.is-instant .about {
+  opacity: 1;
+  transform: none;
+}
+
+.about__head {
+  margin-bottom: clamp(32px, 5vw, 56px);
+}
+.about__title {
+  margin: 0;
+  font-size: clamp(2.4rem, 6.8vw, 5rem);
+  line-height: 0.98;
+  color: var(--about-text-primary);
+}
+
+.about__intro {
+  display: grid;
+  gap: clamp(28px, 4vw, 48px);
+  margin-bottom: clamp(56px, 8vw, 96px);
+}
+@media (min-width: 720px) {
+  .about__intro {
+    grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
+.about__portrait {
+  margin: 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line-2);
+  background: var(--bg-2);
+  box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.85);
+}
+.about__portrait img {
+  width: 100%;
+  height: auto;
+  display: block;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+}
+
+.about__copy {
+  display: grid;
+  gap: clamp(16px, 2vw, 22px);
+}
+.about__copy p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.35vw, 1.08rem);
+  font-weight: 500;
+  line-height: 1.65;
+  color: var(--about-text-secondary);
+}
+.about__copy .about__lede {
+  font-size: clamp(1.02rem, 1.5vw, 1.18rem);
+  color: var(--about-text-primary);
+}
+
+.about__philosophy {
+  padding-top: clamp(32px, 5vw, 48px);
+  border-top: 1px solid var(--line);
+}
+.about__section-title {
+  margin: 0 0 clamp(28px, 4vw, 40px);
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  line-height: 1.05;
+  color: var(--about-text-primary);
+}
+
+.about__cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+@media (min-width: 600px) {
+  .about__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (min-width: 960px) {
+  .about__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+.about__card {
+  padding: clamp(20px, 2.4vw, 28px);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--line);
+}
+.about__card-title {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+  line-height: 1.15;
+  color: var(--about-text-primary);
+}
+.about__card-body {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--about-text-secondary);
+}
+
+.about__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(20px, 3vw, 36px);
+  margin-top: clamp(48px, 7vw, 72px);
+  padding-top: clamp(24px, 3vw, 32px);
+  border-top: 1px solid var(--line);
+}
+.about__links a {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--about-text-tertiary);
+  transition: color 150ms ease-out;
+}
+.about__links a:hover { color: var(--about-text-secondary); }

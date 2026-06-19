@@ -179,7 +179,7 @@ $(function() {
     debug: false,
     prefetch: true,
     cacheLength: 2,
-    forms: "form:not(#chat-form)",
+    forms: "form",
     onStart: {
       duration: 450,
       render: function($container) {

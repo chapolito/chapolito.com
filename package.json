@@ -2,7 +2,13 @@
   "name": "chapolito-2026",
   "private": true,
   "type": "module",
+  "scripts": {
+    "generate:v1-routes": "node scripts/generate-v1-routes.cjs",
+    "start": "node scripts/generate-v1-routes.cjs && node scripts/serve.cjs",
+    "serve": "npm run start"
+  },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0"
+    "@anthropic-ai/sdk": "^0.39.0",
+    "agentation": "^3.0.2"
   }
 }

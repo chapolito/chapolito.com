@@ -23,7 +23,7 @@ Use the included static server (handles `/about` → `about/index.html`, which S
 
 ```bash
 cd "/path/to/s3 sync"
-node scripts/serve.js
+npm start
 # open http://localhost:8080
 ```
 
@@ -52,6 +52,12 @@ git commit -m "Remove Middleman fingerprint hashes and duplicate build artifacts
 ```
 
 ## Deploying to S3
+
+Before syncing, regenerate concept v1 project routes (copies `concepts/v1/index.html` into each `concepts/v1/{project-id}/index.html` so direct URLs work on refresh):
+
+```bash
+node scripts/generate-v1-routes.cjs
+```
 
 Sync the site root to your bucket (adjust bucket name and profile):
 
