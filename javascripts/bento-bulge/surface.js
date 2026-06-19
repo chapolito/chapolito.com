@@ -4,15 +4,18 @@ import { getEffectiveDpr, shouldUseAntialias } from "./dpr.js";
 
 function createCellUniforms(cells) {
   const rects = [];
+  const veilFromTop = new Float32Array(MAX_CELLS);
   for (let i = 0; i < MAX_CELLS; i++) {
     const cell = cells[i];
     if (cell) {
       rects.push(new THREE.Vector4(cell.normX, cell.normY, cell.normW, cell.normH));
+      veilFromTop[i] = cell.veilFromTop ? 1 : 0;
     } else {
       rects.push(new THREE.Vector4(0, 0, 0, 0));
+      veilFromTop[i] = 0;
     }
   }
-  return rects;
+  return { rects, veilFromTop };
 }
 
 export function createSurface(bento, layout, params, atlasTexture, emptyTexture) {
@@ -51,6 +54,8 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     videoUniforms[`uVideo${i}`] = { value: emptyTexture };
   }
 
+  const cellUniforms = createCellUniforms(layout.cells);
+
   const uniforms = {
     uAtlas: { value: atlasTexture },
     uUseAtlas: { value: params.useRealTextures ? 1 : 0 },
@@ -61,7 +66,8 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uMaxDisplacement: { value: width * params.maxDisplacementRatio },
     uPlaneSize: { value: new THREE.Vector2(width, height) },
     uCellCount: { value: layout.cells.length },
-    uCellRects: { value: createCellUniforms(layout.cells) },
+    uCellRects: { value: cellUniforms.rects },
+    uCellVeilFromTop: { value: cellUniforms.veilFromTop },
     uCornerRadius: { value: params.cornerRadius || 8 },
     uCellVideoSlot: { value: cellVideoSlot },
     uVideoSlotCount: { value: 0 },
@@ -76,10 +82,6 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uCursorRadius: { value: new THREE.Vector2(0.05, 0.05) },
     uCursorStrength: { value: 0 },
     uCursorWeight: { value: params.cursorWeight },
-    uOrganicMix: { value: params.organicMix },
-    uOrganicSpeed: { value: params.organicSpeed },
-    uOrganicScale: { value: params.organicScale },
-    uTime: { value: 0 },
     uProjectSpread: { value: params.projectSpread },
     uCursorSpread: { value: params.cursorSpread },
     uHillFlatness: { value: params.hillFlatness ?? 0.52 },
@@ -152,7 +154,9 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uniforms.uPlaneSize.value.set(w, h);
     uniforms.uMaxDisplacement.value = w * params.maxDisplacementRatio;
     uniforms.uCellCount.value = newLayout.cells.length;
-    uniforms.uCellRects.value = createCellUniforms(newLayout.cells);
+    const cellUniforms = createCellUniforms(newLayout.cells);
+    uniforms.uCellRects.value = cellUniforms.rects;
+    uniforms.uCellVeilFromTop.value = cellUniforms.veilFromTop;
     if (camera.isPerspectiveCamera) {
       camera.aspect = w / h;
       camera.position.set(w * 0.5, h * 0.5, w * 1.1);
@@ -175,12 +179,8 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uniforms.uCursorCenter.value.set(field.cursorCenter.x, field.cursorCenter.y);
     uniforms.uCursorRadius.value.set(field.cursorRadius.x, field.cursorRadius.y);
     uniforms.uCursorStrength.value = field.cursorStrength;
-    uniforms.uTime.value = field.time;
     uniforms.uProjectWeight.value = params.projectWeight;
     uniforms.uCursorWeight.value = params.cursorWeight;
-    uniforms.uOrganicMix.value = params.organicMix;
-    uniforms.uOrganicSpeed.value = params.organicSpeed;
-    uniforms.uOrganicScale.value = params.organicScale;
     uniforms.uProjectSpread.value = params.projectSpread;
     uniforms.uCursorSpread.value = params.cursorSpread;
     uniforms.uHillFlatness.value = params.hillFlatness ?? 0.52;

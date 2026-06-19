@@ -40,29 +40,6 @@ function drawContainBackground(ctx, x, y, w, h, cornerRadius) {
   ctx.restore();
 }
 
-function drawTileVeil(ctx, x, y, w, h, cornerRadius) {
-  roundedRectPath(ctx, x, y, w, h, cornerRadius);
-  ctx.save();
-  ctx.clip();
-
-  const cx = x + w * 0.5;
-  const cy = y + h * 0.5;
-  const len = Math.max(w, h);
-  const angle = (15 * Math.PI) / 180;
-  const dx = Math.sin(angle) * len;
-  const dy = -Math.cos(angle) * len;
-  const gradient = ctx.createLinearGradient(cx - dx, cy - dy, cx + dx, cy + dy);
-  gradient.addColorStop(0, "rgba(0, 0, 0, 0.72)");
-  gradient.addColorStop(0.28, "rgba(0, 0, 0, 0.34)");
-  gradient.addColorStop(0.5, "rgba(0, 0, 0, 0)");
-
-  ctx.globalAlpha = 0.18;
-  ctx.fillStyle = gradient;
-  ctx.fillRect(x, y, w, h);
-  ctx.globalAlpha = 1;
-  ctx.restore();
-}
-
 function drawImageCover(ctx, img, x, y, w, h, fitHeight, cornerRadius) {
   roundedRectPath(ctx, x, y, w, h, cornerRadius);
   ctx.save();
@@ -143,8 +120,6 @@ function drawStaticCell(ctx, cell, cornerRadius, cellSlots) {
   if (!drew) {
     drawPlaceholder(ctx, x, y, w, h, cornerRadius);
   }
-
-  drawTileVeil(ctx, x, y, w, h, cornerRadius);
 }
 
 function isVideoReady(video) {

@@ -167,7 +167,15 @@
     <script>
       (function () {
         var grid = document.getElementById("grid");
-        var projects = window.PROJECTS || [];
+        var projects = (window.PROJECTS || []).filter(function (p) {
+          return p.id !== "mk-play" && p.id !== "life360-messaging";
+        });
+
+        /* Retina tile encodes: *.tile.mp4 (1536px max, CRF 18). Falls back to original if absent. */
+        function tileVideoSrc(src) {
+          if (!src || !/\.mp4$/i.test(src)) return src;
+          return src.replace(/\.mp4$/i, ".tile.mp4");
+        }
 
         projects.forEach(function (p) {
           var tile = document.createElement("article");
@@ -188,7 +196,7 @@
 
           if (m.type === "video") {
             var v = document.createElement("video");
-            v.src = m.src;
+            v.src = tileVideoSrc(m.src);
             v.muted = true;
             v.loop = true;
             v.playsInline = true;
@@ -205,7 +213,8 @@
           }
 
           surface.appendChild(media);
-          surface.appendChild(document.createElement("div")).className = "tile__veil";
+          tile.appendChild(surface);
+          tile.appendChild(document.createElement("div")).className = "tile__veil";
 
           var label = document.createElement("div");
           label.className = "tile__label";
@@ -217,9 +226,8 @@
           title.textContent = p.title;
           label.appendChild(prod);
           label.appendChild(title);
-          surface.appendChild(label);
+          tile.appendChild(label);
 
-          tile.appendChild(surface);
           grid.appendChild(tile);
         });
 

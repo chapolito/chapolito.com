@@ -1,6 +1,6 @@
 import GUI from "/javascripts/vendor/lil-gui.esm.min.js";
 
-const STORAGE_KEY = "bento-bulge-params-v10";
+const STORAGE_KEY = "bento-bulge-params-v13";
 
 export const defaultParams = {
   maxDisplacementRatio: 0.012,
@@ -14,11 +14,7 @@ export const defaultParams = {
   hillFlatness: 0.6,
   screenBulgeScale: 6,
   dimOpacity: 0.65,
-  dimMorphSpeed: 1.75,
-  organicMix: 0,
-  organicSpeed: 1.2,
-  organicScale: 3.5,
-  enableIdleOrganic: false,
+  dimMorphSpeed: 6,
   subdivisions: 20,
   enablePerspective: false,
   showFakeGrid: false,
@@ -30,7 +26,7 @@ export const defaultParams = {
   maxConcurrentVideoTextures: 6,
   cornerRadius: 8,
   enableVideos: true,
-  dprCap: 1.5
+  dprCap: 2
 };
 
 function loadParams() {
@@ -78,12 +74,6 @@ export function createDialkit(root, params, onChange) {
   bulge.add(params, "projectSpread", 0.55, 1.35, 0.01).onChange(onChange);
   bulge.add(params, "cursorSpread", 0.25, 1.1, 0.01).onChange(onChange);
   bulge.add(params, "morphSpeed", 2, 14, 0.1).onChange(onChange);
-
-  const organic = gui.addFolder("Organic");
-  organic.add(params, "organicMix", 0, 0.3, 0.005).onChange(onChange);
-  organic.add(params, "organicSpeed", 0.1, 1.2, 0.01).onChange(onChange);
-  organic.add(params, "organicScale", 0.5, 3.5, 0.05).onChange(onChange);
-  organic.add(params, "enableIdleOrganic").onChange(onChange);
 
   const hover = gui.addFolder("Hover");
   hover.add(params, "dimOpacity", 0.35, 0.85, 0.01).name("dim others").onChange(onChange);
