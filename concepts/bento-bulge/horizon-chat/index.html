@@ -191,14 +191,11 @@
             v.src = m.src;
             v.muted = true;
             v.loop = true;
-            v.autoplay = true;
             v.playsInline = true;
-            v.setAttribute("autoplay", "");
             v.setAttribute("playsinline", "");
-            v.preload = "auto";
+            v.preload = "metadata";
             v.setAttribute("data-inview", "");
             media.appendChild(v);
-            v.play().catch(function () {});
           } else if (m.src) {
             var img = document.createElement("img");
             img.src = m.src;
@@ -230,7 +227,7 @@
       })();
     </script>
     <script type="module">
-      import { initBentoBulge } from "/javascripts/bento-bulge/index.js";
+      import { initBentoBulge, getBulgeWhenReady } from "/javascripts/bento-bulge/index.js";
       import { initBentoBulgeOverlays } from "/javascripts/bento-bulge/overlays.js";
 
       function boot() {
@@ -245,6 +242,7 @@
             });
 
             initBentoBulgeOverlays({
+              whenBulgeReady: getBulgeWhenReady(),
               onOpen() {
                 bulge?.setOverlayOpen?.(true);
               },

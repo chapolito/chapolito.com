@@ -22,7 +22,31 @@
   pointer-events: none;
   z-index: 5;
   background: transparent;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.experimental-bento__surface.is-bulge-surface-ready {
   opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experimental-bento__surface {
+    transition: none;
+  }
+}
+
+.bento-bulge-perf {
+  position: fixed;
+  right: 12px;
+  bottom: 12px;
+  z-index: 9999;
+  padding: 6px 10px;
+  font: 11px/1.35 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(0, 0, 0, 0.72);
+  border-radius: 6px;
+  pointer-events: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
