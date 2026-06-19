@@ -28,6 +28,11 @@
         gap: clamp(12px, 1.4vw, 22px);
       }
       @media (max-width: 900px) { .cards { grid-template-columns: 1fr; } }
+      .cards--secondary {
+        margin-top: clamp(18px, 3vh, 32px);
+        grid-template-columns: minmax(0, 1fr);
+        max-width: 420px;
+      }
       .card {
         position: relative;
         display: block;
@@ -102,6 +107,19 @@
             <span class="card__num t-label">Variation 3</span>
             <h2 class="card__name t-display">Curator wall</h2>
             <p class="card__desc">A restrained gallery with a live placard. Pieces unfold in place, so the work never leaves the wall.</p>
+            <span class="card__go">Open</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="cards cards--secondary">
+        <a class="card" href="bento-bulge/">
+          <video src="/images/home/horizon-world-chat.mp4" muted loop autoplay playsinline></video>
+          <div class="card__shade"></div>
+          <div class="card__body">
+            <span class="card__num t-label">Experiment</span>
+            <h2 class="card__name t-display">Bento bulge</h2>
+            <p class="card__desc">The production bento grid with a WebGL displacement surface — magnetic mound hover, morphing bulge, and a tuning dialkit.</p>
             <span class="card__go">Open</span>
           </div>
         </a>

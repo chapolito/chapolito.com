@@ -1,0 +1,324 @@
+/* Bento bulge experiment — v1 grid overlay + dialkit */
+
+.bento-bulge-page {
+  /*
+   * Overlay dim — CSS opacity on the WebGL canvas (whole layer).
+   * Calibrated ~0.35 here ≈ v1 tile opacity 0.12 visually; same number in
+   * shader alpha reads much fainter (transparent canvas + home-bg bleed-through).
+   */
+  --bento-overlay-dim: 0.35;
+}
+
+.grid.grid--bulge {
+  position: relative;
+}
+
+.experimental-bento__surface,
+.grid--bulge .experimental-bento__surface {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+  background: transparent;
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .grid--bulge {
+    /* Hover dim for tile labels — pairs with shader uDimOpacity (per-cell, not 1:1 with CSS) */
+    --bento-dim-opacity: 0.6;
+  }
+
+  /* WebGL owns the grid — hide DOM media and disable v1 rack-focus / tile lift */
+  body:not(.is-grid-pressing):not(.is-detail-opening):not(.is-detail-open) .bento-bulge-page .grid.grid--bulge-active .grid:hover .tile:not(:hover),
+  body:not(.is-grid-pressing):not(.is-detail-opening):not(.is-detail-open) .bento-bulge-page .grid.grid--bulge-active:hover .tile:not(:hover),
+  body:not(.is-grid-pressing):not(.is-detail-opening):not(.is-detail-open) .bento-bulge-page .grid.grid--bulge-active .tile:not(:hover),
+  body:not(.is-grid-pressing):not(.is-detail-opening):not(.is-detail-open) .bento-bulge-page .grid.grid--bulge-active .tile:hover,
+  body:not(.is-grid-pressing):not(.is-detail-opening):not(.is-detail-open) .bento-bulge-page .grid.grid--bulge-active .tile {
+    opacity: 1;
+    filter: none;
+    transform: none;
+    z-index: auto;
+  }
+
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__surface,
+  .bento-bulge-page .grid.grid--bulge-active .tile .tile__surface {
+    transform: none;
+    border-radius: 8px;
+    border-color: transparent;
+    box-shadow: none;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Keep videos decoding — opacity only, not visibility:hidden */
+  .bento-bulge-page .grid.grid--bulge-active .tile .tile__media video {
+    opacity: 0.001;
+    visibility: visible;
+  }
+
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__media,
+  .bento-bulge-page .grid.grid--bulge-active .tile .tile__media {
+    transform: none;
+  }
+
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__media video,
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__media img,
+  .bento-bulge-page .grid.grid--bulge-active .tile .tile__media video,
+  .bento-bulge-page .grid.grid--bulge-active .tile .tile__media img {
+    transform: none;
+  }
+
+  .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__veil,
+  .bento-bulge-page .grid.grid--bulge-active .tile .tile__veil {
+    opacity: 0;
+  }
+
+  /* Overlay — dim WebGL canvas + tile labels (was 12%; bumped for visibility) */
+  body.is-grid-pressing.bento-bulge-page.is-home .grid.grid--bulge-active .experimental-bento__surface,
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge-active .experimental-bento__surface,
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimental-bento__surface,
+  body.is-grid-pressing.bento-bulge-page.is-home .grid.grid--bulge .experimental-bento__surface,
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge .experimental-bento__surface,
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge .experimental-bento__surface,
+  body.is-grid-pressing.bento-bulge-page.is-home .grid.grid--bulge-active .tile,
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge-active .tile,
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .tile,
+  body.is-grid-pressing.bento-bulge-page.is-home .grid.grid--bulge .tile,
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge .tile,
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge .tile {
+    opacity: var(--bento-overlay-dim) !important;
+    transition: opacity var(--tx-out) ease-in;
+  }
+
+  body.is-grid-pressing.bento-bulge-page.is-home .grid.grid--bulge-active,
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge-active,
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active,
+  body.is-grid-pressing.bento-bulge-page.is-home .grid.grid--bulge,
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge,
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge {
+    transform: scale(0.985) translateY(4px);
+    filter: blur(14px) saturate(0.72);
+    transition:
+      transform var(--tx-out) ease-in,
+      filter var(--tx-out) ease-in;
+  }
+
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge-active,
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: none;
+    transition:
+      transform var(--tx-in) ease-out var(--tx-delay),
+      filter var(--tx-in) ease-out var(--tx-delay),
+      opacity var(--tx-in) ease-out var(--tx-delay);
+  }
+
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge-active .experimental-bento__surface,
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge .experimental-bento__surface,
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge-active .tile,
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge .tile {
+    opacity: 1 !important;
+    transition: opacity var(--tx-in) ease-out var(--tx-delay);
+  }
+}
+
+.bento-bulge-dialkit {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 1200;
+  font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+}
+
+.bento-bulge-dialkit__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(12, 12, 12, 0.82);
+  color: rgba(255, 255, 255, 0.85);
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.bento-bulge-dialkit__toggle:hover {
+  border-color: rgba(255, 255, 255, 0.35);
+  background: rgba(20, 20, 20, 0.92);
+}
+
+.bento-bulge-dialkit__panel {
+  margin-top: 8px;
+  max-height: min(78vh, 720px);
+  overflow: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.bento-bulge-dialkit__panel .lil-gui {
+  --width: 280px;
+  --name-width: 48%;
+  --background-color: transparent;
+  --widget-color: rgba(255, 255, 255, 0.08);
+  --hover-color: rgba(255, 255, 255, 0.12);
+  --focus-color: rgba(255, 255, 255, 0.16);
+  --number-color: #fff;
+  --string-color: #fff;
+}
+
+.bento-bulge-page .tile__label {
+  pointer-events: none;
+  position: relative;
+  z-index: 6;
+  transition: opacity 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bento-bulge-page .grid.grid--bulge-active:has(.tile.is-bulge-hovered) .tile:not(.is-bulge-hovered) .tile__label {
+    opacity: var(--bento-dim-opacity, 0.6);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .bento-bulge-page.bento-bulge-has-cursor,
+  .bento-bulge-page.bento-bulge-has-cursor * {
+    cursor: none !important;
+  }
+}
+
+.bento-bulge-cursor {
+  --cursor-size: 32px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--cursor-size);
+  height: var(--cursor-size);
+  margin: calc(var(--cursor-size) / -2) 0 0 calc(var(--cursor-size) / -2);
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(var(--x, -100px), var(--y, -100px));
+}
+
+.bento-bulge-cursor__dot {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  opacity: 0.5;
+  transform: scale(1);
+  transition: transform 200ms ease;
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.18),
+    0 1px 3px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(0, 0, 0, 0.14);
+}
+
+.bento-bulge-cursor.is-pressed .bento-bulge-cursor__dot {
+  opacity: 0.7;
+  transform: scale(0.875);
+}
+
+.bento-bulge-cursor.is-hidden .bento-bulge-cursor__dot {
+  opacity: 0;
+  transition: transform 200ms ease, opacity 120ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bento-bulge-cursor__dot,
+  .bento-bulge-cursor.is-hidden .bento-bulge-cursor__dot {
+    transition: none;
+  }
+}
+
+/* Overlay close — back button stays hidden; no entrance replay */
+.bento-bulge-page .reader[hidden],
+.bento-bulge-page .reader:not(.is-open) {
+  pointer-events: none !important;
+}
+
+.bento-bulge-page .reader[hidden] {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* About + project overlays — transparent panel over dimmed grid (match v1) */
+body.bento-bulge-page.is-home .reader.is-open .reader__scrim {
+  background: transparent;
+}
+
+body.bento-bulge-page.is-home.is-detail-open .reader.is-open .reader__scrim,
+body.bento-bulge-page.is-home.is-detail-opening .reader.is-open .reader__scrim {
+  opacity: 1;
+}
+
+body.bento-bulge-page.is-home .reader--ov-split.is-open .reader__panel {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+body.bento-bulge-page.is-home:not(.is-detail-closing) .reader--ov-split.is-open .reader__panel {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  opacity: 1;
+}
+
+body.bento-bulge-page .about-page.about-overlay.is-instant,
+body.bento-bulge-page.is-detail-enter .about-page.about-overlay.is-instant,
+body.bento-bulge-page .about-page.about-overlay.is-instant .about {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.bento-bulge-page .reader:not(.is-open) .reader__back,
+.bento-bulge-page .reader.is-exiting .reader__back,
+body.bento-bulge-page.is-detail-closing .reader__back {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  animation: none !important;
+}
+
+/* Restore grid hit targets after overlay closes */
+body.bento-bulge-page:not(.is-detail-open):not(.is-detail-opening):not(.is-grid-pressing) .grid,
+body.bento-bulge-page:not(.is-detail-open):not(.is-detail-opening):not(.is-grid-pressing) .grid .tile {
+  pointer-events: auto !important;
+}
+
+/* Return from overlay — don't replay first-load stage / dock entrance */
+body.bento-bulge-page[data-home-ready="true"].is-home.is-home-enter .stage {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+body.bento-bulge-page[data-home-ready="true"].is-home.is-home-enter .dock__logo,
+body.bento-bulge-page[data-home-ready="true"].is-home.is-home-enter .dock__details,
+body.bento-bulge-page[data-home-ready="true"].is-home.is-home-enter .dock__nav .dock__link {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
