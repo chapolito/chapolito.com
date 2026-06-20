@@ -72,7 +72,8 @@ function drawImageCover(ctx, img, x, y, w, h, fitHeight, cornerRadius) {
 }
 
 function drawVideoCover(ctx, video, x, y, w, h, fitHeight, cornerRadius) {
-  if (video.readyState < 2 || !video.videoWidth) return false;
+  if (!video.videoWidth || !video.videoHeight) return false;
+  if (video.readyState < 2 && video.dataset.bentoBulgeBound !== "true") return false;
   roundedRectPath(ctx, x, y, w, h, cornerRadius);
   ctx.save();
   ctx.clip();
@@ -123,7 +124,10 @@ function drawStaticCell(ctx, cell, cornerRadius, cellSlots) {
 }
 
 function isVideoReady(video) {
-  return Boolean(video && video.readyState >= 2 && video.videoWidth > 0 && video.videoHeight > 0);
+  if (!video || !video.videoWidth || !video.videoHeight) return false;
+  // Keep bound videos slotted through loop seeks (readyState can dip briefly).
+  if (video.dataset.bentoBulgeBound === "true") return true;
+  return video.readyState >= 2;
 }
 
 export { isVideoReady };
@@ -134,6 +138,22 @@ export function createVideoTexture(video) {
   tex.flipY = false;
   tex.minFilter = THREE.LinearFilter;
   tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = false;
+
+  let lastTime = -1;
+  const baseUpdate = THREE.VideoTexture.prototype.update;
+  tex.update = function () {
+    if (video.readyState < video.HAVE_CURRENT_DATA) return;
+    if (video.seeking) return;
+
+    const t = video.currentTime;
+    // Browsers often decode a blank frame right after a loop seek — hold the last frame.
+    if (lastTime >= 0 && t + 0.05 < lastTime && t < 0.08) return;
+    lastTime = t;
+
+    baseUpdate.call(this);
+  };
+
   return tex;
 }
 
