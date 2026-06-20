@@ -9,8 +9,6 @@
     "serve": "npm run start"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
-    "agentation": "^3.0.2",
     "lil-gui": "^0.21.0",
     "three": "^0.184.0"
   }

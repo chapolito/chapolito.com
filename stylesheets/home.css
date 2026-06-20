@@ -1,8 +1,5 @@
 /* ==================================================================
-   V1 Editorial bento — refined pass
-   · Edge-to-edge grid, homepage dock w/ progressive blur
-   · 8 bespoke tile hover treatments (tile--h-*)
-   · 8 bespoke overlay layouts + transitions (reader--ov-*)
+   Home — editorial bento grid, dock, detail/about overlays
 ================================================================== */
 
 body.is-home {
@@ -39,10 +36,6 @@ body.is-home {
   mix-blend-mode: overlay;
   pointer-events: none;
 }
-.home-bg img {
-  display: none; /* TEMP: CSS vignette replaces PNG while tuning */
-}
-
 /* home pages: grain lives on .home-bg, not the viewport overlay */
 body.is-home.u-grain::before,
 body.is-home.u-grain::after {
@@ -309,10 +302,7 @@ body.is-home.is-detail-open .u-glow {
 }
 body.is-home.is-grid-pressing .home-bg,
 body.is-home.is-detail-opening .home-bg,
-body.is-home.is-detail-open .home-bg,
-body.is-home.is-grid-pressing .home-bg img,
-body.is-home.is-detail-opening .home-bg img,
-body.is-home.is-detail-open .home-bg img {
+body.is-home.is-detail-open .home-bg {
   opacity: 1;
 }
 
