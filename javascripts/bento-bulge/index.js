@@ -65,7 +65,7 @@ function clearDomLayers(layout) {
   });
 }
 
-function promoteGridVideos(layout) {
+function promoteGridVideos(layout, pauseIdleVideos = false) {
   const cells = layout.cells
     .filter((cell) => cell.hasVideo && cell.video)
     .sort((a, b) => b.width * b.height - a.width * a.height);
@@ -75,8 +75,10 @@ function promoteGridVideos(layout) {
 
   cells.forEach((cell, index) => {
     const video = cell.video;
+    video.preload = "auto";
+    if (pauseIdleVideos) return;
+
     const start = () => {
-      video.preload = "auto";
       video.play().catch(() => {});
     };
     if (index < immediate) {
@@ -144,7 +146,7 @@ export function initBentoBulge(options = {}) {
     return failApi;
   }
 
-  promoteGridVideos(layout);
+  promoteGridVideos(layout, params.pauseIdleVideos);
 
   const dialkit = createDialkit(document.body, params, () => onParamsChange());
   const field = createBulgeField(params);
@@ -235,10 +237,28 @@ export function initBentoBulge(options = {}) {
     });
   }
 
-  function resumeGridVideos() {
+  function syncVideoPlayback(activeHit = activeCellData) {
     if (!params.enableVideos) return;
+
+    if (overlayOpen) {
+      pauseGridVideos();
+      return;
+    }
+
     layout.cells.forEach((cell) => {
-      if (cell.video && cell.video.paused) cell.video.play().catch(() => {});
+      if (!cell.video) return;
+
+      if (!params.pauseIdleVideos) {
+        if (cell.video.paused) cell.video.play().catch(() => {});
+        return;
+      }
+
+      const isActive = activeHit && cell.index === activeHit.index;
+      if (isActive) {
+        if (cell.video.paused) cell.video.play().catch(() => {});
+      } else if (!cell.video.paused) {
+        cell.video.pause();
+      }
     });
     markDirty();
   }
@@ -332,6 +352,7 @@ export function initBentoBulge(options = {}) {
     dialkit.persist();
     applyDimOpacityVar();
     remeasure();
+    syncVideoPlayback();
     markDirty();
   }
 
@@ -368,6 +389,7 @@ export function initBentoBulge(options = {}) {
     surface.setOverlayDim(1);
     surface.canvas.style.opacity = open ? String(overlayDimAmount()) : "1";
     surface.updateFromField(field, params);
+    syncVideoPlayback(null);
     markDirty();
     scheduleFrame();
     if (!open) remeasure();
@@ -396,6 +418,7 @@ export function initBentoBulge(options = {}) {
     if (!inside || !hit) {
       activeCellData = null;
       syncHoveredTileClass(null);
+      syncVideoPlayback(null);
       setCellTarget(field, null, params, layout);
       setCursorTarget(field, { x: 0.5, y: 0.5 }, null, params, layout);
       return;
@@ -403,6 +426,7 @@ export function initBentoBulge(options = {}) {
 
     activeCellData = hit;
     syncHoveredTileClass(hit);
+    syncVideoPlayback(hit);
     setCellTarget(field, hit, params, layout);
 
     const norm = pointerToNorm(layout, containerRect, event.clientX, event.clientY, surface.camera);
@@ -414,6 +438,7 @@ export function initBentoBulge(options = {}) {
     pointerInside = false;
     activeCellData = null;
     syncHoveredTileClass(null);
+    syncVideoPlayback(null);
     setCellTarget(field, null, params, layout);
   }
 
@@ -434,7 +459,7 @@ export function initBentoBulge(options = {}) {
   function onVisibilityChange() {
     tabVisible = document.visibilityState === "visible";
     if (tabVisible) {
-      resumeGridVideos();
+      syncVideoPlayback();
       markDirty();
       scheduleFrame();
     } else {
@@ -487,7 +512,7 @@ export function initBentoBulge(options = {}) {
     (entries) => {
       gridVisible = entries.some((entry) => entry.isIntersecting);
       if (gridVisible) {
-        resumeGridVideos();
+        syncVideoPlayback();
         markDirty();
         scheduleFrame();
       } else {
@@ -526,6 +551,7 @@ export function initBentoBulge(options = {}) {
 
   surface.updateFromField(field, params);
   surface.updateVideoSlots(initialVideoState);
+  syncVideoPlayback(null);
   needsRender = true;
   scheduleFrame();
 
@@ -534,6 +560,7 @@ export function initBentoBulge(options = {}) {
     params,
     remeasure,
     setOverlayOpen,
+    syncVideoPlayback,
     onParamsChange: handleParamsChange,
     whenReady: whenReadyPromise
   };

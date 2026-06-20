@@ -26,6 +26,7 @@ export const defaultParams = {
   maxConcurrentVideoTextures: 6,
   cornerRadius: 8,
   enableVideos: true,
+  pauseIdleVideos: false,
   dprCap: 2
 };
 
@@ -81,6 +82,7 @@ export function createDialkit(root, params, onChange) {
     .onChange(onChange);
   debug.add(params, "useRealTextures").name("real textures").onChange(onChange);
   debug.add(params, "enableVideos").name("videos").onChange(onChange);
+  debug.add(params, "pauseIdleVideos").name("pause idle videos").onChange(onChange);
   debug
     .add(params, "maxConcurrentVideoTextures", 1, 8, 1)
     .name("video slots")

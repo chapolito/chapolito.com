@@ -124,18 +124,6 @@ export function initBentoBulgeOverlays(options = {}) {
     document.body.classList.remove("is-grid-pressing");
   }
 
-  function pauseGridVideos() {
-    grid.querySelectorAll("video").forEach((v) => {
-      v.pause();
-    });
-  }
-
-  function resumeGridVideos() {
-    grid.querySelectorAll("video").forEach((v) => {
-      v.play().catch(() => {});
-    });
-  }
-
   function restoreHomeEnter() {
     if (document.body.dataset.homeReady === "true") {
       document.body.classList.add("is-home-enter");
@@ -160,7 +148,6 @@ export function initBentoBulgeOverlays(options = {}) {
     doc.className = "pj-doc";
     doc.innerHTML = "";
     clearOverlayState();
-    resumeGridVideos();
     onClose();
     restoreHomeEnter();
     document.title = "Bento bulge — Jesse O'Chapo";
@@ -213,7 +200,6 @@ export function initBentoBulgeOverlays(options = {}) {
     reader.removeAttribute("hidden");
     reader.removeAttribute("inert");
     reader.classList.add("reader--ov-split");
-    pauseGridVideos();
     onOpen();
     reader.classList.add("is-open");
     reader.setAttribute("aria-hidden", "false");
