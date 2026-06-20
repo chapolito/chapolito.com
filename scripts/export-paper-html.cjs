@@ -84,7 +84,7 @@ function homeChunks() {
     {
       name: "Page shell",
       html: `<div layer-name="Home shell" style="display: flex; flex-direction: column; width: ${W}px; background-color: #07060a; position: relative; overflow: hidden;">
-  <img layer-name="Home background" src="${asset("images/home_background.png")}" style="position: absolute; left: 0; bottom: 0; width: ${W}px; height: auto; display: block; pointer-events: none;" />
+  <div layer-name="Home background" style="position: absolute; inset: 0; background: radial-gradient(ellipse 100% 85% at 50% 100%, #2a2130 0%, #151118 50%, #0a080c 75%, #000 100%); pointer-events: none;"></div>
 </div>`,
     },
     {
