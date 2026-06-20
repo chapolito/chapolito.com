@@ -3,25 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Jesse O'Chapo — Principal Product Designer</title>
-    <meta name="description" content="Selected work by Jesse O'Chapo, Principal Product Designer." />
-    <base href="/concepts/v1/" />
-    <link rel="stylesheet" href="../shared/tokens.css" />
-    <link rel="stylesheet" href="../shared/project.css" />
-    <link rel="stylesheet" href="../shared/dock.css" />
-    <link rel="stylesheet" href="../shared/detail-view.css" />
-    <link rel="stylesheet" href="../shared/about.css" />
-    <link rel="stylesheet" href="v1.css" />
+    <title>Portfolio of Jesse O'Chapo</title>
+    <meta name="description" content="Chapolito.com is the portfolio of Principal Product Designer Jesse O'Chapo." />
+    <meta property="og:image" content="http://www.chapolito.com/images/og-image.jpg" />
+    <link rel="stylesheet" href="/stylesheets/tokens.css" />
+    <link rel="stylesheet" href="/stylesheets/project.css" />
+    <link rel="stylesheet" href="/stylesheets/dock.css" />
+    <link rel="stylesheet" href="/stylesheets/detail-view.css" />
+    <link rel="stylesheet" href="/stylesheets/about.css" />
+    <link rel="stylesheet" href="/stylesheets/home.css" />
+    <link rel="stylesheet" href="/javascripts/vendor/lil-gui.min.css" />
+    <link rel="stylesheet" href="/stylesheets/bento-bulge.css" />
   </head>
-  <body class="u-grain is-home is-home-pending">
+  <body class="u-grain is-home is-home-pending bento-bulge-page">
     <div class="home-bg" aria-hidden="true">
-      <img src="../../images/home_background.png" alt="" />
+      <img src="/images/home_background.png" alt="" />
     </div>
     <div class="u-glow" aria-hidden="true"></div>
 
     <div class="stage" id="stage">
       <section class="home-portfolio" id="portfolio" aria-label="Selected work">
-        <main class="grid" id="grid"></main>
+        <main class="grid grid--bulge" id="grid"></main>
       </section>
     </div>
 
@@ -34,7 +36,7 @@
         <div class="about__intro">
           <figure class="about__portrait">
             <img
-              src="../../images/jesse-ochapo-portrait.jpg"
+              src="/images/jesse-ochapo-portrait.jpg"
               alt="Portrait of Jesse O'Chapo"
               width="560"
               height="700"
@@ -116,7 +118,6 @@
       </article>
     </template>
 
-    <!-- homepage-style dock (progressive blur) -->
     <aside class="dock" aria-label="Site">
       <div class="dock__backdrop" aria-hidden="true">
         <div class="dock__blur dock__blur--1"></div>
@@ -127,8 +128,8 @@
         <div class="dock__gradient"></div>
       </div>
       <div class="dock__content">
-        <a class="dock__logo" href="https://chapolito.com" aria-label="Chapolito">
-          <img src="../../images/chapolito-logo-footer.svg" alt="Chapolito" width="97" height="31" />
+        <a class="dock__logo" href="/" aria-label="Chapolito">
+          <img src="/images/chapolito-logo-footer.svg" alt="Chapolito" width="97" height="31" />
         </a>
         <p class="dock__details">
           <span class="dock__name">Jesse O'Chapo</span>
@@ -138,14 +139,13 @@
           <span class="dock__loc">Santa Cruz, CA</span>
         </p>
         <nav class="dock__nav" aria-label="Site navigation">
-          <a class="dock__link is-active" href="#" data-view="portfolio">Portfolio</a>
+          <a class="dock__link is-active" href="#" data-view="portfolio">Projects</a>
           <a class="dock__link" href="#about" data-view="about">About</a>
         </nav>
       </div>
     </aside>
 
-    <!-- overlay reader -->
-    <div class="reader" id="reader" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project">
+    <div class="reader" id="reader" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project">
       <div class="reader__scrim" id="scrim"></div>
       <button class="detail-back reader__back" id="close" type="button" aria-label="Back to home">
         <svg class="detail-back__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -158,8 +158,124 @@
       </div>
     </div>
 
-    <script src="../shared/projects.js"></script>
-    <script src="../shared/render.js"></script>
-    <script src="v1.js"></script>
+    <script src="/javascripts/projects.js"></script>
+    <script src="/javascripts/render.js"></script>
+    <script>
+      (function () {
+        var grid = document.getElementById("grid");
+        var projects = (window.PROJECTS || []).filter(function (p) {
+          return p.id !== "mk-play" && p.id !== "life360-messaging";
+        });
+
+        function tileVideoSrc(src) {
+          if (!src || !/\.mp4$/i.test(src)) return src;
+          return src.replace(/\.mp4$/i, ".tile.mp4");
+        }
+
+        projects.forEach(function (p) {
+          var tile = document.createElement("article");
+          tile.className = "tile";
+          tile.dataset.id = p.id;
+          tile.dataset.orient = p.orientation || "landscape";
+          tile.dataset.fit = (p.tile && p.tile.fit) || "cover";
+          tile.tabIndex = 0;
+          tile.setAttribute("role", "button");
+          tile.setAttribute("aria-label", p.title + ", " + p.product);
+
+          var surface = document.createElement("div");
+          surface.className = "tile__surface";
+
+          var media = document.createElement("div");
+          media.className = "tile__media";
+          var m = p.tile || {};
+
+          if (m.type === "video") {
+            var v = document.createElement("video");
+            v.src = tileVideoSrc(m.src);
+            v.muted = true;
+            v.loop = true;
+            v.playsInline = true;
+            v.setAttribute("playsinline", "");
+            v.preload = "metadata";
+            v.setAttribute("data-inview", "");
+            media.appendChild(v);
+          } else if (m.src) {
+            var img = document.createElement("img");
+            img.src = m.src;
+            img.alt = p.title;
+            img.loading = "eager";
+            media.appendChild(img);
+          }
+
+          surface.appendChild(media);
+          tile.appendChild(surface);
+          tile.appendChild(document.createElement("div")).className = "tile__veil";
+
+          var label = document.createElement("div");
+          label.className = "tile__label";
+          var prod = document.createElement("p");
+          prod.className = "tile__product";
+          prod.textContent = p.product;
+          var title = document.createElement("h2");
+          title.className = "tile__title";
+          title.textContent = p.title;
+          label.appendChild(prod);
+          label.appendChild(title);
+          tile.appendChild(label);
+
+          grid.appendChild(tile);
+        });
+
+        if (window.initInview) window.initInview(grid);
+      })();
+    </script>
+    <script type="module">
+      import { initBentoBulge, getBulgeWhenReady } from "/javascripts/bento-bulge/index.js";
+      import { initBentoBulgeOverlays } from "/javascripts/bento-bulge/overlays.js";
+
+      function boot() {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            const bulge = initBentoBulge({
+              bento: "#grid",
+              projects: "#portfolio",
+              cellSelector: ".tile",
+              hoverClass: "is-bulge-hovered",
+              cornerRadius: 8
+            });
+
+            initBentoBulgeOverlays({
+              whenBulgeReady: getBulgeWhenReady(),
+              onOpen() {
+                bulge?.setOverlayOpen?.(true);
+              },
+              onClose() {
+                bulge?.setOverlayOpen?.(false);
+              }
+            });
+          });
+        });
+      }
+
+      boot();
+    </script>
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          };
+        i[r].l = 1 * new Date();
+        a = s.createElement(o);
+        m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
+      ga("create", "UA-4247086-1", "auto");
+      ga("send", "pageview");
+    </script>
   </body>
 </html>

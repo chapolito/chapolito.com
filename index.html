@@ -1,185 +1,281 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset='utf-8'>
-    <meta content='IE=edge,chrome=1' http-equiv='X-UA-Compatible'>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio of Jesse O'Chapo</title>
-    <meta content='Chapolito.com is the portfolio of Principal Product Designer Jesse O&amp;39;Chapo.' name='description'>
-    <meta content='user-scalable=0, initial-scale=1.0' name='viewport'>
-    <meta content='http://www.chapolito.com/images/og-image.jpg' property='og:image'>
-    <link href="/stylesheets/all.css" rel="stylesheet" type="text/css" />
-    <link href="https://fonts.googleapis.com/css?family=Karla:400,700,400italic,700italic|Montserrat:700" rel="stylesheet" type="text/css" />
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/jquery.smoothstate/0.7.2/jquery.smoothState.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fastclick/1.0.6/fastclick.min.js" type="text/javascript"></script>
-    <script>
-      window.jQuery || document.write('<script src="/javascripts/vendor/jquery-2.2.0.min.js"><\/script>')
-    </script>
-    <script src="/javascripts/all.js" type="text/javascript"></script>
+    <meta name="description" content="Chapolito.com is the portfolio of Principal Product Designer Jesse O'Chapo." />
+    <meta property="og:image" content="http://www.chapolito.com/images/og-image.jpg" />
+    <link rel="stylesheet" href="/stylesheets/tokens.css" />
+    <link rel="stylesheet" href="/stylesheets/project.css" />
+    <link rel="stylesheet" href="/stylesheets/dock.css" />
+    <link rel="stylesheet" href="/stylesheets/detail-view.css" />
+    <link rel="stylesheet" href="/stylesheets/about.css" />
+    <link rel="stylesheet" href="/stylesheets/home.css" />
+    <link rel="stylesheet" href="/javascripts/vendor/lil-gui.min.css" />
+    <link rel="stylesheet" href="/stylesheets/bento-bulge.css" />
   </head>
-  <body>
-    <div id='main'>
-      <div class='identifier-wrapper experimental-home'>
-        <main>
-          <div class='home-projects experimental-bento-projects'>
-            <div class='experimental-bento'>
+  <body class="u-grain is-home is-home-pending bento-bulge-page">
+    <div class="home-bg" aria-hidden="true">
+      <img src="/images/home_background.png" alt="" />
+    </div>
+    <div class="u-glow" aria-hidden="true"></div>
 
-              <article class='bento-cell bento-size-2x1' aria-label='Horizon'>
-                <video class='bento-cell__video' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/horizon-world-chat.mp4'></video>
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Portal Voice Recognition'>
-                <video class='bento-cell__video' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/portal-voice-recognition.mp4'></video>
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Portal Household Mode'>
-                <video class='bento-cell__video' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/household-mode-animation.mp4'></video>
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Quest VR'>
-                <video class='bento-cell__video' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/quest-vr-project-joy.mp4'></video>
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Portal Live'>
-                <img class='bento-cell__img' src='/images/home/portal-live.png' alt='Portal Facebook Live interface' />
-              </article>
+    <div class="stage" id="stage">
+      <section class="home-portfolio" id="portfolio" aria-label="Selected work">
+        <main class="grid grid--bulge" id="grid"></main>
+      </section>
+    </div>
 
-              <article class='bento-cell bento-size-1x2' aria-label='Horizon Mobile'>
-                <video class='bento-cell__video bento-cell__video--fit-height' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/horizon-mobile.mp4'></video>
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Portal Account Switching'>
-                <img class='bento-cell__img' src='/images/home/portal-account-switching.png' alt='Portal Change profiles screen with Household Mode' />
-              </article>
-              <article class='bento-cell bento-size-2x2' aria-label='Quest VR'>
-                <video class='bento-cell__video bento-cell__video--fit-height' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/quest-vr/people-tab.mp4'></video>
-              </article>
-              <article class='bento-cell bento-size-2x1' aria-label='Meta Accounts'>
-                <img class='bento-cell__img' src='/images/home/meta-accounts.png' alt='Meta account sign-in across desktop, VR, tablet, and phone' />
-              </article>
+    <template id="about-template">
+      <article class="about">
+        <header class="about__head">
+          <h1 class="about__title t-display" id="about-title">About</h1>
+        </header>
 
-              <article class='bento-cell bento-size-2x1' aria-label='Life360'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Life360 Quick Messages'>
-                <img class='bento-cell__img' src='/images/home/life360-quick-messages.png' alt='Life360 quick messages icon' />
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Life360 Stickers'>
-                <img class='bento-cell__img' src='/images/home/life360-stickers.png' alt='' />
-              </article>
-              <article class='bento-cell bento-size-1x1' aria-label='Account Center TV'>
-                <video class='bento-cell__video' autoplay='true' loop='true' muted='true' playsinline='true' src='/images/home/account-center-tv.mp4'></video>
-              </article>
-
-              <article class='bento-cell bento-size-2x1' aria-label='The Wiki Game'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Placeholder'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='The Wiki Game Icon'></article>
-
-              <article class='bento-cell bento-size-2x1' aria-label='Fanpics'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Placeholder'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Placeholder'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Placeholder'></article>
-              <article class='bento-cell bento-size-1x2' aria-label='Fanpics Video'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Fanpics Badge'></article>
-
-              <article class='bento-cell bento-size-2x1' aria-label='Spritzr'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Quest for Business'></article>
-              <article class='bento-cell bento-size-1x1' aria-label='Quest for Business'></article>
-
-            </div>
+        <div class="about__intro">
+          <figure class="about__portrait">
+            <img
+              src="/images/jesse-ochapo-portrait.jpg"
+              alt="Portrait of Jesse O'Chapo"
+              width="560"
+              height="700"
+              loading="lazy"
+            />
+          </figure>
+          <div class="about__copy">
+            <p class="about__lede">
+              Hello! I'm Jesse O'Chapo, a Principal Product Designer at Meta, based in Santa Cruz, CA. Previously, I
+              designed at Life360, Fanpics, and MTV.
+            </p>
+            <p>
+              I built my first website in 1998 to host my Starcraft maps (twinkling star GIF background and all). That
+              turned into a career that started in 2006, ran through early-stage startups, and landed me at Meta in 2017.
+            </p>
+            <p>
+              During my 9+ years at Meta I've grown from Product Designer to Senior, Staff, and now Principal. I
+              specialize in turning ambiguous zero-to-one initiatives into clear product direction. As a leader, I shape
+              work, set the bar for craft, mentor designers, and partner closely with PM and engineering leads to define
+              vision where no blueprint exists. I'm an exceptional systems thinker and I'm regularly sought out to frame
+              complex team strategies that VPs and Directors can rally behind.
+            </p>
+            <p>
+              While I focus on product strategy and design leadership, I stay hands-on in high-fidelity design. Right now
+              that means integrating AI into my daily workflow as a creative thought partner for research, synthesis,
+              prototyping, and creating visual content that brings mocks to life. I love experimenting with new
+              technology, and I'm usually the person bringing new AI workflows to my peers.
+            </p>
           </div>
-        </main>
-        <aside class='portfolio-chat experimental-home-footer'>
-          <div class='portfolio-chat__backdrop' aria-hidden='true'>
-            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--1'></div>
-            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--2'></div>
-            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--3'></div>
-            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--4'></div>
-            <div class='portfolio-chat__blur-layer portfolio-chat__blur-layer--5'></div>
-            <div class='portfolio-chat__gradient'></div>
-          </div>
-          <div class='portfolio-chat__content'>
-            <div class='experimental-home-footer__identity'>
-              <a class='experimental-home-footer__logo' href='/'>
-                <img src='/images/chapolito-logo-footer.svg' alt='Chapolito' width='97' height='31' />
-              </a>
-              <p class='experimental-home-footer__details'>
-                <span class='experimental-home-footer__name'>Jesse O'Chapo</span>
-                <span class='experimental-home-footer__sep' aria-hidden='true'>·</span>
-                <span class='experimental-home-footer__title'>Product Designer</span>
-                <span class='experimental-home-footer__sep' aria-hidden='true'>·</span>
-                <span class='experimental-home-footer__location'>Santa Cruz, CA</span>
+        </div>
+
+        <section class="about__philosophy" aria-labelledby="how-i-work">
+          <h2 class="about__section-title t-display" id="how-i-work">How I work</h2>
+          <ul class="about__cards">
+            <li class="about__card">
+              <h3 class="about__card-title">Systems thinker.</h3>
+              <p class="about__card-body">
+                My happy place is ambiguous problems that require orchestrating across multiple teams.
               </p>
-            </div>
-            <nav class='experimental-home-footer__nav' aria-label='Site'>
-              <a class='experimental-home-footer__nav-link is-active' href='/'>Portfolio</a>
-              <a class='experimental-home-footer__nav-link' href='/about'>About</a>
-            </nav>
-          </div>
-        </aside>
-        <script>
-          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-          ga('create', 'UA-4247086-1', 'auto');
-          ga('send', 'pageview');
-        </script>
-        <script>
-          document.addEventListener('DOMContentLoaded', function () {
-            var root = document.querySelector('.experimental-home');
-            if (!root) return;
-            requestAnimationFrame(function () {
-              root.classList.add('is-loaded');
-            });
-          });
-        </script>
-        <script>
-          (function () {
-            if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+            </li>
+            <li class="about__card">
+              <h3 class="about__card-title">Full stack designer.</h3>
+              <p class="about__card-body">
+                My days range from developing product strategy to sweating visual polish.
+              </p>
+            </li>
+            <li class="about__card">
+              <h3 class="about__card-title">Mentor.</h3>
+              <p class="about__card-body">
+                I get a lot of joy from scaling my experiences through mentorship and coaching.
+              </p>
+            </li>
+            <li class="about__card">
+              <h3 class="about__card-title">Growth mindset.</h3>
+              <p class="about__card-body">
+                I cringe at all my old work and enjoy reflecting on how to improve.
+              </p>
+            </li>
+            <li class="about__card">
+              <h3 class="about__card-title">Get it done.</h3>
+              <p class="about__card-body">
+                Not knowing how to do something does not stop me figuring it out and getting it done.
+              </p>
+            </li>
+            <li class="about__card">
+              <h3 class="about__card-title">Inclusive process.</h3>
+              <p class="about__card-body">
+                My best work materializes by sharing, discussing, and seeking new perspectives.
+              </p>
+            </li>
+          </ul>
+        </section>
 
-            var bento = document.querySelector('.experimental-bento');
-            if (!bento) return;
+        <div class="about__links">
+          <a href="https://www.linkedin.com/in/chapolito">LinkedIn</a>
+          <a href="https://github.com/chapolito">GitHub</a>
+          <a href="mailto:jesse@chapolito.com">jesse@chapolito.com</a>
+        </div>
+      </article>
+    </template>
 
-            var cells = bento.querySelectorAll('.bento-cell');
-            var activeCell = null;
+    <aside class="dock" aria-label="Site">
+      <div class="dock__backdrop" aria-hidden="true">
+        <div class="dock__blur dock__blur--1"></div>
+        <div class="dock__blur dock__blur--2"></div>
+        <div class="dock__blur dock__blur--3"></div>
+        <div class="dock__blur dock__blur--4"></div>
+        <div class="dock__blur dock__blur--5"></div>
+        <div class="dock__gradient"></div>
+      </div>
+      <div class="dock__content">
+        <a class="dock__logo" href="/" aria-label="Chapolito">
+          <img src="/images/chapolito-logo-footer.svg" alt="Chapolito" width="97" height="31" />
+        </a>
+        <p class="dock__details">
+          <span class="dock__name">Jesse O'Chapo</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__title">Principal Product Designer</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__loc">Santa Cruz, CA</span>
+        </p>
+        <nav class="dock__nav" aria-label="Site navigation">
+          <a class="dock__link is-active" href="#" data-view="portfolio">Projects</a>
+          <a class="dock__link" href="#about" data-view="about">About</a>
+        </nav>
+      </div>
+    </aside>
 
-            function distanceToRect(x, y, rect) {
-              var dx = Math.max(rect.left - x, 0, x - rect.right);
-              var dy = Math.max(rect.top - y, 0, y - rect.bottom);
-              return dx * dx + dy * dy;
-            }
-
-            function cellAtPoint(x, y) {
-              var nearest = null;
-              var nearestDist = Infinity;
-
-              for (var i = 0; i < cells.length; i++) {
-                var rect = cells[i].getBoundingClientRect();
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                  return cells[i];
-                }
-                var dist = distanceToRect(x, y, rect);
-                if (dist < nearestDist) {
-                  nearestDist = dist;
-                  nearest = cells[i];
-                }
-              }
-              return nearest;
-            }
-
-            function setHovered(cell) {
-              if (cell === activeCell) return;
-              if (activeCell) activeCell.classList.remove('is-hovered');
-              activeCell = cell;
-              if (activeCell) activeCell.classList.add('is-hovered');
-            }
-
-            function clearHovered() {
-              setHovered(null);
-            }
-
-            document.addEventListener('pointermove', function (e) {
-              setHovered(cellAtPoint(e.clientX, e.clientY));
-            }, { passive: true });
-
-            document.documentElement.addEventListener('mouseleave', clearHovered);
-          })();
-        </script>
+    <div class="reader" id="reader" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project">
+      <div class="reader__scrim" id="scrim"></div>
+      <button class="detail-back reader__back" id="close" type="button" aria-label="Back to home">
+        <svg class="detail-back__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+        <span class="detail-back__label">Back to Home</span>
+      </button>
+      <div class="reader__panel" id="panel">
+        <div class="pj-doc" id="doc"></div>
       </div>
     </div>
+
+    <script src="/javascripts/projects.js"></script>
+    <script src="/javascripts/render.js"></script>
+    <script>
+      (function () {
+        var grid = document.getElementById("grid");
+        var projects = (window.PROJECTS || []).filter(function (p) {
+          return p.id !== "mk-play" && p.id !== "life360-messaging";
+        });
+
+        function tileVideoSrc(src) {
+          if (!src || !/\.mp4$/i.test(src)) return src;
+          return src.replace(/\.mp4$/i, ".tile.mp4");
+        }
+
+        projects.forEach(function (p) {
+          var tile = document.createElement("article");
+          tile.className = "tile";
+          tile.dataset.id = p.id;
+          tile.dataset.orient = p.orientation || "landscape";
+          tile.dataset.fit = (p.tile && p.tile.fit) || "cover";
+          tile.tabIndex = 0;
+          tile.setAttribute("role", "button");
+          tile.setAttribute("aria-label", p.title + ", " + p.product);
+
+          var surface = document.createElement("div");
+          surface.className = "tile__surface";
+
+          var media = document.createElement("div");
+          media.className = "tile__media";
+          var m = p.tile || {};
+
+          if (m.type === "video") {
+            var v = document.createElement("video");
+            v.src = tileVideoSrc(m.src);
+            v.muted = true;
+            v.loop = true;
+            v.playsInline = true;
+            v.setAttribute("playsinline", "");
+            v.preload = "metadata";
+            v.setAttribute("data-inview", "");
+            media.appendChild(v);
+          } else if (m.src) {
+            var img = document.createElement("img");
+            img.src = m.src;
+            img.alt = p.title;
+            img.loading = "eager";
+            media.appendChild(img);
+          }
+
+          surface.appendChild(media);
+          tile.appendChild(surface);
+          tile.appendChild(document.createElement("div")).className = "tile__veil";
+
+          var label = document.createElement("div");
+          label.className = "tile__label";
+          var prod = document.createElement("p");
+          prod.className = "tile__product";
+          prod.textContent = p.product;
+          var title = document.createElement("h2");
+          title.className = "tile__title";
+          title.textContent = p.title;
+          label.appendChild(prod);
+          label.appendChild(title);
+          tile.appendChild(label);
+
+          grid.appendChild(tile);
+        });
+
+        if (window.initInview) window.initInview(grid);
+      })();
+    </script>
+    <script type="module">
+      import { initBentoBulge, getBulgeWhenReady } from "/javascripts/bento-bulge/index.js";
+      import { initBentoBulgeOverlays } from "/javascripts/bento-bulge/overlays.js";
+
+      function boot() {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            const bulge = initBentoBulge({
+              bento: "#grid",
+              projects: "#portfolio",
+              cellSelector: ".tile",
+              hoverClass: "is-bulge-hovered",
+              cornerRadius: 8
+            });
+
+            initBentoBulgeOverlays({
+              whenBulgeReady: getBulgeWhenReady(),
+              onOpen() {
+                bulge?.setOverlayOpen?.(true);
+              },
+              onClose() {
+                bulge?.setOverlayOpen?.(false);
+              }
+            });
+          });
+        });
+      }
+
+      boot();
+    </script>
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          };
+        i[r].l = 1 * new Date();
+        a = s.createElement(o);
+        m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
+      ga("create", "UA-4247086-1", "auto");
+      ga("send", "pageview");
+    </script>
   </body>
 </html>
