@@ -6,12 +6,13 @@ Static design portfolio for Jesse O'Chapo, deployed to Amazon S3.
 
 | Path | Purpose |
 |------|---------|
-| `index.html` | Home / portfolio grid |
-| `about/`, `contact/` | Site pages |
-| `horizon/`, `quest-vr/`, `quest-for-business/`, `portal/`, `messenger-kids/`, `life360/`, `the-wiki-game/`, `fanpics/`, `spritzr/` | Case studies |
-| `free-design-resources/` | Legacy blog-style resource posts |
-| `stylesheets/all.css` | Compiled site styles (formerly Middleman `all.css`) |
-| `javascripts/all.js` | Site JS (smooth page transitions, scroll animations) |
+| `index.html` | Home — bento bulge portfolio grid with overlay project reader |
+| `/{project-id}/` | Deep links to home + open project overlay (generated copies of `index.html`) |
+| `about/` | Redirects to `/#about` on the home page |
+| `contact/` | Site pages |
+| `horizon/`, `quest-vr/`, etc. | Legacy case studies |
+| `stylesheets/` | Site CSS — `all.css` for legacy pages; `tokens.css`, `home.css`, `bento-bulge.css`, etc. for home |
+| `javascripts/` | Site JS — `all.js` for legacy; `bento-bulge/` + `projects.js` for home |
 | `images/`, `fonts/` | Static assets |
 | `.well-known/` | SSL domain validation (keep when syncing to S3) |
 
@@ -53,10 +54,10 @@ git commit -m "Remove Middleman fingerprint hashes and duplicate build artifacts
 
 ## Deploying to S3
 
-Before syncing, regenerate concept v1 project routes (copies `concepts/v1/index.html` into each `concepts/v1/{project-id}/index.html` so direct URLs work on refresh):
+Before syncing, regenerate home project routes (copies `index.html` into each `/{project-id}/index.html` so direct URLs work on refresh):
 
 ```bash
-node scripts/generate-v1-routes.cjs
+node scripts/generate-home-routes.cjs
 ```
 
 Sync the site root to your bucket (adjust bucket name and profile):

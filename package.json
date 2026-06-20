@@ -3,10 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "generate:v1-routes": "node scripts/generate-v1-routes.cjs",
-    "generate:bento-bulge-routes": "node scripts/generate-bento-bulge-routes.cjs",
+    "generate:home-routes": "node scripts/generate-home-routes.cjs",
     "vendor:three": "cp node_modules/three/build/three.core.min.js node_modules/three/build/three.module.min.js javascripts/vendor/",
-    "start": "node scripts/generate-v1-routes.cjs && node scripts/generate-bento-bulge-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
+    "start": "node scripts/generate-home-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
     "serve": "npm run start"
   },
   "dependencies": {

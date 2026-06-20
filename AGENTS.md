@@ -29,13 +29,14 @@ These hold whether you are editing the site or designing in Figma.
 
 Static portfolio site, deployed to Amazon S3. See [README.md](README.md) for full structure and deploy steps.
 
-- **No new frameworks:** do not add Tailwind, a second global stylesheet, or a CSS build step. Reuse [stylesheets/all.css](stylesheets/all.css).
-- **Layout:** follow the grid and CSS conventions in [.cursor/rules/chapolito-css-layout.mdc](.cursor/rules/chapolito-css-layout.mdc). Match a sibling page (a case study, `free-design-resources`, or the home page) before creating new structure.
-- **Page shell:** keep the `#main` > `.identifier-wrapper` > `header.row` / `main` / `footer.row` pattern.
+- **No new frameworks:** do not add Tailwind, a CSS build step, or a second global stylesheet for the home page. Case studies and legacy pages use [stylesheets/all.css](stylesheets/all.css); the home page uses the modular sheets under `stylesheets/` (`tokens.css`, `home.css`, `bento-bulge.css`, etc.).
+- **Layout:** follow the grid and CSS conventions in [.cursor/rules/chapolito-css-layout.mdc](.cursor/rules/chapolito-css-layout.mdc). Match the home page or a sibling case study before creating new structure.
+- **Home page:** `index.html` is the bento bulge portfolio — grid shell, dock, overlay reader, and WebGL surface in `javascripts/bento-bulge/`. Project content lives in [javascripts/projects.js](javascripts/projects.js).
+- **Page shell:** legacy case studies keep `#main` > `.identifier-wrapper` > `header.row` / `main` / `footer.row`. The home page uses `.stage`, `.grid`, `.dock`, and `.reader` instead.
 - **Assets:** images and video live under `images/`; fonts under `fonts/`. Keep `.well-known/` when syncing to S3.
-- **JS:** the site uses jQuery + SmoothState + FastClick (CDN with local fallbacks in `javascripts/vendor/`). Don't introduce a new framework for small interactions.
-- **Local preview:** `npm start` (or `node scripts/serve.cjs`) then open `http://localhost:8080` (the server handles `/about` → `about/index.html`, which SmoothState needs; `/concepts/v1/{project}/` refreshes via per-project `index.html` copies).
-- **No inline styles for layout/spacing;** add scoped, BEM-like rules in `all.css` under the page class.
+- **JS:** case studies use jQuery + SmoothState + FastClick ([javascripts/all.js](javascripts/all.js)). The home page uses ES modules (Three.js bulge + overlays). Don't introduce another framework for small interactions.
+- **Local preview:** `npm start` then open `http://localhost:8080`. Run `npm run generate:home-routes` before deploy so `/{project-id}/` deep links resolve on S3. `/about` redirects to `/#about`.
+- **No inline styles for layout/spacing;** add scoped rules in the relevant stylesheet (`all.css` for legacy pages; `stylesheets/home.css` / `bento-bulge.css` for the home page).
 
 <!-- TODO: add your own website rules here -->
 

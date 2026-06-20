@@ -1,4 +1,3 @@
-const BASE_PATH = "/concepts/bento-bulge";
 const TX_OUT = 400;
 const TX_IN = 400;
 const TX_DELAY = 150;
@@ -61,21 +60,25 @@ export function initBentoBulgeOverlays(options = {}) {
   }
 
   function idFromLocation() {
-    const path = location.pathname.replace(/\/+$/, "");
-    const match = path.match(/\/concepts\/bento-bulge\/([^/]+)$/);
-    return match ? decodeURIComponent(match[1]) : null;
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    if (path === "/") return null;
+    const match = path.match(/^\/([^/]+)$/);
+    if (!match) return null;
+    const id = decodeURIComponent(match[1]);
+    const projects = window.PROJECTS || [];
+    return projects.some((p) => p.id === id) ? id : null;
   }
 
   function homeUrl() {
-    return `${BASE_PATH}/`;
+    return "/";
   }
 
   function projectUrl(id) {
-    return `${BASE_PATH}/${encodeURIComponent(id)}/`;
+    return `/${encodeURIComponent(id)}/`;
   }
 
   function aboutUrl() {
-    return `${BASE_PATH}/#about`;
+    return "/#about";
   }
 
   function setActiveNav(name) {

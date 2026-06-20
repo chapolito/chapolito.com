@@ -9,7 +9,7 @@ const path = require("path");
 const ROOT = path.resolve(__dirname, "..");
 const OUT = path.join(ROOT, "exports/paper/chunks.json");
 
-const projectsCode = fs.readFileSync(path.join(ROOT, "concepts/shared/projects.js"), "utf8");
+const projectsCode = fs.readFileSync(path.join(ROOT, "javascripts/projects.js"), "utf8");
 const PROJECTS = Function(
   "window",
   projectsCode.replace(/^[\s\S]*?window\.PROJECTS\s*=\s*/, "return ") + ";"
