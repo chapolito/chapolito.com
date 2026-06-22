@@ -101,8 +101,30 @@
 .dock__title { font-weight: 600; color: #fff; opacity: 0.55; }
 .dock__sep { font-weight: 400; color: #fff; opacity: 0.38; }
 .dock__loc { font-weight: 500; color: #fff; opacity: 0.42; }
+.dock__social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-left: 0.15rem;
+  vertical-align: middle;
+}
+.dock__social-link {
+  display: inline-flex;
+  line-height: 0;
+  opacity: 0.6;
+  transition: opacity 150ms ease-out;
+}
+.dock__social-link img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+@media (hover: hover) {
+  .dock__social-link:hover { opacity: 1; }
+}
 .dock__nav {
   display: flex;
+  align-items: flex-end;
   gap: 1.75rem;
   flex-shrink: 0;
   justify-self: end;

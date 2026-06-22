@@ -37,6 +37,7 @@ Static portfolio site, deployed to Amazon S3. See [README.md](README.md) for ful
 - **JS:** case studies use jQuery + SmoothState + FastClick ([javascripts/all.js](javascripts/all.js)). The home page uses ES modules (Three.js bulge + overlays). Don't introduce another framework for small interactions.
 - **Local preview:** `npm start` then open `http://localhost:8080`. Run `npm run generate:home-routes` before deploy so `/{project-id}/` deep links resolve on S3. `/about` redirects to `/#about`.
 - **No inline styles for layout/spacing;** add scoped rules in the relevant stylesheet (`all.css` for legacy pages; `stylesheets/home.css` / `bento-bulge.css` for the home page).
+- **WebGL + fallback parity:** any interaction or visual state driven by the bento bulge WebGL path (`javascripts/bento-bulge/`) must also work when WebGL is unavailable — coarse pointer, reduced motion, low memory, or context failure. The fallback uses DOM tiles and CSS (see `initFallbackHover` and overlay rules on `.grid.grid--bulge` without `.grid--bulge-active`). Shader-only effects need a CSS or DOM equivalent on the fallback path; do not rely on `.experimental-bento__surface` alone.
 
 <!-- TODO: add your own website rules here -->
 

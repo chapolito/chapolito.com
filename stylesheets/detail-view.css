@@ -28,7 +28,6 @@
 .tile {
   transition: opacity var(--tx-out) ease-in;
 }
-body.is-grid-pressing .grid,
 body.is-detail-opening .grid,
 body.is-detail-open .grid {
   transform: scale(0.965) translateY(8px);
@@ -45,7 +44,6 @@ body.is-home-enter .grid {
     filter var(--tx-in) ease-out var(--tx-delay);
 }
 
-body.is-grid-pressing .grid .tile,
 body.is-detail-opening .grid .tile,
 body.is-detail-open .grid .tile {
   opacity: 0.12;
@@ -356,6 +354,17 @@ body.is-home-enter .grid .tile {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.detail-split.is-revealed .pj-head,
+.detail-split.is-revealed .pj-bento__media,
+.detail-split.is-instant .pj-head,
+.detail-split.is-instant .pj-bento__media,
+body.is-detail-enter .detail-split.is-revealed .pj-head,
+body.is-detail-enter .detail-split.is-revealed .pj-bento__media {
+  animation: none;
+  opacity: 1;
+  transform: none;
 }
 
 .detail-split.is-revealed .pj-sec.reveal,

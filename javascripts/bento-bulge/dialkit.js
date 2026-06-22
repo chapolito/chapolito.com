@@ -1,32 +1,30 @@
 import GUI from "/javascripts/vendor/lil-gui.esm.min.js";
 
-const STORAGE_KEY = "bento-bulge-params-v14";
+const STORAGE_KEY = "bento-bulge-params-v17";
 
 export const defaultParams = {
   maxDisplacementRatio: 0.012,
   projectWeight: 0.82,
-  cursorWeight: 0,
   projectSpread: 1.08,
-  cursorSpread: 1.1,
-  cursorDeadZone: 120,
   morphSpeed: 7,
-  hillRadiusScale: 1.65,
+  hillRadiusScale: 1.85,
   hillFlatness: 0.6,
   screenBulgeScale: 6,
   dimOpacity: 0.65,
   dimMorphSpeed: 6,
   subdivisions: 20,
   enablePerspective: false,
-  showFakeGrid: false,
-  useRealTextures: true,
-  fakeGridOpacity: 0.85,
   showAlignmentOverlay: false,
   showWireframe: false,
-  forceWebGL: false,
   maxConcurrentVideoTextures: 6,
   cornerRadius: 8,
   enableVideos: true,
   pauseIdleVideos: false,
+  pressSpreadAdd: 0.29,
+  pressBulgeBoost: 0.25,
+  pressMorphSpeed: 14,
+  pressDimOpacity: 0.35,
+  overlayDimMorphSpeed: 7.5,
   dprCap: 2
 };
 
@@ -65,31 +63,35 @@ export function createDialkit(root, params, onChange) {
   const panel = shell.querySelector(".bento-bulge-dialkit__panel");
   const gui = new GUI({ container: panel, title: "Bento bulge" });
 
-  function syncFakeOpacityVisibility(show) {
-    fakeOpacityCtrl.domElement.style.display = show ? "" : "none";
-  }
-
   const debug = gui.addFolder("Debug");
   debug.add(params, "showWireframe").name("wireframe").onChange(onChange);
   debug.add(params, "showAlignmentOverlay").name("alignment").onChange(onChange);
-  debug.add(params, "showFakeGrid").name("fake grid").onChange((value) => {
-    syncFakeOpacityVisibility(value);
-    onChange();
-  });
-  const fakeOpacityCtrl = debug
-    .add(params, "fakeGridOpacity", 0, 1, 0.01)
-    .name("fake opacity")
-    .onChange(onChange);
-  debug.add(params, "useRealTextures").name("real textures").onChange(onChange);
   debug.add(params, "enableVideos").name("videos").onChange(onChange);
   debug.add(params, "pauseIdleVideos").name("pause idle videos").onChange(onChange);
   debug
-    .add(params, "maxConcurrentVideoTextures", 1, 8, 1)
-    .name("video slots")
+    .add(params, "hillRadiusScale", 1, 3, 0.01)
+    .name("hill radius")
     .onChange(onChange);
-  debug.add(params, "forceWebGL").name("force WebGL").onChange(onChange);
   debug.close();
-  syncFakeOpacityVisibility(params.showFakeGrid);
+
+  const press = gui.addFolder("Press");
+  press
+    .add(params, "pressSpreadAdd", 0, 0.65, 0.01)
+    .name("spread tighten")
+    .onChange(onChange);
+  press
+    .add(params, "pressBulgeBoost", 0, 0.6, 0.01)
+    .name("bulge depress")
+    .onChange(onChange);
+  press
+    .add(params, "pressMorphSpeed", 4, 28, 1)
+    .name("ripple speed")
+    .onChange(onChange);
+  press
+    .add(params, "pressDimOpacity", 0.08, 0.65, 0.01)
+    .name("idle dim on press")
+    .onChange(onChange);
+  press.close();
 
   const actions = {
     copySettings() {
@@ -98,7 +100,6 @@ export function createDialkit(root, params, onChange) {
     resetSettings() {
       Object.assign(params, defaultParams);
       gui.controllersRecursive().forEach((c) => c.updateDisplay());
-      syncFakeOpacityVisibility(params.showFakeGrid);
       onChange();
     }
   };

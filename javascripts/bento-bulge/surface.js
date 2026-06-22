@@ -5,17 +5,26 @@ import { getEffectiveDpr, shouldUseAntialias } from "./dpr.js";
 function createCellUniforms(cells) {
   const rects = [];
   const veilFromTop = new Float32Array(MAX_CELLS);
+  const coverAnchorX = new Float32Array(MAX_CELLS);
+  const coverAnchorY = new Float32Array(MAX_CELLS);
+  const insetShadow = new Float32Array(MAX_CELLS);
   for (let i = 0; i < MAX_CELLS; i++) {
     const cell = cells[i];
     if (cell) {
       rects.push(new THREE.Vector4(cell.normX, cell.normY, cell.normW, cell.normH));
       veilFromTop[i] = cell.veilFromTop ? 1 : 0;
+      coverAnchorX[i] = cell.coverAnchorX ?? 0.5;
+      coverAnchorY[i] = cell.coverAnchorY ?? 0.5;
+      insetShadow[i] = cell.insetShadow ? 1 : 0;
     } else {
       rects.push(new THREE.Vector4(0, 0, 0, 0));
       veilFromTop[i] = 0;
+      coverAnchorX[i] = 0.5;
+      coverAnchorY[i] = 0.5;
+      insetShadow[i] = 0;
     }
   }
-  return { rects, veilFromTop };
+  return { rects, veilFromTop, coverAnchorX, coverAnchorY, insetShadow };
 }
 
 export function createSurface(bento, layout, params, atlasTexture, emptyTexture) {
@@ -31,7 +40,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: shouldUseAntialias(dpr),
+    antialias: shouldUseAntialias(),
     premultipliedAlpha: false,
     powerPreference: "high-performance"
   });
@@ -49,6 +58,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   cellVideoSlot.fill(-1);
   const videoSizes = Array.from({ length: MAX_VIDEO_SLOTS }, () => new THREE.Vector2(1, 1));
   const videoFitContain = new Float32Array(MAX_VIDEO_SLOTS);
+  const videoFitFill = new Float32Array(MAX_VIDEO_SLOTS);
   const videoUniforms = {};
   for (let i = 0; i < MAX_VIDEO_SLOTS; i++) {
     videoUniforms[`uVideo${i}`] = { value: emptyTexture };
@@ -58,36 +68,35 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
 
   const uniforms = {
     uAtlas: { value: atlasTexture },
-    uUseAtlas: { value: params.useRealTextures ? 1 : 0 },
-    uShowFakeGrid: { value: params.showFakeGrid ? 1 : 0 },
     uShowAlignment: { value: 0 },
-    uLayerOpacity: { value: params.fakeGridOpacity },
     uBulgeAmount: { value: 0 },
     uMaxDisplacement: { value: width * params.maxDisplacementRatio },
     uPlaneSize: { value: new THREE.Vector2(width, height) },
     uCellCount: { value: layout.cells.length },
     uCellRects: { value: cellUniforms.rects },
     uCellVeilFromTop: { value: cellUniforms.veilFromTop },
+    uCellCoverAnchorX: { value: cellUniforms.coverAnchorX },
+    uCellCoverAnchorY: { value: cellUniforms.coverAnchorY },
+    uCellInsetShadow: { value: cellUniforms.insetShadow },
     uCornerRadius: { value: params.cornerRadius || 8 },
     uCellVideoSlot: { value: cellVideoSlot },
     uVideoSlotCount: { value: 0 },
     uVideoSize: { value: videoSizes },
     uVideoFitContain: { value: videoFitContain },
+    uVideoFitFill: { value: videoFitFill },
     ...videoUniforms,
     uProjectCenter: { value: new THREE.Vector2(0.5, 0.5) },
     uProjectRadius: { value: new THREE.Vector2(0.1, 0.1) },
     uProjectStrength: { value: 0 },
     uProjectWeight: { value: params.projectWeight },
-    uCursorCenter: { value: new THREE.Vector2(0.5, 0.5) },
-    uCursorRadius: { value: new THREE.Vector2(0.05, 0.05) },
-    uCursorStrength: { value: 0 },
-    uCursorWeight: { value: params.cursorWeight },
     uProjectSpread: { value: params.projectSpread },
-    uCursorSpread: { value: params.cursorSpread },
     uHillFlatness: { value: params.hillFlatness ?? 0.52 },
     uDimOpacity: { value: params.dimOpacity },
+    uHoverEngaged: { value: 0 },
     uOverlayDim: { value: 1 },
     uCellDimAmount: { value: new Float32Array(MAX_CELLS) },
+    uPressExtraDim: { value: 0 },
+    uPressDimOpacity: { value: params.pressDimOpacity ?? 0.35 },
     uScreenBulgeScale: { value: params.screenBulgeScale ?? 5 },
     uCameraDistance: { value: params.enablePerspective ? width * 1.1 : 1000 },
     uPerspectiveComp: { value: params.enablePerspective ? 1 : 0 },
@@ -157,6 +166,9 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     const cellUniforms = createCellUniforms(newLayout.cells);
     uniforms.uCellRects.value = cellUniforms.rects;
     uniforms.uCellVeilFromTop.value = cellUniforms.veilFromTop;
+    uniforms.uCellCoverAnchorX.value = cellUniforms.coverAnchorX;
+    uniforms.uCellCoverAnchorY.value = cellUniforms.coverAnchorY;
+    uniforms.uCellInsetShadow.value = cellUniforms.insetShadow;
     if (camera.isPerspectiveCamera) {
       camera.aspect = w / h;
       camera.position.set(w * 0.5, h * 0.5, w * 1.1);
@@ -176,26 +188,22 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uniforms.uProjectCenter.value.set(field.projectCenter.x, field.projectCenter.y);
     uniforms.uProjectRadius.value.set(field.projectRadius.x, field.projectRadius.y);
     uniforms.uProjectStrength.value = field.projectStrength;
-    uniforms.uCursorCenter.value.set(field.cursorCenter.x, field.cursorCenter.y);
-    uniforms.uCursorRadius.value.set(field.cursorRadius.x, field.cursorRadius.y);
-    uniforms.uCursorStrength.value = field.cursorStrength;
     uniforms.uProjectWeight.value = params.projectWeight;
-    uniforms.uCursorWeight.value = params.cursorWeight;
-    uniforms.uProjectSpread.value = params.projectSpread;
-    uniforms.uCursorSpread.value = params.cursorSpread;
+    uniforms.uProjectSpread.value = params.projectSpread * Math.max(0.35, 1 - field.pressSpreadAdd);
     uniforms.uHillFlatness.value = params.hillFlatness ?? 0.52;
     uniforms.uMaxDisplacement.value = layout.width * params.maxDisplacementRatio;
     uniforms.uDimOpacity.value = params.dimOpacity;
+    uniforms.uHoverEngaged.value = field.active ? 1 : 0;
     uniforms.uCellDimAmount.value = field.cellDimAmounts;
+    uniforms.uPressExtraDim.value = field.pressExtraDim;
+    uniforms.uPressDimOpacity.value = params.pressDimOpacity ?? 0.35;
+    uniforms.uOverlayDim.value = field.overlayDim;
     uniforms.uScreenBulgeScale.value = params.screenBulgeScale ?? 5;
     uniforms.uPerspectiveComp.value = params.enablePerspective ? 1 : 0;
     if (camera.isPerspectiveCamera) {
       uniforms.uCameraDistance.value = layout.width * 1.1;
     }
-    uniforms.uShowFakeGrid.value = params.showFakeGrid ? 1 : 0;
-    uniforms.uUseAtlas.value = params.useRealTextures ? 1 : 0;
     uniforms.uShowAlignment.value = params.showAlignmentOverlay ? 1 : 0;
-    uniforms.uLayerOpacity.value = params.fakeGridOpacity;
     uniforms.uCornerRadius.value = params.cornerRadius || 8;
     uniforms.uShowWireframe.value = params.showWireframe ? 1 : 0;
     uniforms.uSubdivisions.value = params.subdivisions;
@@ -212,19 +220,18 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
         uniforms[`uVideo${i}`].value = slot.texture;
         videoSizes[i].set(slot.width, slot.height);
         videoFitContain[i] = slot.fitContain;
+        videoFitFill[i] = slot.fitFill;
       } else {
         uniforms[`uVideo${i}`].value = emptyTexture;
         videoSizes[i].set(1, 1);
         videoFitContain[i] = 0;
+        videoFitFill[i] = 0;
       }
     }
 
     uniforms.uVideoSize.value = videoSizes;
     uniforms.uVideoFitContain.value = videoFitContain;
-  }
-
-  function setOverlayDim(value) {
-    uniforms.uOverlayDim.value = value;
+    uniforms.uVideoFitFill.value = videoFitFill;
   }
 
   function render() {
@@ -248,7 +255,6 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     resize,
     updateFromField,
     updateVideoSlots,
-    setOverlayDim,
     render,
     dispose
   };

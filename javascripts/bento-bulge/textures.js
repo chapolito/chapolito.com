@@ -40,7 +40,16 @@ function drawContainBackground(ctx, x, y, w, h, cornerRadius) {
   ctx.restore();
 }
 
-function drawImageCover(ctx, img, x, y, w, h, fitHeight, cornerRadius) {
+function coverDrawRect(x, y, w, h, iw, ih, anchorX, anchorY) {
+  const scale = Math.max(w / iw, h / ih);
+  const dw = iw * scale;
+  const dh = ih * scale;
+  const dx = x + (w - dw) * anchorX;
+  const dy = y + (h - dh) * anchorY;
+  return { dx, dy, dw, dh };
+}
+
+function drawImageCover(ctx, img, x, y, w, h, mediaFit, cornerRadius, anchorX = 0.5, anchorY = 0.5) {
   roundedRectPath(ctx, x, y, w, h, cornerRadius);
   ctx.save();
   ctx.clip();
@@ -52,7 +61,9 @@ function drawImageCover(ctx, img, x, y, w, h, fitHeight, cornerRadius) {
     return;
   }
 
-  if (fitHeight) {
+  if (mediaFit === "fill") {
+    ctx.drawImage(img, x, y, w, h);
+  } else if (mediaFit === "contain") {
     const scale = Math.min(w / iw, h / ih);
     const dw = iw * scale;
     const dh = ih * scale;
@@ -60,18 +71,14 @@ function drawImageCover(ctx, img, x, y, w, h, fitHeight, cornerRadius) {
     const dy = y + (h - dh) * 0.5;
     ctx.drawImage(img, dx, dy, dw, dh);
   } else {
-    const scale = Math.max(w / iw, h / ih);
-    const dw = iw * scale;
-    const dh = ih * scale;
-    const dx = x + (w - dw) * 0.5;
-    const dy = y + (h - dh) * 0.5;
+    const { dx, dy, dw, dh } = coverDrawRect(x, y, w, h, iw, ih, anchorX, anchorY);
     ctx.drawImage(img, dx, dy, dw, dh);
   }
 
   ctx.restore();
 }
 
-function drawVideoCover(ctx, video, x, y, w, h, fitHeight, cornerRadius) {
+function drawVideoCover(ctx, video, x, y, w, h, mediaFit, cornerRadius, anchorX = 0.5, anchorY = 0.5) {
   if (!video.videoWidth || !video.videoHeight) return false;
   if (video.readyState < 2 && video.dataset.bentoBulgeBound !== "true") return false;
   roundedRectPath(ctx, x, y, w, h, cornerRadius);
@@ -79,7 +86,9 @@ function drawVideoCover(ctx, video, x, y, w, h, fitHeight, cornerRadius) {
   ctx.clip();
   const iw = video.videoWidth;
   const ih = video.videoHeight;
-  if (fitHeight) {
+  if (mediaFit === "fill") {
+    ctx.drawImage(video, x, y, w, h);
+  } else if (mediaFit === "contain") {
     const scale = Math.min(w / iw, h / ih);
     const dw = iw * scale;
     const dh = ih * scale;
@@ -87,11 +96,7 @@ function drawVideoCover(ctx, video, x, y, w, h, fitHeight, cornerRadius) {
     const dy = y + (h - dh) * 0.5;
     ctx.drawImage(video, dx, dy, dw, dh);
   } else {
-    const scale = Math.max(w / iw, h / ih);
-    const dw = iw * scale;
-    const dh = ih * scale;
-    const dx = x + (w - dw) * 0.5;
-    const dy = y + (h - dh) * 0.5;
+    const { dx, dy, dw, dh } = coverDrawRect(x, y, w, h, iw, ih, anchorX, anchorY);
     ctx.drawImage(video, dx, dy, dw, dh);
   }
   ctx.restore();
@@ -106,16 +111,38 @@ function drawStaticCell(ctx, cell, cornerRadius, cellSlots) {
     return;
   }
 
-  if (cell.fitHeight) {
+  if (cell.mediaFit === "contain") {
     drawContainBackground(ctx, x, y, w, h, cornerRadius);
   }
 
   let drew = false;
   if (cell.hasImage && cell.img && cell.img.complete) {
-    drawImageCover(ctx, cell.img, x, y, w, h, cell.fitHeight, cornerRadius);
+    drawImageCover(
+      ctx,
+      cell.img,
+      x,
+      y,
+      w,
+      h,
+      cell.mediaFit,
+      cornerRadius,
+      cell.coverAnchorX,
+      cell.coverAnchorY
+    );
     drew = true;
   } else if (cell.hasVideo && cell.video) {
-    drew = drawVideoCover(ctx, cell.video, x, y, w, h, cell.fitHeight, cornerRadius);
+    drew = drawVideoCover(
+      ctx,
+      cell.video,
+      x,
+      y,
+      w,
+      h,
+      cell.mediaFit,
+      cornerRadius,
+      cell.coverAnchorX,
+      cell.coverAnchorY
+    );
   }
 
   if (!drew) {
@@ -221,7 +248,8 @@ export function createTextureManager(cornerRadius = 8) {
         slot,
         cellIndex: cell.index,
         texture: tex,
-        fitContain: cell.fitHeight ? 1 : 0,
+        fitContain: cell.mediaFit === "contain" ? 1 : 0,
+        fitFill: cell.mediaFit === "fill" ? 1 : 0,
         width: video.videoWidth,
         height: video.videoHeight
       });

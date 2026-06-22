@@ -1,14 +1,21 @@
-import * as THREE from "/javascripts/vendor/three.module.min.js";
 import { MAX_CELLS } from "./shaders.js";
 
 const INSET_PX = 0.5;
-const _raycaster = new THREE.Raycaster();
-const _ndc = new THREE.Vector2();
-const _hit = new THREE.Vector3();
-const _plane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 
 function snap(value, dpr) {
   return Math.round(value * dpr) / dpr;
+}
+
+/** Maps tile `data-cover-align` / projects `tile.align` to normalized anchor (0–1). */
+export function parseCoverAlign(raw) {
+  const value = (raw || "center").toLowerCase().trim();
+  let x = 0.5;
+  let y = 0.5;
+  if (value.includes("left")) x = 0;
+  else if (value.includes("right")) x = 1;
+  if (value.includes("top")) y = 0;
+  else if (value.includes("bottom")) y = 1;
+  return { x, y };
 }
 
 export function measureCells(container, dpr, options = {}) {
@@ -36,7 +43,10 @@ export function measureCells(container, dpr, options = {}) {
 
     const img = el.querySelector(imgSelector);
     const video = el.querySelector(videoSelector);
-    const fitHeight = video && (el.dataset.fit === "contain" || video.dataset.fitHeight === "true");
+    const fit = el.dataset.fit || "cover";
+    const mediaFit = fit === "contain" || fit === "fill" ? fit : "cover";
+    const fitHeight = mediaFit === "contain";
+    const coverAnchor = parseCoverAlign(el.dataset.coverAlign);
 
     return {
       el,
@@ -57,7 +67,11 @@ export function measureCells(container, dpr, options = {}) {
       areaScale: baselineArea ? area / baselineArea : 1,
       hasImage: Boolean(img),
       hasVideo: Boolean(video),
+      mediaFit,
       fitHeight,
+      coverAnchorX: coverAnchor.x,
+      coverAnchorY: coverAnchor.y,
+      insetShadow: el.dataset.insetShadow === "true",
       img,
       video,
       veilFromTop:
@@ -100,27 +114,6 @@ export function cellAtPoint(cells, containerRect, x, y) {
   }
 
   return nearest;
-}
-
-export function pointerToNorm(layout, containerRect, clientX, clientY, camera) {
-  const x = (clientX - containerRect.left) / layout.width;
-  const y = (clientY - containerRect.top) / layout.height;
-
-  if (!camera || camera.isOrthographicCamera) {
-    return { x, y };
-  }
-
-  _ndc.x = x * 2 - 1;
-  _ndc.y = -(y * 2 - 1);
-  _raycaster.setFromCamera(_ndc, camera);
-  if (_raycaster.ray.intersectPlane(_plane, _hit)) {
-    return {
-      x: _hit.x / layout.width,
-      y: 1 - _hit.y / layout.height
-    };
-  }
-
-  return { x, y };
 }
 
 export function cellsInBulgeRadius(cells, centerX, centerY, radiusPx, maxCount) {

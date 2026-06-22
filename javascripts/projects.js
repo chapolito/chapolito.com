@@ -11,13 +11,13 @@
 window.PROJECTS = [
   {
     id: "quest-people",
-    title: "People Tab",
+    title: "Social VR",
     product: "Quest VR",
     era: "Meta",
     orientation: "landscape",
     hover: "depth",
     overlay: "split",
-    tile: { type: "video", src: "/images/quest-vr/people-tab.mp4", fit: "cover" },
+    tile: { type: "video", src: "/images/quest-vr/people-tab.mp4", fit: "cover", insetShadow: true },
     detail: {
       lede:
         "Finding friends and feeling their presence inside the headset. A People surface for Quest that makes social the front door, not a setting.",
@@ -117,36 +117,41 @@ window.PROJECTS = [
 
   {
     id: "portal-voice",
-    title: "Hey Portal",
+    title: "Facebook on Portal",
     product: "Portal",
     era: "Meta",
     orientation: "portrait",
     hover: "bloom",
     overlay: "drop",
-    tile: { type: "video", src: "/images/portal/biometrics-voice.mp4", fit: "cover" },
+    tile: { type: "video", src: "/images/home/FB-Watch.tile.mp4", fit: "cover" },
     detail: {
       lede:
-        "Recognizing the person speaking made a shared device feel personal. It surfaced the right profile and content hands-free, without anyone touching the screen.",
+        "Portal brought Facebook to the living room. I designed and shipped the first versions of Facebook Watch and Facebook Live for TV — lean-back video and live broadcasting, built for a shared device on the couch.",
       meta: [
         { k: "Role", v: "Product Design" },
         { k: "Platforms", v: "Portal & TV apps" },
         { k: "Date", v: "2019–2021" },
       ],
-      hero: { type: "video", src: "/images/home/portal-voice-recognition.mp4", fit: "cover" },
+      hero: { type: "video", src: "/images/portal/watch-tv-video-chaining.mp4", fit: "cover" },
       sections: [
         {
-          kicker: "Hands-free",
-          title: "Who's who, by voice",
-          body: "The system recognizes the speaker and brings their world forward.",
+          kicker: "Watch",
+          title: "Video made for the living room",
+          body:
+            "Facebook Watch on Portal — browsing shows at a distance, smart chaining between episodes, and a UI tuned for shared viewing on the couch.",
           layout: "full",
-          media: [{ type: "video", src: "/images/portal/biometrics-voice.mp4", alt: "Voice & biometrics", fit: "cover" }],
+          media: [{ type: "video", src: "/images/portal/watch-tv-video-chaining.mp4", alt: "Facebook Watch on Portal", fit: "cover" }],
         },
         {
-          kicker: "Shared device",
-          title: "Switch profiles, stay personal",
-          body: "Voice recognition pairs with account switching so the right profile and contacts surface without touching the screen.",
-          layout: "full",
-          media: [{ type: "image", src: "/images/home/portal-account-switching.png", alt: "Portal account switching", fit: "cover" }],
+          kicker: "Live",
+          title: "Go live from the couch",
+          body:
+            "Facebook Live on Portal let anyone broadcast to friends and groups from the device already in the room — no phone propped on a shelf.",
+          layout: "grid2",
+          media: [
+            { type: "video", src: "/images/portal/fb-live.mp4", alt: "Facebook Live on Portal", fit: "cover" },
+            { type: "image", src: "/images/portal/facebook-live.png", alt: "Facebook Live interface on Portal", fit: "cover" },
+          ],
         },
       ],
     },
@@ -161,7 +166,12 @@ window.PROJECTS = [
     feature: true,
     hover: "rise",
     overlay: "expand",
-    tile: { type: "video", src: "/images/portal/household-mode-animation.mp4", fit: "cover" },
+    tile: {
+      type: "video",
+      src: "/images/home/Householde-Mode.tile.mp4",
+      fit: "cover",
+      align: "top left"
+    },
     detail: {
       bentoMedia: "showcase",
       bentoTiles: [
@@ -209,6 +219,17 @@ window.PROJECTS = [
             "A shared device needs a calm way to know who's using it. I designed the switch between people to feel personal and quick, never like a login screen.",
           layout: "full",
           media: [{ type: "video", src: "/images/portal/household-mode-animation.mp4", alt: "Household Mode profile switching", fit: "cover" }],
+        },
+        {
+          kicker: "Verify instantly",
+          title: "Access without signing in",
+          body:
+            "Household Mode pairs with voice and face verification so the device knows who's asking. You don't manually log in to reach your contacts and apps — biometrics verify you instantly and put your profile forward.",
+          layout: "grid2",
+          media: [
+            { type: "video", src: "/images/home/portal-voice-recognition.mp4", alt: "Voice verification on Portal", fit: "cover" },
+            { type: "video", src: "/images/portal/biometrics-voice.mp4", alt: "Voice and face biometrics on Portal", fit: "cover" },
+          ],
         },
         {
           kicker: "Detail",

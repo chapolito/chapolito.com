@@ -11,12 +11,7 @@ uniform vec2 uProjectCenter;
 uniform vec2 uProjectRadius;
 uniform float uProjectStrength;
 uniform float uProjectWeight;
-uniform vec2 uCursorCenter;
-uniform vec2 uCursorRadius;
-uniform float uCursorStrength;
-uniform float uCursorWeight;
 uniform float uProjectSpread;
-uniform float uCursorSpread;
 uniform float uHillFlatness;
 uniform float uScreenBulgeScale;
 uniform float uCameraDistance;
@@ -40,9 +35,7 @@ float hillRadialNorm(vec2 uv, vec2 center, vec2 radius, float spreadScale) {
 }
 
 float heightField(vec2 uv) {
-  float project = smoothHill(uv, uProjectCenter, uProjectRadius, uProjectSpread) * uProjectStrength;
-  float cursor = smoothHill(uv, uCursorCenter, uCursorRadius, uCursorSpread * 1.15) * uCursorStrength;
-  return project * uProjectWeight + cursor * uCursorWeight;
+  return smoothHill(uv, uProjectCenter, uProjectRadius, uProjectSpread) * uProjectStrength * uProjectWeight;
 }
 
 void main() {
@@ -73,10 +66,7 @@ export const fragmentShader = /* glsl */ `
 precision highp float;
 
 uniform sampler2D uAtlas;
-uniform float uUseAtlas;
-uniform float uShowFakeGrid;
 uniform float uShowAlignment;
-uniform float uLayerOpacity;
 uniform vec2 uPlaneSize;
 uniform int uCellCount;
 uniform vec4 uCellRects[25];
@@ -85,6 +75,7 @@ uniform float uCellVideoSlot[25];
 uniform int uVideoSlotCount;
 uniform vec2 uVideoSize[8];
 uniform float uVideoFitContain[8];
+uniform float uVideoFitFill[8];
 uniform sampler2D uVideo0;
 uniform sampler2D uVideo1;
 uniform sampler2D uVideo2;
@@ -95,8 +86,14 @@ uniform sampler2D uVideo6;
 uniform sampler2D uVideo7;
 
 uniform float uDimOpacity;
+uniform float uHoverEngaged;
 uniform float uCellDimAmount[${MAX_CELLS}];
+uniform float uPressExtraDim;
+uniform float uPressDimOpacity;
 uniform float uCellVeilFromTop[${MAX_CELLS}];
+uniform float uCellCoverAnchorX[${MAX_CELLS}];
+uniform float uCellCoverAnchorY[${MAX_CELLS}];
+uniform float uCellInsetShadow[${MAX_CELLS}];
 uniform float uOverlayDim;
 uniform float uShowWireframe;
 uniform float uSubdivisions;
@@ -110,31 +107,48 @@ float sdRoundedBox(vec2 p, vec2 b, float r) {
   return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
 }
 
+float cellCornerRadiusNorm(vec4 rect) {
+  return uCornerRadius / max(uPlaneSize.x, uPlaneSize.y);
+}
+
+float cellRoundedDist(vec2 uv, vec4 rect) {
+  vec2 center = rect.xy + rect.zw * 0.5;
+  vec2 rectHalf = rect.zw * 0.5;
+  return sdRoundedBox(uv - center, rectHalf, cellCornerRadiusNorm(rect));
+}
+
+float distToEdgePx(float d) {
+  float grad = max(length(vec2(dFdx(d), dFdy(d))), 0.0001);
+  return -d / grad;
+}
+
+float cellShapeAlpha(float d) {
+  float aa = max(length(vec2(dFdx(d), dFdy(d))) * 1.25, 0.0001);
+  return 1.0 - smoothstep(-aa, aa, d);
+}
+
 int cellIndexAt(vec2 uv) {
   for (int i = 0; i < 25; i++) {
     if (i >= uCellCount) break;
     vec4 rect = uCellRects[i];
-    vec2 center = rect.xy + rect.zw * 0.5;
-    vec2 rectHalf = rect.zw * 0.5;
-    float d = sdRoundedBox(uv - center, rectHalf, uCornerRadius / max(uPlaneSize.x, uPlaneSize.y));
-    if (d <= 0.0) return i;
+    if (
+      uv.x >= rect.x && uv.x <= rect.x + rect.z &&
+      uv.y >= rect.y && uv.y <= rect.y + rect.w
+    ) {
+      return i;
+    }
   }
   return -1;
 }
 
-vec3 fakeCellColor(vec2 uv) {
-  int idx = cellIndexAt(uv);
-  if (idx < 0) return vec3(0.0);
-  vec2 p = (uv - uCellRects[idx].xy) / max(uCellRects[idx].zw, vec2(0.0001));
-  return mix(vec3(0.188), vec3(0.141), p.y);
-}
-
-vec2 coverUV(vec2 local, float cellAspect, float mediaAspect) {
+vec2 coverUV(vec2 local, float cellAspect, float mediaAspect, vec2 anchor) {
   vec2 uv = local;
   if (mediaAspect > cellAspect) {
-    uv.x = 0.5 + (local.x - 0.5) * (cellAspect / mediaAspect);
+    float visible = cellAspect / mediaAspect;
+    uv.x = anchor.x * (1.0 - visible) + local.x * visible;
   } else {
-    uv.y = 0.5 + (local.y - 0.5) * (mediaAspect / cellAspect);
+    float visible = mediaAspect / cellAspect;
+    uv.y = anchor.y * (1.0 - visible) + local.y * visible;
   }
   return clamp(uv, 0.0, 1.0);
 }
@@ -175,6 +189,20 @@ vec3 applyLegibilityVeil(vec3 color, vec2 local, float strength, float fromTop) 
   return color * (1.0 - mask * strength);
 }
 
+vec3 applyCellBorder(vec3 color, float edgeDistPx, float strength) {
+  // 0.5px hairline — rgba(255, 255, 255, 0.1)
+  float borderMix = 1.0 - smoothstep(0.0, 0.5, edgeDistPx);
+  return mix(color, vec3(1.0), borderMix * 0.1 * strength);
+}
+
+vec3 applyInsetShadow(vec3 color, float edgeDistPx) {
+  // Figma node 2491:47930 — inset 0 0 45px 45px #222229
+  float insetReach = 90.0;
+  float vignette = smoothstep(0.0, insetReach, edgeDistPx);
+  vec3 shadow = vec3(0.133333, 0.133333, 0.160784);
+  return mix(shadow, color, vignette);
+}
+
 void main() {
   vec2 uv = vUv;
   int idx = cellIndexAt(uv);
@@ -188,9 +216,19 @@ void main() {
     float cellAspect = rect.z * uPlaneSize.x / max(rect.w * uPlaneSize.y, 0.0001);
     vec2 mediaSize = uVideoSize[slot];
     float mediaAspect = mediaSize.x / max(mediaSize.y, 0.0001);
-    vec2 mediaUV = uVideoFitContain[slot] > 0.5
-      ? containUV(local, cellAspect, mediaAspect)
-      : coverUV(local, cellAspect, mediaAspect);
+    vec2 mediaUV;
+    if (uVideoFitFill[slot] > 0.5) {
+      mediaUV = local;
+    } else if (uVideoFitContain[slot] > 0.5) {
+      mediaUV = containUV(local, cellAspect, mediaAspect);
+    } else {
+      mediaUV = coverUV(
+        local,
+        cellAspect,
+        mediaAspect,
+        vec2(uCellCoverAnchorX[idx], uCellCoverAnchorY[idx])
+      );
+    }
     if (uVideoFitContain[slot] > 0.5) {
       bool inMedia = mediaUV.x >= 0.0 && mediaUV.x <= 1.0 && mediaUV.y >= 0.0 && mediaUV.y <= 1.0;
       color = inMedia
@@ -200,39 +238,47 @@ void main() {
       color = sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0));
     }
     alpha = 1.0;
-  } else if (uUseAtlas > 0.5) {
+  } else {
     vec4 atlasSample = texture2D(uAtlas, uv);
-    if (atlasSample.a < 0.04) discard;
     color = atlasSample.rgb;
     alpha = atlasSample.a;
-  } else {
-    if (idx < 0) discard;
-    color = fakeCellColor(uv);
-    alpha = 1.0;
   }
 
   if (idx >= 0) {
     vec4 rect = uCellRects[idx];
     vec2 local = (uv - rect.xy) / max(rect.zw, vec2(0.0001));
+    float cellDist = cellRoundedDist(uv, rect);
+    float edgeDistPx = distToEdgePx(cellDist);
+
+    if (uCellVideoSlot[idx] >= 0.0) {
+      alpha *= cellShapeAlpha(cellDist);
+    }
+
     float veilStrength = vBulgeAmount > 0.001 ? uCellDimAmount[idx] : 0.0;
     color = applyLegibilityVeil(color, local, veilStrength, uCellVeilFromTop[idx]);
+    if (uCellInsetShadow[idx] > 0.5) {
+      color = applyInsetShadow(color, edgeDistPx);
+    }
+    float borderStrength = 1.0 - uPressExtraDim;
+    if (borderStrength > 0.001) {
+      color = applyCellBorder(color, edgeDistPx, borderStrength);
+    }
   }
 
   float bulge = vBulgeAmount;
-  if (bulge > 0.001 && idx >= 0) {
-    alpha *= mix(uDimOpacity, 1.0, uCellDimAmount[idx]);
-  }
-
-  if (uShowFakeGrid > 0.5) {
-    alpha = mix(0.0, 0.92, bulge) * uLayerOpacity;
+  if (bulge > 0.001 && uHoverEngaged > 0.5 && idx >= 0) {
+    float dimFactor = mix(uDimOpacity, 1.0, uCellDimAmount[idx]);
+    if (uPressExtraDim > 0.001 && uCellDimAmount[idx] < 0.5) {
+      dimFactor = mix(dimFactor, uPressDimOpacity, uPressExtraDim);
+    }
+    alpha *= dimFactor;
   }
 
   if (uShowAlignment > 0.5 && idx >= 0) {
     vec4 rect = uCellRects[idx];
-    vec2 center = rect.xy + rect.zw * 0.5;
-    vec2 rectHalf = rect.zw * 0.5;
-    float d = sdRoundedBox(uv - center, rectHalf, uCornerRadius / max(uPlaneSize.x, uPlaneSize.y));
-    if (abs(d) < 1.5 / max(uPlaneSize.x, uPlaneSize.y)) {
+    float d = cellRoundedDist(uv, rect);
+    float dPx = abs(d / max(length(vec2(dFdx(d), dFdy(d))), 0.0001));
+    if (dPx < 1.5) {
       color = mix(color, vec3(0.2, 0.9, 0.5), 0.85);
     }
   }
