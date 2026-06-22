@@ -320,6 +320,40 @@ export function initBentoBulgeOverlays(options = {}) {
   function openAbout(skipPush, instant, afterDockExit) {
     if ((aboutOpen && !openId) || isClosing) return;
 
+    if (openId) {
+      clearOpenPhaseTimer();
+      cancelTilePress();
+      grid.querySelectorAll(".tile.is-pressed").forEach((t) => {
+        t.classList.remove("is-pressed");
+      });
+      activePress = null;
+      openId = null;
+      aboutOpen = true;
+      mountAboutContent();
+      reader.setAttribute("aria-label", "About");
+      reader.classList.add("reader--ov-split", "is-open");
+      reader.removeAttribute("hidden");
+      reader.removeAttribute("inert");
+      reader.setAttribute("aria-hidden", "false");
+      closeBtn.removeAttribute("aria-hidden");
+      document.body.style.overflow = "hidden";
+      panel.classList.add("is-morphed");
+      panel.scrollTop = 0;
+      doc.classList.remove("detail-split", "is-instant");
+      doc.classList.add("is-revealed");
+      document.body.classList.remove("is-detail-opening", "is-detail-closing");
+      document.body.classList.add("is-detail-open", "is-detail-enter");
+
+      if (window.initInview) window.initInview(doc);
+
+      if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
+      else if (location.hash !== "#about") history.replaceState({ about: true }, "", aboutUrl());
+      document.title = "About · Jesse O'Chapo";
+      setActiveNav("about");
+      closeBtn.focus();
+      return;
+    }
+
     if (!instant && !afterDockExit && document.body.classList.contains("is-home") && !isOverlayOpen()) {
       startOpenTransition();
       runHomeDockExit(() => {
@@ -452,13 +486,6 @@ export function initBentoBulgeOverlays(options = {}) {
 
     if (view === "about") {
       if (aboutOpen && !openId) return;
-      if (openId) {
-        close(true);
-        window.setTimeout(() => {
-          openAbout(false);
-        }, 120);
-        return;
-      }
       openAbout(false);
       return;
     }
