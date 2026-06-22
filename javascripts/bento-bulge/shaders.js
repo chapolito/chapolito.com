@@ -196,8 +196,8 @@ vec3 applyCellBorder(vec3 color, float edgeDistPx, float strength) {
 }
 
 vec3 applyInsetShadow(vec3 color, float edgeDistPx) {
-  // Figma node 2491:47930 — inset 0 0 45px 45px #222229
-  float insetReach = 90.0;
+  // inset 0 0 90px 90px #222229 (2× Figma spec)
+  float insetReach = 180.0;
   float vignette = smoothstep(0.0, insetReach, edgeDistPx);
   vec3 shadow = vec3(0.133333, 0.133333, 0.160784);
   return mix(shadow, color, vignette);
