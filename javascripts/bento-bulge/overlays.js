@@ -19,17 +19,48 @@ export function initBentoBulgeOverlays(options = {}) {
   }
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const coarsePointer = !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
   let openId = null;
   let aboutOpen = false;
   let activePress = null;
   let disposed = false;
   let isClosing = false;
   let openPhaseTimer = 0;
+  let openTransitionStartedAt = 0;
 
   function clearOpenPhaseTimer() {
     if (!openPhaseTimer) return;
     window.clearTimeout(openPhaseTimer);
     openPhaseTimer = 0;
+  }
+
+  function scheduleOpenPhaseComplete() {
+    clearOpenPhaseTimer();
+    const elapsed = openTransitionStartedAt ? Date.now() - openTransitionStartedAt : 0;
+    const remaining = Math.max(0, TX_OUT - elapsed);
+    openPhaseTimer = window.setTimeout(() => {
+      openPhaseTimer = 0;
+      if (isClosing || !document.body.classList.contains("is-detail-opening")) return;
+      document.body.classList.remove("is-detail-opening");
+      document.body.classList.add("is-detail-open");
+    }, remaining);
+  }
+
+  function startOpenTransition() {
+    if (reduceMotion || isOverlayActive()) return false;
+    if (
+      document.body.classList.contains("is-detail-opening") ||
+      document.body.classList.contains("is-detail-open")
+    ) {
+      scheduleOpenPhaseComplete();
+      return true;
+    }
+    openTransitionStartedAt = Date.now();
+    setBodyDetailState("is-detail-opening");
+    document.body.classList.add("is-detail-enter");
+    onOpen(false);
+    scheduleOpenPhaseComplete();
+    return true;
   }
 
   function isOverlayOpen() {
@@ -114,14 +145,14 @@ export function initBentoBulgeOverlays(options = {}) {
     if (isOverlayActive() || reduceMotion) return;
     activePress = { tile, id };
     tile.classList.add("is-pressed");
-    document.body.classList.add("is-grid-pressing");
+    window.BentoBulge?.setTilePress?.(tile, true);
   }
 
   function cancelTilePress() {
     if (!activePress) return;
+    window.BentoBulge?.setTilePress?.(activePress.tile, false);
     activePress.tile.classList.remove("is-pressed");
     activePress = null;
-    document.body.classList.remove("is-grid-pressing");
   }
 
   function restoreHomeEnter() {
@@ -148,32 +179,48 @@ export function initBentoBulgeOverlays(options = {}) {
     doc.className = "pj-doc";
     doc.innerHTML = "";
     clearOverlayState();
-    onClose();
     restoreHomeEnter();
     document.title = "Bento bulge — Jesse O'Chapo";
     setActiveNav("portfolio");
     isClosing = false;
   }
 
-  function clearOverlayState() {
-    cancelTilePress();
+  function isDetailTransitionActive() {
+    return (
+      document.body.classList.contains("is-detail-opening") ||
+      document.body.classList.contains("is-detail-open")
+    );
+  }
+
+  function clearOverlayState(options = {}) {
+    const keepDetailTransition = options.keepDetailTransition === true;
+    if (!keepDetailTransition) {
+      cancelTilePress();
+      openTransitionStartedAt = 0;
+      document.body.classList.remove(
+        "is-detail-opening",
+        "is-detail-open",
+        "is-detail-enter",
+        "is-detail-closing",
+        "is-home-enter",
+        "is-home-dock-exit",
+        "is-home-dock-pending"
+      );
+    } else {
+      grid.querySelectorAll(".tile.is-pressed").forEach((t) => {
+        t.classList.remove("is-pressed");
+      });
+      activePress = null;
+    }
     reader.classList.remove("is-open", "is-exiting", "reader--ov-split");
     panel.classList.remove("is-morphed");
     doc.classList.remove("is-revealed", "is-instant", "detail-split");
     doc.innerHTML = "";
-    document.body.classList.remove(
-      "is-detail-opening",
-      "is-detail-open",
-      "is-detail-enter",
-      "is-detail-closing",
-      "is-home-enter",
-      "is-home-dock-exit",
-      "is-home-dock-pending",
-      "is-grid-pressing"
-    );
-    grid.querySelectorAll(".tile.is-pressed").forEach((t) => {
-      t.classList.remove("is-pressed");
-    });
+    if (!keepDetailTransition) {
+      grid.querySelectorAll(".tile.is-pressed").forEach((t) => {
+        t.classList.remove("is-pressed");
+      });
+    }
   }
 
   function setBodyDetailState(state) {
@@ -200,7 +247,6 @@ export function initBentoBulgeOverlays(options = {}) {
     reader.removeAttribute("hidden");
     reader.removeAttribute("inert");
     reader.classList.add("reader--ov-split");
-    onOpen();
     reader.classList.add("is-open");
     reader.setAttribute("aria-hidden", "false");
     closeBtn.removeAttribute("aria-hidden");
@@ -211,19 +257,13 @@ export function initBentoBulgeOverlays(options = {}) {
     if (instant) {
       doc.classList.add("is-revealed", "is-instant");
       document.body.classList.add("is-detail-open", "is-detail-enter");
+      onOpen(instant);
       closeBtn.focus();
       return;
     }
 
     doc.classList.add("is-revealed");
-    setBodyDetailState("is-detail-opening");
-    document.body.classList.add("is-detail-enter");
-    openPhaseTimer = window.setTimeout(() => {
-      openPhaseTimer = 0;
-      if (!isOverlayOpen() || isClosing) return;
-      document.body.classList.remove("is-detail-opening");
-      document.body.classList.add("is-detail-open");
-    }, TX_OUT);
+    startOpenTransition();
     closeBtn.focus();
   }
 
@@ -232,13 +272,16 @@ export function initBentoBulgeOverlays(options = {}) {
     if (!p || isClosing) return;
 
     if (!instant && !afterDockExit && document.body.classList.contains("is-home") && !isOverlayOpen()) {
+      startOpenTransition();
       runHomeDockExit(() => {
         open(id, skipPush, tile, instant, true);
       });
       return;
     }
 
-    clearOverlayState();
+    clearOverlayState({
+      keepDetailTransition: afterDockExit || isDetailTransitionActive()
+    });
     aboutOpen = false;
     openId = id;
 
@@ -249,7 +292,7 @@ export function initBentoBulgeOverlays(options = {}) {
     openOverlayCommon(instant);
 
     if (instant) {
-      doc.querySelectorAll(".pj-sec, .pj-cta").forEach((n) => {
+      doc.querySelectorAll(".pj-sec").forEach((n) => {
         n.classList.add("reveal", "in");
       });
       window.initInview(doc);
@@ -260,8 +303,9 @@ export function initBentoBulgeOverlays(options = {}) {
       return;
     }
 
-    doc.querySelectorAll(".pj-sec, .pj-cta").forEach((n) => {
+    doc.querySelectorAll(".pj-sec").forEach((n) => {
       n.classList.add("reveal");
+      if (coarsePointer || reduceMotion) n.classList.add("in");
     });
     window.initInview(doc);
     requestAnimationFrame(() => {
@@ -277,13 +321,16 @@ export function initBentoBulgeOverlays(options = {}) {
     if ((aboutOpen && !openId) || isClosing) return;
 
     if (!instant && !afterDockExit && document.body.classList.contains("is-home") && !isOverlayOpen()) {
+      startOpenTransition();
       runHomeDockExit(() => {
         openAbout(skipPush, instant, true);
       });
       return;
     }
 
-    clearOverlayState();
+    clearOverlayState({
+      keepDetailTransition: afterDockExit || isDetailTransitionActive()
+    });
     openId = null;
     aboutOpen = true;
     mountAboutContent();
@@ -303,9 +350,11 @@ export function initBentoBulgeOverlays(options = {}) {
 
     isClosing = true;
     clearOpenPhaseTimer();
+    openTransitionStartedAt = 0;
+    onClose();
 
     doc.classList.remove("is-revealed");
-    document.body.classList.remove("is-detail-enter", "is-detail-open", "is-detail-opening", "is-grid-pressing");
+    document.body.classList.remove("is-detail-enter", "is-detail-open", "is-detail-opening");
     document.body.classList.add("is-detail-closing", "is-home-enter");
     grid.querySelectorAll(".tile.is-pressed").forEach((t) => {
       t.classList.remove("is-pressed");
@@ -329,8 +378,7 @@ export function initBentoBulgeOverlays(options = {}) {
     if (!activePress) return;
     if (e.target.closest && e.target.closest(".tile") === activePress.tile) {
       activePress.tile.classList.remove("is-pressed");
-      document.body.classList.remove("is-grid-pressing");
-      activePress = null;
+      startOpenTransition();
       return;
     }
     cancelTilePress();
@@ -344,7 +392,13 @@ export function initBentoBulgeOverlays(options = {}) {
     const id = tile.dataset.id;
     if (!id) return;
     e.preventDefault();
-    cancelTilePress();
+    activePress = null;
+    if (
+      !document.body.classList.contains("is-detail-opening") &&
+      !document.body.classList.contains("is-detail-open")
+    ) {
+      startOpenTransition();
+    }
     open(id, false, tile);
   }
 

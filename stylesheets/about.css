@@ -137,20 +137,5 @@
 }
 
 .about__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(20px, 3vw, 36px);
-  margin-top: clamp(48px, 7vw, 72px);
-  padding-top: clamp(24px, 3vw, 32px);
-  border-top: 1px solid var(--line);
+  display: none;
 }
-.about__links a {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--about-text-tertiary);
-  transition: color 150ms ease-out;
-}
-.about__links a:hover { color: var(--about-text-secondary); }

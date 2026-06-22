@@ -1,8 +1,11 @@
-import { measureCells, cellAtPoint, pointerToNorm } from "./cells.js";
+import { measureCells, cellAtPoint } from "./cells.js";
 import {
   createBulgeField,
   setCellTarget,
-  setCursorTarget,
+  setPressTarget,
+  snapPressState,
+  snapOverlayDim,
+  snapCellDims,
   updateBulgeField,
   isFieldMorphing,
   isDimMorphing
@@ -32,9 +35,7 @@ function resolveWhenReady(api) {
   }
 }
 
-function canUseWebGL(params) {
-  if (params.forceWebGL) return { ok: true };
-
+function canUseWebGL() {
   if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
     return { ok: false, reason: "coarse pointer or no hover" };
   }
@@ -116,12 +117,21 @@ export function initBentoBulge(options = {}) {
   const customCursor = createCustomCursor();
   let onParamsChange = function () {};
 
-  const capability = canUseWebGL(params);
+  const capability = canUseWebGL();
   if (!capability.ok) {
     console.info("[bento-bulge] fallback:", capability.reason);
     const dialkit = createDialkit(document.body, params, () => onParamsChange());
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
-    const fallbackApi = { dispose: () => { customCursor.dispose(); dialkit.dispose(); perf.dispose(); }, params };
+    const fallbackApi = {
+      dispose: () => {
+        customCursor.dispose();
+        dialkit.dispose();
+        perf.dispose();
+      },
+      params,
+      // Overlay dim is CSS-only when WebGL is unavailable (see home.css / bento-bulge.css).
+      setOverlayOpen() {}
+    };
     resolveWhenReady(fallbackApi);
     onReady(fallbackApi);
     return fallbackApi;
@@ -140,7 +150,16 @@ export function initBentoBulge(options = {}) {
     }
     console.warn("[bento-bulge] grid has no measurable size");
     const dialkit = createDialkit(document.body, params, () => onParamsChange());
-    const failApi = { dispose: () => { customCursor.dispose(); dialkit.dispose(); perf.dispose(); }, params, dialkit };
+    const failApi = {
+      dispose: () => {
+        customCursor.dispose();
+        dialkit.dispose();
+        perf.dispose();
+      },
+      params,
+      dialkit,
+      setOverlayOpen() {}
+    };
     resolveWhenReady(failApi);
     onReady(failApi);
     return failApi;
@@ -161,7 +180,16 @@ export function initBentoBulge(options = {}) {
   } catch (err) {
     console.error("[bento-bulge] WebGL surface failed:", err);
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
-    const failApi = { dispose: () => { customCursor.dispose(); dialkit.dispose(); perf.dispose(); }, params, dialkit };
+    const failApi = {
+      dispose: () => {
+        customCursor.dispose();
+        dialkit.dispose();
+        perf.dispose();
+      },
+      params,
+      dialkit,
+      setOverlayOpen() {}
+    };
     resolveWhenReady(failApi);
     onReady(failApi);
     return failApi;
@@ -184,7 +212,7 @@ export function initBentoBulge(options = {}) {
   let cachedRectTime = 0;
 
   function isSystemActive() {
-    return running && tabVisible && gridVisible;
+    return running && tabVisible && (gridVisible || !readyFired);
   }
 
   function getBentoRect() {
@@ -215,11 +243,13 @@ export function initBentoBulge(options = {}) {
   }
 
   function wantsContinuousRender() {
+    if (!readyFired) return true;
     if (overlayOpen) {
       return (
         isFieldMorphing(field) ||
         field.bulgeAmount > 0.01 ||
-        field.projectStrength > 0.01
+        field.projectStrength > 0.01 ||
+        Math.abs(field.overlayDim - field.targetOverlayDim) > 0.008
       );
     }
     return (
@@ -268,6 +298,29 @@ export function initBentoBulge(options = {}) {
     handoffDone = true;
     bento.classList.add("grid--bulge-active");
     surface.canvas.classList.add("is-bulge-surface-ready");
+    syncVideoMedia();
+  }
+
+  function syncVideoMedia() {
+    syncVideoPlayback(null);
+    if (overlayOpen) return;
+    const videoState = textureManager.syncVideoSlotsAndAtlas(
+      layout,
+      dpr,
+      params.enableVideos,
+      maxVideos()
+    );
+    surface.updateVideoSlots(videoState);
+    markDirty();
+  }
+
+  let syncVideoMediaRaf = 0;
+  function scheduleSyncVideoMedia() {
+    if (syncVideoMediaRaf) return;
+    syncVideoMediaRaf = requestAnimationFrame(() => {
+      syncVideoMediaRaf = 0;
+      syncVideoMedia();
+    });
   }
 
   function fireReady() {
@@ -280,14 +333,16 @@ export function initBentoBulge(options = {}) {
 
   function checkHandoff() {
     if (handoffDone || readyFired) return;
-    const hasVideoTiles = layout.cells.some((cell) => cell.hasVideo);
-    const videosOk =
-      !hasVideoTiles ||
-      !params.enableVideos ||
-      textureManager.getSlotCount() > 0;
-    if (textureManager.hasAtlas() && videosOk) {
+    if (textureManager.hasAtlas()) {
       fireReady();
     }
+  }
+
+  function finishBootRender() {
+    surface.updateFromField(field, params);
+    surface.updateVideoSlots(initialVideoState);
+    surface.render();
+    checkHandoff();
   }
 
   function drawFrame() {
@@ -330,7 +385,7 @@ export function initBentoBulge(options = {}) {
     const dt = Math.min((now - lastTime) / 1000, 0.05);
     lastTime = now;
 
-    updateBulgeField(field, params, dt);
+    updateBulgeField(field, params, dt, { overlayOpen });
 
     const continuous = wantsContinuousRender();
     const shouldDraw = continuous || needsRender;
@@ -352,6 +407,9 @@ export function initBentoBulge(options = {}) {
     dialkit.persist();
     applyDimOpacityVar();
     remeasure();
+    if (activeCellData) {
+      setCellTarget(field, activeCellData, params, layout);
+    }
     syncVideoPlayback();
     markDirty();
   }
@@ -379,20 +437,45 @@ export function initBentoBulge(options = {}) {
     return Number.isFinite(value) ? value : 0.35;
   }
 
-  function setOverlayOpen(open) {
-    overlayOpen = open;
-    pointerInside = false;
+  function setOverlayOpen(open, options = {}) {
+    const instant = options.instant === true;
+
+    if (open) {
+      overlayOpen = true;
+      pointerInside = false;
+      if (clearHoverTimer) clearTimeout(clearHoverTimer);
+      clearHoverTimer = 0;
+      setPressTarget(field, false, params);
+      snapPressState(field);
+      clearHoverBulge();
+      snapCellDims(field);
+      field.targetOverlayDim = overlayDimAmount();
+      snapOverlayDim(field);
+      surface.updateFromField(field, params);
+      syncVideoPlayback(null);
+      markDirty();
+      scheduleFrame();
+      return;
+    }
+
+    overlayOpen = false;
+    if (clearHoverTimer) clearTimeout(clearHoverTimer);
+    clearHoverTimer = 0;
+    clearHoverBulge();
+    field.targetOverlayDim = 1;
+    if (instant) snapOverlayDim(field);
+    remeasure();
+    surface.updateFromField(field, params);
+    scheduleSyncVideoMedia();
+    markDirty();
+    scheduleFrame();
+  }
+
+  function clearHoverBulge() {
+    clearHoverTimer = 0;
     activeCellData = null;
     syncHoveredTileClass(null);
     setCellTarget(field, null, params, layout);
-    setCursorTarget(field, { x: 0.5, y: 0.5 }, null, params, layout);
-    surface.setOverlayDim(1);
-    surface.canvas.style.opacity = open ? String(overlayDimAmount()) : "1";
-    surface.updateFromField(field, params);
-    syncVideoPlayback(null);
-    markDirty();
-    scheduleFrame();
-    if (!open) remeasure();
   }
 
   function syncHoveredTileClass(hit) {
@@ -420,7 +503,6 @@ export function initBentoBulge(options = {}) {
       syncHoveredTileClass(null);
       syncVideoPlayback(null);
       setCellTarget(field, null, params, layout);
-      setCursorTarget(field, { x: 0.5, y: 0.5 }, null, params, layout);
       return;
     }
 
@@ -428,13 +510,12 @@ export function initBentoBulge(options = {}) {
     syncHoveredTileClass(hit);
     syncVideoPlayback(hit);
     setCellTarget(field, hit, params, layout);
-
-    const norm = pointerToNorm(layout, containerRect, event.clientX, event.clientY, surface.camera);
-    setCursorTarget(field, norm, hit, params, layout);
   }
 
-  function onPointerLeave() {
+  function onPointerLeave(event) {
     if (overlayOpen) return;
+    // Only clear when the pointer actually leaves the browser window.
+    if (event.relatedTarget !== null) return;
     pointerInside = false;
     activeCellData = null;
     syncHoveredTileClass(null);
@@ -449,9 +530,9 @@ export function initBentoBulge(options = {}) {
     scheduleFrame();
   }
 
-  function onPointerLeaveWrapped() {
+  function onPointerLeaveWrapped(event) {
     if (overlayOpen) return;
-    onPointerLeave();
+    onPointerLeave(event);
     markDirty();
     scheduleFrame();
   }
@@ -478,6 +559,7 @@ export function initBentoBulge(options = {}) {
   }
 
   let resizeTimer;
+  let clearHoverTimer = 0;
 
   layout.cells.forEach((cell) => {
     if (cell.img && !cell.img.complete) {
@@ -486,18 +568,12 @@ export function initBentoBulge(options = {}) {
         markDirty();
       }, { once: true });
     }
-    if (cell.video && cell.video.readyState < 2) {
-      cell.video.addEventListener("loadeddata", () => {
-        const videoState = textureManager.syncVideoSlotsAndAtlas(
-          layout,
-          dpr,
-          params.enableVideos,
-          maxVideos()
-        );
-        surface.updateVideoSlots(videoState);
-        markDirty();
-      }, { once: true });
-    }
+    if (!cell.video) return;
+
+    const onVideoReady = () => scheduleSyncVideoMedia();
+    cell.video.addEventListener("loadeddata", onVideoReady);
+    cell.video.addEventListener("canplay", onVideoReady);
+    cell.video.addEventListener("playing", onVideoReady);
   });
 
   textureManager.bindVideoFrameWatchers(layout.cells, markDirty);
@@ -512,7 +588,7 @@ export function initBentoBulge(options = {}) {
     (entries) => {
       gridVisible = entries.some((entry) => entry.isIntersecting);
       if (gridVisible) {
-        syncVideoPlayback();
+        scheduleSyncVideoMedia();
         markDirty();
         scheduleFrame();
       } else {
@@ -527,6 +603,19 @@ export function initBentoBulge(options = {}) {
   const resizeObserver = new ResizeObserver(onResizeDebounced);
   resizeObserver.observe(bento);
 
+  function setTilePress(tileEl, pressing) {
+    if (overlayOpen) return;
+    const cell = tileEl ? layout.cells.find((c) => c.el === tileEl) : null;
+    if (pressing && cell) {
+      activeCellData = cell;
+      syncHoveredTileClass(cell);
+      setCellTarget(field, cell, params, layout);
+    }
+    setPressTarget(field, pressing, params);
+    markDirty();
+    scheduleFrame();
+  }
+
   function dispose() {
     if (!running) return;
     running = false;
@@ -539,6 +628,8 @@ export function initBentoBulge(options = {}) {
     gridObserver.disconnect();
     resizeObserver.disconnect();
     clearTimeout(resizeTimer);
+    clearTimeout(clearHoverTimer);
+    if (syncVideoMediaRaf) cancelAnimationFrame(syncVideoMediaRaf);
     clearDomLayers(layout);
     textureManager.dispose();
     surface.dispose();
@@ -549,29 +640,26 @@ export function initBentoBulge(options = {}) {
     if (instance === api) instance = null;
   }
 
-  surface.updateFromField(field, params);
-  surface.updateVideoSlots(initialVideoState);
-  syncVideoPlayback(null);
-  needsRender = true;
-  scheduleFrame();
-
   const api = {
     dispose,
     params,
     remeasure,
     setOverlayOpen,
+    setTilePress,
     syncVideoPlayback,
     onParamsChange: handleParamsChange,
     whenReady: whenReadyPromise
   };
+
+  surface.updateFromField(field, params);
+  surface.updateVideoSlots(initialVideoState);
+  syncVideoMedia();
+  finishBootRender();
+  needsRender = true;
+  scheduleFrame();
+
   instance = api;
   window.BentoBulge = api;
-
-  window.setTimeout(() => {
-    if (readyFired) return;
-    if (!textureManager.hasAtlas()) return;
-    fireReady();
-  }, 2500);
 
   return api;
 }

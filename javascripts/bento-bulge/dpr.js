@@ -4,6 +4,6 @@ export function getEffectiveDpr(params) {
   return Math.min(window.devicePixelRatio || 1, adaptiveCap);
 }
 
-export function shouldUseAntialias(effectiveDpr) {
-  return effectiveDpr >= 1.5;
+export function shouldUseAntialias() {
+  return true;
 }

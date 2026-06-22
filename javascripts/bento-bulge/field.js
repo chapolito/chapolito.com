@@ -16,21 +16,26 @@ export function createBulgeField(params) {
     projectCenter: { x: 0.5, y: 0.5 },
     projectRadius: { x: 0.1, y: 0.1 },
     projectStrength: 0,
-    cursorCenter: { x: 0.5, y: 0.5 },
-    cursorRadius: { x: 0.05, y: 0.05 },
-    cursorStrength: 0,
     bulgeAmount: 0,
     targetProjectCenter: { x: 0.5, y: 0.5 },
     targetProjectRadius: { x: 0.1, y: 0.1 },
     targetProjectStrength: 0,
     targetBulgeAmount: 0,
+    pressSpreadAdd: 0,
+    targetPressSpreadAdd: 0,
+    pressBulgeAdd: 0,
+    targetPressBulgeAdd: 0,
     cellDimAmounts: new Float32Array(MAX_CELLS),
     cellDimTargets: new Float32Array(MAX_CELLS),
+    pressExtraDim: 0,
+    targetPressExtraDim: 0,
+    overlayDim: 1,
+    targetOverlayDim: 1,
     active: false
   };
 }
 
-/** Circular oval hill sized from tile area — not the tile rectangle. */
+/** Uniform pixel gap from each tile edge to the rNorm = 1 ellipse (x = y). */
 export function setCellTarget(field, cell, params, layout) {
   field.cellDimTargets.fill(0);
 
@@ -43,10 +48,10 @@ export function setCellTarget(field, cell, params, layout) {
 
   field.cellDimTargets[cell.index] = 1;
 
-  const planeMin = Math.min(layout.width, layout.height);
+  const hillScale = params.hillRadiusScale ?? 1.1;
+  const spread = params.projectSpread;
   const tileArea = Math.max(cell.width * cell.height, 1);
-  const equivRadius = Math.sqrt(tileArea / Math.PI) * (params.hillRadiusScale ?? 1.1);
-  const normR = (equivRadius / planeMin) * params.projectSpread;
+  const gapPx = Math.sqrt(tileArea / Math.PI) * Math.max(hillScale - 1, 0);
 
   field.active = true;
   field.targetBulgeAmount = 1;
@@ -54,43 +59,62 @@ export function setCellTarget(field, cell, params, layout) {
     x: cell.normCenterX,
     y: cell.normCenterY
   };
+  // stored * uProjectSpread reaches tile edge + gapPx on every side.
   field.targetProjectRadius = {
-    x: normR,
-    y: normR
+    x: Math.max((cell.normRadiusX + gapPx / layout.width) / spread, 1e-6),
+    y: Math.max((cell.normRadiusY + gapPx / layout.height) / spread, 1e-6)
   };
   field.targetProjectStrength = 1;
 }
 
-/** Broad pointer lift — wide, flat muscle profile; peak stays on the tile center. */
-export function setCursorTarget(field, norm, cell, params, layout) {
-  if (!cell || !field.active) {
-    field.cursorStrength = 0;
-    return;
-  }
-
-  field.cursorCenter = {
-    x: cell.normCenterX,
-    y: cell.normCenterY
-  };
-
-  const planeMin = Math.min(layout.width, layout.height);
-  const cursorRadius = planeMin * (params.cursorSpread ?? 0.65) * 0.42;
-  field.cursorRadius = {
-    x: cursorRadius / layout.width,
-    y: cursorRadius / layout.height
-  };
-
-  const dx = (norm.x - cell.normCenterX) * layout.width;
-  const dy = (norm.y - cell.normCenterY) * layout.height;
-  const dist = Math.hypot(dx, dy);
-  const deadZone = Math.max(params.cursorDeadZone ?? 80, 1);
-  const proximity = 1 - Math.min(dist / deadZone, 1);
-  field.cursorStrength = proximity * proximity;
+export function snapCellDims(field) {
+  field.cellDimTargets.fill(0);
+  field.cellDimAmounts.fill(0);
 }
 
-export function updateBulgeField(field, params, dt) {
+export function snapOverlayDim(field) {
+  field.overlayDim = field.targetOverlayDim;
+}
+
+export function snapPressState(field) {
+  field.pressSpreadAdd = field.targetPressSpreadAdd;
+  field.pressBulgeAdd = field.targetPressBulgeAdd;
+  field.pressExtraDim = field.targetPressExtraDim;
+  if (field.active) {
+    const engagedBulge = Math.max(0, 1 - field.targetPressBulgeAdd);
+    field.bulgeAmount = engagedBulge;
+    field.targetBulgeAmount = engagedBulge;
+  }
+}
+
+export function setPressTarget(field, pressing, params) {
+  field.targetPressExtraDim = pressing ? 1 : 0;
+  if (pressing) {
+    field.targetPressSpreadAdd = params.pressSpreadAdd ?? 0.15;
+    field.targetPressBulgeAdd = params.pressBulgeBoost ?? 0.06;
+  } else {
+    field.targetPressSpreadAdd = 0;
+    field.targetPressBulgeAdd = 0;
+  }
+  if (field.active) {
+    field.targetBulgeAmount = Math.max(0, 1 - field.targetPressBulgeAdd);
+  }
+}
+
+export function updateBulgeField(field, params, dt, options = {}) {
   const morph = params.morphSpeed;
   const dimMorph = params.dimMorphSpeed ?? morph * 0.35;
+  const basePressMorph = params.pressMorphSpeed ?? morph * 1.4;
+  const pressMorph = options.overlayOpen ? Math.max(basePressMorph, 22) : basePressMorph;
+  const overlayMorph = params.overlayDimMorphSpeed ?? 7.5;
+
+  field.pressSpreadAdd = damp(field.pressSpreadAdd, field.targetPressSpreadAdd, pressMorph, dt);
+  field.pressBulgeAdd = damp(field.pressBulgeAdd, field.targetPressBulgeAdd, pressMorph, dt);
+  field.pressExtraDim = damp(field.pressExtraDim, field.targetPressExtraDim, pressMorph, dt);
+  field.overlayDim = damp(field.overlayDim, field.targetOverlayDim, overlayMorph, dt);
+  if (field.active) {
+    field.targetBulgeAmount = Math.max(0, 1 - field.targetPressBulgeAdd);
+  }
 
   field.projectCenter = dampVec2(field.projectCenter, field.targetProjectCenter, morph, dt);
   field.projectRadius = dampVec2(field.projectRadius, field.targetProjectRadius, morph, dt);
@@ -122,6 +146,10 @@ export function isFieldMorphing(field) {
     centerSep > 0.0008 ||
     radiusSep > 0.0008 ||
     Math.abs(field.bulgeAmount - field.targetBulgeAmount) > 0.008 ||
-    Math.abs(field.projectStrength - field.targetProjectStrength) > 0.008
+    Math.abs(field.projectStrength - field.targetProjectStrength) > 0.008 ||
+    Math.abs(field.pressSpreadAdd - field.targetPressSpreadAdd) > 0.008 ||
+    Math.abs(field.pressBulgeAdd - field.targetPressBulgeAdd) > 0.008 ||
+    Math.abs(field.pressExtraDim - field.targetPressExtraDim) > 0.008 ||
+    Math.abs(field.overlayDim - field.targetOverlayDim) > 0.008
   );
 }

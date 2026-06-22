@@ -122,13 +122,6 @@
       bento.appendChild(sec);
     });
 
-    var cta = el("div", "pj-cta pj-bento__cta");
-    cta.appendChild(el("h2", "pj-cta__h t-display", "Let's talk."));
-    var mail = el("a", "pj-cta__a", "jesse@chapolito.com");
-    mail.href = "mailto:jesse@chapolito.com?subject=Portfolio";
-    cta.appendChild(mail);
-    bento.appendChild(cta);
-
     root.appendChild(bento);
   };
 
@@ -143,6 +136,9 @@
             document.body.classList.contains("is-detail-opening") ||
             document.body.classList.contains("is-detail-open") ||
             document.body.classList.contains("is-detail-closing");
+          var bulgeGrid =
+            document.body.classList.contains("bento-bulge-page") && v.closest("#grid");
+          if (bulgeGrid) return;
           if (e.isIntersecting) {
             if (v.closest("#grid") && detailActive) return;
             v.play().catch(function () {});
@@ -160,9 +156,10 @@
 
   window.initReveal = function (scope) {
     var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var coarse = !window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     var root = scope || document;
     var items = root.querySelectorAll(".reveal");
-    if (reduce) {
+    if (reduce || coarse) {
       items.forEach(function (n) {
         n.classList.add("in");
       });

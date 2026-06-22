@@ -107,12 +107,6 @@
             </li>
           </ul>
         </section>
-
-        <div class="about__links">
-          <a href="https://www.linkedin.com/in/chapolito">LinkedIn</a>
-          <a href="https://github.com/chapolito">GitHub</a>
-          <a href="mailto:jesse@chapolito.com">jesse@chapolito.com</a>
-        </div>
       </article>
     </template>
 
@@ -135,6 +129,30 @@
           <span class="dock__title">Principal Product Designer</span>
           <span class="dock__sep" aria-hidden="true">·</span>
           <span class="dock__loc">Santa Cruz, CA</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__social">
+            <a class="dock__social-link" href="mailto:jesse@chapolito.com" aria-label="Email Jesse O'Chapo">
+              <img src="/images/dock/icon-email.svg" alt="" width="14" height="14" />
+            </a>
+            <a
+              class="dock__social-link"
+              href="https://www.linkedin.com/in/chapolito"
+              aria-label="LinkedIn profile"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <img src="/images/dock/icon-linkedin.svg" alt="" width="14" height="14" />
+            </a>
+            <a
+              class="dock__social-link"
+              href="https://github.com/chapolito"
+              aria-label="GitHub profile"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <img src="/images/dock/icon-github.svg" alt="" width="14" height="14" />
+            </a>
+          </span>
         </p>
         <nav class="dock__nav" aria-label="Site navigation">
           <a class="dock__link is-active" href="#" data-view="portfolio">Projects</a>
@@ -167,6 +185,7 @@
 
         function tileVideoSrc(src) {
           if (!src || !/\.mp4$/i.test(src)) return src;
+          if (/\.tile\.mp4$/i.test(src)) return src;
           return src.replace(/\.mp4$/i, ".tile.mp4");
         }
 
@@ -176,6 +195,12 @@
           tile.dataset.id = p.id;
           tile.dataset.orient = p.orientation || "landscape";
           tile.dataset.fit = (p.tile && p.tile.fit) || "cover";
+          if (p.tile && (p.tile.align || p.tile.coverAlign)) {
+            tile.dataset.coverAlign = p.tile.align || p.tile.coverAlign;
+          }
+          if (p.tile && p.tile.insetShadow) {
+            tile.dataset.insetShadow = "true";
+          }
           tile.tabIndex = 0;
           tile.setAttribute("role", "button");
           tile.setAttribute("aria-label", p.title + ", " + p.product);
@@ -244,8 +269,8 @@
 
             initBentoBulgeOverlays({
               whenBulgeReady: getBulgeWhenReady(),
-              onOpen() {
-                bulge?.setOverlayOpen?.(true);
+              onOpen(instant) {
+                bulge?.setOverlayOpen?.(true, { instant });
               },
               onClose() {
                 bulge?.setOverlayOpen?.(false);
