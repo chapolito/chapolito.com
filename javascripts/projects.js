@@ -55,7 +55,7 @@ window.PROJECTS = [
     feature: true,
     hover: "sweep",
     overlay: "dock",
-    tile: { type: "video", src: "/images/home/horizon-world-chat.mp4", fit: "cover" },
+    tile: { type: "video", src: "/images/home/World-Comms.tile.mp4", fit: "cover" },
     detail: {
       lede:
         "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication (text chat, voice, and emotes), including the in-game menu, and changed the default modality from voice to text.",
@@ -87,13 +87,13 @@ window.PROJECTS = [
 
   {
     id: "horizon-mobile",
-    title: "Worlds in your pocket",
-    product: "Horizon",
+    title: "Gaming Profiles across Meta",
+    product: "Meta",
     era: "Meta",
     orientation: "portrait",
     hover: "drift",
     overlay: "magazine",
-    tile: { type: "video", src: "/images/home/horizon-mobile.mp4", fit: "cover" },
+    tile: { type: "video", src: "/images/home/Gaming-Profile.tile.mp4", fit: "cover" },
     detail: {
       lede:
         "The Horizon mobile experience. Discovering worlds, friends, and games on the phone, then jumping in.",
