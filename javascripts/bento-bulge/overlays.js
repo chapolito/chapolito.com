@@ -242,14 +242,30 @@ export function initBentoBulgeOverlays(options = {}) {
     doc.appendChild(tpl.content.cloneNode(true));
   }
 
-  function openOverlayCommon(instant) {
+  function focusAboutEntry() {
+    const title = doc.querySelector(".about__hero-title");
+    if (title) {
+      title.setAttribute("tabindex", "-1");
+      title.focus({ preventScroll: true });
+      return;
+    }
+    panel.setAttribute("tabindex", "-1");
+    panel.focus({ preventScroll: true });
+  }
+
+  function openOverlayCommon(instant, options = {}) {
+    const isAbout = options.about === true;
     clearOpenPhaseTimer();
     reader.removeAttribute("hidden");
     reader.removeAttribute("inert");
     reader.classList.add("reader--ov-split");
     reader.classList.add("is-open");
     reader.setAttribute("aria-hidden", "false");
-    closeBtn.removeAttribute("aria-hidden");
+    if (isAbout) {
+      closeBtn.setAttribute("aria-hidden", "true");
+    } else {
+      closeBtn.removeAttribute("aria-hidden");
+    }
     document.body.style.overflow = "hidden";
     panel.classList.add("is-morphed");
     panel.scrollTop = 0;
@@ -258,13 +274,19 @@ export function initBentoBulgeOverlays(options = {}) {
       doc.classList.add("is-revealed", "is-instant");
       document.body.classList.add("is-detail-open", "is-detail-enter");
       onOpen(instant);
-      closeBtn.focus();
+      if (!instant) {
+        if (isAbout) focusAboutEntry();
+        else closeBtn.focus();
+      }
       return;
     }
 
     doc.classList.add("is-revealed");
     startOpenTransition();
-    closeBtn.focus();
+    if (!instant) {
+      if (isAbout) focusAboutEntry();
+      else closeBtn.focus();
+    }
   }
 
   function open(id, skipPush, tile, instant, afterDockExit) {
@@ -335,7 +357,7 @@ export function initBentoBulgeOverlays(options = {}) {
       reader.removeAttribute("hidden");
       reader.removeAttribute("inert");
       reader.setAttribute("aria-hidden", "false");
-      closeBtn.removeAttribute("aria-hidden");
+      closeBtn.setAttribute("aria-hidden", "true");
       document.body.style.overflow = "hidden";
       panel.classList.add("is-morphed");
       panel.scrollTop = 0;
@@ -350,7 +372,7 @@ export function initBentoBulgeOverlays(options = {}) {
       else if (location.hash !== "#about") history.replaceState({ about: true }, "", aboutUrl());
       document.title = "About · Jesse O'Chapo";
       setActiveNav("about");
-      closeBtn.focus();
+      if (!instant) focusAboutEntry();
       return;
     }
 
@@ -369,7 +391,7 @@ export function initBentoBulgeOverlays(options = {}) {
     aboutOpen = true;
     mountAboutContent();
     reader.setAttribute("aria-label", "About");
-    openOverlayCommon(instant);
+    openOverlayCommon(instant, { about: true });
 
     if (window.initInview) window.initInview(doc);
 

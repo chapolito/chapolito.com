@@ -399,6 +399,11 @@ body.is-home.is-detail-enter .detail-back {
   opacity: 1 !important;
   transform: translate(-50%, 0) !important;
 }
+body.is-home.is-detail-enter .reader:has(.about-overlay) .detail-back {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none;
+}
 
 /* ---- responsive ---- */
 @media (max-width: 1080px) {

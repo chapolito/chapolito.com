@@ -27,83 +27,150 @@
 
     <template id="about-template">
       <article class="about">
-        <header class="about__head">
-          <h1 class="about__title t-display" id="about-title">About</h1>
-        </header>
+        <section class="about__hero" aria-labelledby="about-greeting">
+          <div class="about__hero-canvas">
+            <div class="about__hero-intro">
+              <div class="about__hero-copy">
+                <h1 class="about__hero-title t-display" id="about-greeting">Hello! I'm Jesse.</h1>
+                <p class="about__hero-lede">
+                  I'm a Principal Product Designer at Meta, based in Santa Cruz, CA. Previously, I designed at Life360,
+                  Fanpics, and MTV.
+                </p>
+              </div>
+            </div>
 
-        <div class="about__intro">
-          <figure class="about__portrait">
-            <img
-              src="/images/jesse-ochapo-portrait.jpg"
-              alt="Portrait of Jesse O'Chapo"
-              width="560"
-              height="700"
-              loading="lazy"
-            />
-          </figure>
-          <div class="about__copy">
-            <p class="about__lede">
-              Hello! I'm Jesse O'Chapo, a Principal Product Designer at Meta, based in Santa Cruz, CA. Previously, I
-              designed at Life360, Fanpics, and MTV.
-            </p>
+            <div class="about__hero-collage">
+              <figure class="about__portrait">
+                <img
+                  src="/images/about/jesse-portrait.png"
+                  alt="Portrait of Jesse O'Chapo wearing yellow sunglasses and a green hoodie"
+                  width="426"
+                  height="426"
+                  loading="lazy"
+                />
+              </figure>
+              <figure class="about__photo about__photo--surf about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/surfing.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--wide about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/wood-handle.png" alt="" width="480" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--manta about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/diving-with-manta-rays.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--polaroid about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/jesse-and-caito.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--scalloped about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/scalloped-wood.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--coffee about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/coffee-table-wave.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section class="about__bio" aria-label="Bio">
+          <div class="about__bio-main">
             <p>
-              I built my first website in 1998 to host my Starcraft maps (twinkling star GIF background and all). That
-              turned into a career that started in 2006, ran through early-stage startups, and landed me at Meta in 2017.
-            </p>
-            <p>
-              During my 9+ years at Meta I've grown from Product Designer to Senior, Staff, and now Principal. I
-              specialize in turning ambiguous zero-to-one initiatives into clear product direction. As a leader, I shape
+              I specialize in turning ambiguous zero-to-one initiatives into clear product direction. As a leader, I shape
               work, set the bar for craft, mentor designers, and partner closely with PM and engineering leads to define
-              vision where no blueprint exists. I'm an exceptional systems thinker and I'm regularly sought out to frame
-              complex team strategies that VPs and Directors can rally behind.
+              vision where no blueprint exists.
             </p>
             <p>
               While I focus on product strategy and design leadership, I stay hands-on in high-fidelity design. Right now
               that means integrating AI into my daily workflow as a creative thought partner for research, synthesis,
-              prototyping, and creating visual content that brings mocks to life. I love experimenting with new
-              technology, and I'm usually the person bringing new AI workflows to my peers.
+              prototyping, and creating visual content that brings mocks to life.
             </p>
           </div>
-        </div>
+          <p class="about__bio-aside">
+            When I'm not furiously clicking in Figma &amp; walking Claude back from the ledge, I love to build things with
+            my hands and spend time in the ocean with my partner.
+          </p>
+        </section>
 
-        <section class="about__philosophy" aria-labelledby="how-i-work">
-          <h2 class="about__section-title t-display" id="how-i-work">How I work</h2>
-          <ul class="about__cards">
-            <li class="about__card">
-              <h3 class="about__card-title">Systems thinker.</h3>
-              <p class="about__card-body">
-                My happy place is ambiguous problems that require orchestrating across multiple teams.
-              </p>
+        <section class="about__career" aria-labelledby="about-career">
+          <h2 class="about__section-title t-display" id="about-career">Career Moments</h2>
+          <div class="about__moments-track">
+            <ol class="about__moments">
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/starcraft.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">1998</p>
+                  <p class="about__moment-text">
+                    Built my first website to host Starcraft maps. The entire background was twinkling star GIFs.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/mtv.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2008</p>
+                  <p class="about__moment-text">
+                    After college I got my first full-time design job working on social networks for MTV &amp; VH1.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/meta.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2017</p>
+                  <p class="about__moment-text">
+                    After a decade of startups &amp; freelancing, I joined Meta to take on large-scale problems.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/oculus-vr.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2022</p>
+                  <p class="about__moment-text">
+                    Managed a VR team for a year. Learned to create impact through vision and influence, not just my own
+                    output. Ultimately, I missed being hands-on.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/whats-next.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2026</p>
+                  <p class="about__moment-text">
+                    At Meta I've grown from product designer to senior, staff, and now principal. I'm excited to start the
+                    next challenge this year.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="about__contact" aria-labelledby="about-contact">
+          <h2 class="about__section-title t-display" id="about-contact">Contact</h2>
+          <ul class="about__contact-list">
+            <li class="about__contact-item">
+              <img class="about__contact-icon" src="/images/dock/icon-email.svg" alt="" width="24" height="24" />
+              <a href="mailto:jesse@chapolito.com">jesse@chapolito.com</a>
             </li>
-            <li class="about__card">
-              <h3 class="about__card-title">Full stack designer.</h3>
-              <p class="about__card-body">
-                My days range from developing product strategy to sweating visual polish.
-              </p>
+            <li class="about__contact-item">
+              <img class="about__contact-icon" src="/images/about/icons/phone.svg" alt="" width="24" height="24" />
+              <a href="tel:+17608140831">(760) 814-0831</a>
             </li>
-            <li class="about__card">
-              <h3 class="about__card-title">Mentor.</h3>
-              <p class="about__card-body">
-                I get a lot of joy from scaling my experiences through mentorship and coaching.
-              </p>
-            </li>
-            <li class="about__card">
-              <h3 class="about__card-title">Growth mindset.</h3>
-              <p class="about__card-body">
-                I cringe at all my old work and enjoy reflecting on how to improve.
-              </p>
-            </li>
-            <li class="about__card">
-              <h3 class="about__card-title">Get it done.</h3>
-              <p class="about__card-body">
-                Not knowing how to do something does not stop me figuring it out and getting it done.
-              </p>
-            </li>
-            <li class="about__card">
-              <h3 class="about__card-title">Inclusive process.</h3>
-              <p class="about__card-body">
-                My best work materializes by sharing, discussing, and seeking new perspectives.
-              </p>
+            <li class="about__contact-item">
+              <img class="about__contact-icon" src="/images/dock/icon-linkedin.svg" alt="" width="24" height="24" />
+              <a href="https://www.linkedin.com/in/chapolito/" rel="noopener noreferrer" target="_blank"
+                >https://www.linkedin.com/in/chapolito/</a
+              >
             </li>
           </ul>
         </section>
