@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="2160px" height="1354px" viewBox="0 0 2460 1354" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 40 (33762) - http://www.bohemiancoding.com/sketch -->
+    <title>closing-the-loop-bg</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="9.52630929%" y1="76.1348197%" x2="75.0405293%" y2="32.8356596%" id="linearGradient-1">
+            <stop stop-color="#7C4DFF" offset="0%"></stop>
+            <stop stop-color="#4C94FF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="18.9578359%" y1="62.1600017%" x2="81.2391493%" y2="29.2250359%" id="linearGradient-2">
+            <stop stop-color="#2ED1C6" offset="0%"></stop>
+            <stop stop-color="#4C94FF" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="113.312752%" y1="25.5229335%" x2="16.0740291%" y2="75.160801%" id="linearGradient-3">
+            <stop stop-color="#7B4EFF" offset="0%"></stop>
+            <stop stop-color="#2ED1C6" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="82.8072497%" x2="98.5645581%" y2="18.6365927%" id="linearGradient-4">
+            <stop stop-color="#FFAE36" offset="0%"></stop>
+            <stop stop-color="#FF6A59" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Life360" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-2">
+            <g id="closing-the-loop-bg">
+                <g id="Group-7" transform="translate(662.000000, 662.000000) scale(-1, 1) translate(-662.000000, -662.000000) ">
+                    <circle id="Oval-199-Copy-5" fill="url(#linearGradient-1)" cx="662" cy="662" r="662"></circle>
+                    <ellipse id="Oval-199-Copy-3" fill="url(#linearGradient-2)" cx="555.5" cy="573.5" rx="479.5" ry="479.5"></ellipse>
+                    <circle id="Oval-199-Copy-4" fill="url(#linearGradient-3)" cx="485" cy="499" r="337"></circle>
+                </g>
+                <g id="Group-7" transform="translate(1148.000000, 342.000000)">
+                    <circle id="Oval-199-Copy-5" fill="url(#linearGradient-1)" cx="506" cy="506" r="506"></circle>
+                    <ellipse id="Oval-199-Copy-3" fill="url(#linearGradient-2)" cx="424.5" cy="438.5" rx="366.5" ry="366.5"></ellipse>
+                    <circle id="Oval-199-Copy-4" fill="url(#linearGradient-3)" cx="370.5" cy="381.5" r="257.5"></circle>
+                </g>
+                <polygon id="Rectangle-7-Copy" fill="#6D3CF3" opacity="0.100000001" points="631 923.783171 1666.95312 461 1666.95312 514.844381 631 977.627552"></polygon>
+                <polygon id="Rectangle-7" fill="url(#linearGradient-4)" points="622 912.783171 1657.95312 450 1657.95312 503.844381 622 966.627552"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

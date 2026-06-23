@@ -1,0 +1,573 @@
+/* ------------------------------------------------------------------
+   About overlay — Figma Desktop HD (1728px artboard)
+------------------------------------------------------------------ */
+.about-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  padding: clamp(48px, 8vw, 96px) var(--pad) 116px;
+}
+
+.about-page.about-overlay {
+  min-height: 0;
+  width: 100%;
+  padding: var(--pad) var(--pad) var(--dock-h);
+  box-sizing: border-box;
+}
+
+.reader.is-open:has(.about-overlay) .detail-back {
+  display: none;
+}
+
+.about {
+  --about-text-primary: rgba(255, 255, 255, 1);
+  --about-text-secondary: rgba(255, 255, 255, 0.8);
+  --about-text-tertiary: rgba(255, 255, 255, 0.6);
+  --about-artboard: 1728;
+  --about-hero-collage-top: 146;
+  --about-hero-collage-height: 700;
+  --about-hero-collage-pull: 254;
+  --about-hero-intro-top: clamp(80px, 13.08vw, 226px);
+  --about-inset: calc(402 / var(--about-artboard) * 100%);
+  --about-portrait-left: calc(960 / var(--about-artboard) * 100%);
+  --about-intro-portrait-gap: calc(78 / var(--about-artboard) * 100%);
+  --about-copy-max: 480px;
+  --about-aside-max: 317px;
+  --about-bio-gap: 62px;
+  --about-bio-collage-gap: clamp(24px, 4vw, 48px);
+  --about-radius: 48px;
+  --about-photo-stroke: rgba(255, 255, 255, 0.1);
+  --about-photo-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
+  --about-card-shadow: 0 0 74px rgba(255, 255, 255, 0.06);
+  --about-career-glow: 74px;
+  width: min(100%, 1728px);
+  margin: 0 auto;
+  color: var(--about-text-primary);
+}
+
+.about-page.about-overlay .about {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.about-page.about-overlay.is-revealed .about,
+.about-page.about-overlay.is-instant .about {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---- hero (intro in flow; collage offsets from intro block) ---- */
+.about__hero {
+  margin-bottom: 0;
+}
+
+.about__hero-canvas {
+  position: relative;
+  width: 100%;
+}
+
+.about__hero-intro {
+  padding-top: var(--about-hero-intro-top);
+}
+
+.about__hero-copy {
+  min-width: 0;
+}
+
+.about__hero-title {
+  margin: 0 0 calc(24 / 52 * 1em);
+  font-size: clamp(1.8rem, 2.708vw, 2.925rem); /* ~10% below Figma 52px */
+  line-height: calc(72 / 52);
+  letter-spacing: 0;
+  color: var(--about-text-primary);
+}
+
+.about__hero-lede {
+  margin: 0;
+  font-size: clamp(1rem, 1.042vw, 1.125rem);
+  font-weight: 500;
+  line-height: calc(26 / 18);
+  color: var(--about-text-secondary);
+}
+
+.about__hero-collage {
+  position: relative;
+  width: 100%;
+  margin-top: calc(var(--about-hero-collage-pull) / var(--about-artboard) * -100%);
+  aspect-ratio: var(--about-artboard) / var(--about-hero-collage-height);
+}
+
+.about__portrait {
+  position: absolute;
+  z-index: 2;
+  left: calc(960 / var(--about-artboard) * 100%);
+  top: calc((146 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(426 / var(--about-artboard) * 100%);
+  margin: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: var(--about-photo-shadow);
+}
+
+.about__portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Photo Frame — Figma parent styling applied in CSS */
+.about__photo-frame {
+  overflow: hidden;
+  border: 0.555px solid var(--about-photo-stroke);
+  border-radius: var(--about-radius);
+  box-shadow: var(--about-photo-shadow);
+}
+
+.about__photo-frame--career {
+  border-width: 1px;
+  box-shadow: var(--about-card-shadow);
+}
+
+.about__photo-frame img,
+.about__moment-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.about__photo {
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  aspect-ratio: 1;
+}
+
+.about__photo--wide {
+  aspect-ratio: 480 / 234;
+}
+
+.about__photo--surf {
+  left: calc(88 / var(--about-artboard) * 100%);
+  top: calc((424 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(234 / var(--about-artboard) * 100%);
+  z-index: 2;
+}
+
+.about__photo--wide {
+  left: calc(250 / var(--about-artboard) * 100%);
+  top: calc((509 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(480 / var(--about-artboard) * 100%);
+  z-index: 1;
+}
+
+.about__photo--manta {
+  left: calc(679 / var(--about-artboard) * 100%);
+  top: calc((440 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(234 / var(--about-artboard) * 100%);
+}
+
+.about__photo--polaroid {
+  left: calc(888 / var(--about-artboard) * 100%);
+  top: calc((459 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(234 / var(--about-artboard) * 100%);
+}
+
+.about__photo--scalloped {
+  left: calc(1201 / var(--about-artboard) * 100%);
+  top: calc((517 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(234 / var(--about-artboard) * 100%);
+}
+
+.about__photo--coffee {
+  left: calc(1410 / var(--about-artboard) * 100%);
+  top: calc((612 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
+  width: calc(234 / var(--about-artboard) * 100%);
+}
+
+/* ---- bio ---- */
+.about__bio {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  gap: clamp(24px, 4vw, 48px);
+  margin-top: var(--about-bio-collage-gap);
+  margin-bottom: clamp(56px, 8vw, 96px);
+}
+
+.about__bio-main {
+  display: grid;
+  gap: 20px;
+}
+
+.about__bio-main p,
+.about__bio-aside {
+  margin: 0;
+  font-size: clamp(1rem, 1.05vw, 1.125rem);
+  font-weight: 500;
+  line-height: calc(26 / 18);
+}
+
+.about__bio-main p {
+  color: var(--about-text-secondary);
+}
+
+.about__bio-aside {
+  color: var(--about-text-tertiary);
+  font-size: clamp(0.875rem, 0.9vw, 0.9375rem);
+  line-height: calc(21 / 15);
+}
+
+/* ---- section titles ---- */
+.about__section-title {
+  margin: 0 0 clamp(28px, 4vw, 40px);
+  font-size: clamp(1.75rem, 2.3vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--about-text-primary);
+}
+
+/* ---- career moments ---- */
+.about__career {
+  margin-bottom: clamp(56px, 8vw, 96px);
+}
+
+.about__moments-track {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  /* overflow-x: auto forces overflow-y: auto — pad so card glow isn't clipped */
+  padding-top: var(--about-career-glow);
+  margin-top: calc(-1 * var(--about-career-glow));
+}
+
+.about__moments {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: clamp(16px, 1.74vw, 30px);
+  width: min(100%, 1520px);
+  flex: 0 1 1520px;
+}
+
+.about__moment {
+  min-width: 0;
+}
+
+.about__moment:nth-child(1) { margin-top: clamp(80px, 9.26vw, 160px); }
+.about__moment:nth-child(2) { margin-top: clamp(60px, 6.94vw, 120px); }
+.about__moment:nth-child(3) { margin-top: clamp(40px, 4.63vw, 80px); }
+.about__moment:nth-child(4) { margin-top: clamp(20px, 2.31vw, 40px); }
+.about__moment:nth-child(5) { margin-top: 0; }
+
+.about__moment-art {
+  margin: 0 0 16px;
+  aspect-ratio: 1;
+}
+
+.about__moment-year {
+  margin: 0 0 8px;
+  font-size: clamp(1.5rem, 1.85vw, 2rem);
+  line-height: 1.75;
+  letter-spacing: 0;
+  color: var(--about-text-primary);
+}
+
+.about__moment-text {
+  margin: 0;
+  font-size: clamp(1rem, 1.05vw, 1.125rem);
+  font-weight: 500;
+  line-height: calc(26 / 18);
+  color: var(--about-text-secondary);
+}
+
+/* ---- contact ---- */
+.about__contact {
+  padding-bottom: clamp(24px, 4vw, 48px);
+}
+
+.about__contact-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 20px;
+  max-width: var(--about-copy-max);
+}
+
+.about__contact-item {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.about__contact-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin-top: 1px;
+}
+
+.about__contact-item a {
+  color: var(--about-text-secondary);
+  font-size: clamp(1rem, 1.05vw, 1.125rem);
+  font-weight: 500;
+  line-height: calc(26 / 18);
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.about__contact-item a:hover,
+.about__contact-item a:focus-visible {
+  color: var(--about-text-primary);
+}
+
+/* ---- tablet / desktop (fixed copy width, shared left edge) ---- */
+@media (min-width: 768px) {
+  .about__hero-intro,
+  .about__bio {
+    --about-inline-inset: max(
+      var(--pad),
+      min(
+        var(--about-inset),
+        calc(100% - var(--about-copy-max) - var(--about-bio-gap) - var(--about-aside-max) - var(--pad))
+      )
+    );
+    margin-left: var(--about-inline-inset);
+    margin-right: var(--pad);
+  }
+
+  .about__hero-intro {
+    position: relative;
+    z-index: 3;
+    /* Shrink copy width with viewport before encroaching on portrait */
+    width: min(
+      var(--about-copy-max),
+      calc(var(--about-portrait-left) - var(--about-intro-portrait-gap) - var(--about-inline-inset))
+    );
+  }
+
+  .about__hero-copy {
+    width: 100%;
+  }
+
+  .about__bio {
+    grid-template-columns: var(--about-copy-max) var(--about-aside-max);
+    gap: var(--about-bio-gap);
+    justify-content: start;
+    align-items: start;
+  }
+
+  .about__bio-main {
+    width: var(--about-copy-max);
+  }
+
+  .about__bio-aside {
+    width: var(--about-aside-max);
+    text-align: right;
+  }
+}
+
+/* Narrow tablet: fluid two-column bio (blurb stays beside main copy) */
+@media (min-width: 768px) and (max-width: 1000px) {
+  .about__bio {
+    width: calc(100% - var(--about-inline-inset) - var(--pad));
+    max-width: calc(var(--about-copy-max) + var(--about-bio-gap) + var(--about-aside-max));
+    grid-template-columns: minmax(0, 1.515fr) minmax(0, 1fr);
+    gap: clamp(16px, 3vw, var(--about-bio-gap));
+  }
+
+  .about__bio-main,
+  .about__bio-aside {
+    width: auto;
+    max-width: none;
+  }
+
+  .about__bio-aside {
+    text-align: right;
+  }
+
+  .about__moment-text {
+    font-size: clamp(0.875rem, 0.9vw, 0.9375rem);
+    line-height: calc(21 / 15);
+  }
+}
+
+/* ---- desktop (16-inch / 1728 artboard) ---- */
+@media (min-width: 1200px) {
+  .about__contact,
+  .about__career .about__section-title {
+    margin-left: var(--about-inset);
+  }
+
+  .about__bio {
+    margin-right: var(--about-inset);
+  }
+}
+
+/* Large desktop — tighten gap between collage and bio */
+@media (min-width: 1536px) {
+  .about {
+    --about-bio-collage-gap: 0;
+  }
+}
+
+/* ---- tablet ---- */
+@media (max-width: 1199px) {
+  .about__contact,
+  .about__career .about__section-title {
+    margin-left: 0;
+  }
+}
+
+/* Collage corner radius steps down at tablet */
+@media (max-width: 1000px) {
+  .about {
+    --about-radius: 32px;
+  }
+}
+
+/* ---- mobile ---- */
+@media (max-width: 767px) {
+  .about__hero-intro {
+    padding-top: 8px;
+    padding-left: 0;
+  }
+
+  .about__hero-copy {
+    width: auto;
+  }
+
+  .about__hero-collage {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: var(--about-copy-max);
+    aspect-ratio: auto;
+    margin-top: 12px;
+  }
+
+  .about__portrait {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    margin: 0;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+
+  .about__portrait img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .about__photo {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .about__photo:not(.about__photo--wide) {
+    aspect-ratio: 1;
+  }
+
+  .about__photo--wide,
+  .about__photo--scalloped,
+  .about__photo--manta {
+    display: none;
+  }
+
+  .about__photo--polaroid img {
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+    object-position: right center;
+    border-radius: 0;
+  }
+
+  .about__photo-frame img {
+    border-radius: 0;
+  }
+
+  .about__bio {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    gap: 24px;
+  }
+
+  .about__bio-aside {
+    order: -1;
+    max-width: none;
+    text-align: left;
+  }
+
+  .about__moments-track {
+    overflow: visible;
+    padding-top: 0;
+    margin-top: 0;
+  }
+
+  .about__moments {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    width: 100%;
+    padding-inline: 0;
+    flex: none;
+  }
+
+  .about__moment:nth-child(n) {
+    margin-top: 0;
+  }
+
+  .about__moment {
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr);
+    column-gap: 16px;
+    align-items: start;
+  }
+
+  .about__moment-art {
+    grid-row: 1 / span 2;
+    margin: 0;
+    width: 80px;
+    height: 80px;
+    aspect-ratio: auto;
+    border-radius: 20px;
+  }
+
+  .about__moment-art img {
+    border-radius: 0;
+  }
+
+  .about__moment-copy {
+    grid-column: 2;
+  }
+
+  .about__moment-year {
+    margin-bottom: 4px;
+    font-size: 1.25rem;
+    line-height: 1.3;
+  }
+
+  .about__moment-text {
+    font-size: 0.9375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about__moments {
+    scroll-behavior: auto;
+  }
+}
