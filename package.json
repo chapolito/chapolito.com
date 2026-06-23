@@ -1,0 +1,15 @@
+{
+  "name": "chapolito.com",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate:home-routes": "node scripts/generate-home-routes.cjs",
+    "vendor:three": "cp node_modules/three/build/three.core.min.js node_modules/three/build/three.module.min.js javascripts/vendor/",
+    "start": "node scripts/generate-home-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
+    "serve": "npm run start"
+  },
+  "dependencies": {
+    "lil-gui": "^0.21.0",
+    "three": "^0.184.0"
+  }
+}

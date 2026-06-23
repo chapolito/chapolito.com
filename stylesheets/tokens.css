@@ -1,0 +1,192 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap");
+@import "fonts.css";
+
+/* ------------------------------------------------------------------
+   Chapolito 2026 — concept design tokens (v2)
+   Pulled from the case-study deck:
+     · Type  — Neue Plak Wide Bold headlines + IBM Plex Mono
+     · Color — plum→black radial bg (rgb 42,33,48 → #000)
+     · Accent gradient — light purple → light orange (deck section titles)
+   Refined, understated, craft-forward. No cyan.
+------------------------------------------------------------------ */
+
+:root {
+  /* surfaces (warm plum-black, from the deck slide bg) */
+  --bg: #07060a;
+  --bg-1: #100d16;
+  --bg-2: #17131f;
+  --bg-3: #211b2c;
+  --plum: #2a2130;
+
+  /* home vignette (Figma Website background — node 2407:46675) */
+  --home-vignette-mid: #151118;
+  --home-vignette-deep: #0a080c;
+
+  /* ink */
+  --ink: #ffffff;
+  --ink-dim: #c4bed2;
+  --ink-mut: #847e96;
+  --ink-faint: rgba(255, 255, 255, 0.4);
+
+  /* accent gradient (deck: #D6B6F0 light purple → warm; nudged to light orange) */
+  --pp: #d6b6f0; /* light purple (deck exact) */
+  --pk: #f3c2ce; /* mid warm */
+  --po: #ffc59e; /* light orange */
+  --grad: linear-gradient(96deg, var(--pp) 0%, var(--pk) 46%, var(--po) 100%);
+  --grad-soft: linear-gradient(180deg, #efe2ff 0%, #f7c9bd 130%);
+
+  /* solid accent for small UI (soft purple, not cyan) */
+  --accent: #c9a9ff;
+
+  /* ambient glow colors (loop-orb hues, used very subtly) */
+  --glow-violet: rgba(139, 95, 255, 0.18);
+  --glow-warm: rgba(255, 170, 120, 0.12);
+
+  /* lines */
+  --line: rgba(255, 255, 255, 0.08);
+  --line-2: rgba(255, 255, 255, 0.16);
+
+  /* type */
+  --font-display: "Neue Plak Wide", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* motion */
+  --e-out: cubic-bezier(0.16, 1, 0.3, 1);       /* expo-out: confident settle */
+  --e-inout: cubic-bezier(0.83, 0, 0.17, 1);    /* expo-in-out: page/morph */
+  --e-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --d-1: 0.4s;
+  --d-2: 0.6s;
+  --d-3: 0.9s;
+
+  /* layout */
+  --pad: clamp(16px, 2.4vw, 40px);
+  --gap: clamp(8px, 0.7vw, 14px);
+  --maxw: 1760px;
+  --radius: 14px;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+body {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 16px;
+  line-height: 1.5;
+  overflow-x: clip;
+  background-color: var(--bg);
+  background-image: radial-gradient(135% 95% at 50% -12%, #241b2b 0%, #0c0913 46%, var(--bg) 100%);
+  background-attachment: fixed;
+}
+
+a { color: inherit; text-decoration: none; }
+img, video { display: block; max-width: 100%; }
+button { font: inherit; }
+
+::selection { background: var(--pp); color: #1a1320; }
+
+/* ---- type utilities (deck ramp, made responsive) ---- */
+.t-display {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: normal;
+  font-synthesis: none;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+.t-mono { font-family: var(--font-mono); font-weight: 600; }
+
+/* gradient text (light purple → light orange) — background spans text width only */
+.t-grad {
+  display: inline-block;
+  width: fit-content;
+  max-width: 100%;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* small mono label — sentence case by default (caps used sparingly via .is-caps) */
+.t-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.01em;
+  color: var(--ink-mut);
+}
+.t-label.is-caps {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+}
+
+/* ambient glow */
+.u-glow {
+  position: fixed;
+  inset: -25% -10% auto -10%;
+  height: 70vh;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(42% 60% at 22% 8%, var(--glow-violet), transparent 70%),
+    radial-gradient(38% 52% at 84% 0%, var(--glow-warm), transparent 72%);
+  filter: blur(6px);
+}
+
+/* film grain — PNG tile (SVG feTurbulence data-URIs don't paint as CSS backgrounds) */
+.u-grain::before,
+.u-grain::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background-image: url("/images/home-grain-tile.png");
+  background-repeat: repeat;
+}
+.u-grain::before {
+  opacity: 0.4;
+  mix-blend-mode: overlay;
+  background-size: 200px 200px;
+}
+.u-grain::after {
+  z-index: 9999;
+  opacity: 0.22;
+  mix-blend-mode: soft-light;
+  background-size: 120px 120px;
+}
+
+/* chapolito wordmark (continuity with the live site) */
+.u-logo { display: inline-flex; align-items: center; }
+.u-logo img { height: 26px; width: auto; display: block; }
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.u-vh {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

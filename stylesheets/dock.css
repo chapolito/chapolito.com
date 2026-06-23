@@ -1,0 +1,242 @@
+/* ------------------------------------------------------------------
+   Site dock — progressive blur footer (from live chapolito.com home)
+------------------------------------------------------------------ */
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 130;
+  height: 125px;
+  pointer-events: none;
+}
+.dock__backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.dock__blur {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.dock__blur--1 {
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.45) 48%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.45) 48%, transparent 100%);
+}
+.dock__blur--2 {
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.55) 38%, transparent 90%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.55) 38%, transparent 90%);
+}
+.dock__blur--3 {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.7) 28%, transparent 74%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.7) 28%, transparent 74%);
+}
+.dock__blur--4 {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.8) 20%, transparent 58%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.8) 20%, transparent 58%);
+}
+.dock__blur--5 {
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.9) 12%, transparent 44%);
+  -webkit-mask-image: linear-gradient(to top, #000 0%, rgba(0, 0, 0, 0.9) 12%, transparent 44%);
+}
+.dock__gradient {
+  position: absolute;
+  inset: 0;
+  /* darkening starts ~15% below where blur begins at the dock top */
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 15%,
+    rgba(0, 0, 0, 0.62) 100%
+  );
+}
+.dock__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: flex-end;
+  gap: 1rem;
+  height: 125px;
+  padding: 0 clamp(16px, 2.6vw, 46px) 24px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+.dock__logo {
+  display: flex;
+  flex-shrink: 0;
+  line-height: 0;
+  justify-self: start;
+  grid-column: 1;
+}
+.dock__logo img { display: block; height: 26px; width: auto; }
+.dock__details {
+  margin: 0;
+  grid-column: 2;
+  justify-self: center;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.78rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.dock__name {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  color: rgba(255, 255, 255, 1);
+}
+.dock__title { font-weight: 600; color: #fff; opacity: 0.55; }
+.dock__sep { font-weight: 400; color: #fff; opacity: 0.38; }
+.dock__loc { font-weight: 500; color: #fff; opacity: 0.42; }
+.dock__social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-left: 0.15rem;
+  vertical-align: middle;
+}
+.dock__social-link {
+  display: inline-flex;
+  line-height: 0;
+  opacity: 0.6;
+  transition: opacity 150ms ease-out;
+}
+.dock__social-link img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+@media (hover: hover) {
+  .dock__social-link:hover { opacity: 1; }
+}
+.dock__nav {
+  display: flex;
+  align-items: flex-end;
+  gap: 1.75rem;
+  flex-shrink: 0;
+  justify-self: end;
+  grid-column: 3;
+}
+.dock__link {
+  position: relative;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+  padding-bottom: 10px;
+  transition: color 150ms ease-out;
+}
+.dock__link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.38);
+  opacity: 0;
+  transition: opacity 300ms ease-out, transform 300ms ease-out;
+}
+.dock__link.is-active { color: rgba(255, 255, 255, 0.88); }
+.dock__link.is-active::after { opacity: 1; }
+@media (hover: hover) {
+  .dock__link:hover { color: rgba(255, 255, 255, 0.88); }
+  .dock__link:hover::after { opacity: 1; transform: translateY(-4px); }
+}
+@media (max-width: 47.99em) {
+  .dock__content {
+    grid-template-columns: auto 1fr;
+  }
+  .dock__details { display: none; }
+  .dock__nav { grid-column: 2; }
+}
+
+/* dock nav stagger — home + detail */
+@keyframes dock-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes dock-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+/* Hidden before home enter */
+body.is-home.is-home-pending .dock__logo,
+body.is-home.is-home-pending .dock__details,
+body.is-home.is-home-pending .dock__link,
+body.is-home.is-home-dock-pending .dock__logo,
+body.is-home.is-home-dock-pending .dock__details,
+body.is-home.is-home-dock-pending .dock__link {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+/* Home load — dock after content */
+body.is-home.is-home-enter .dock__logo {
+  animation: dock-in 400ms ease-out 380ms both;
+}
+body.is-home.is-home-enter .dock__details {
+  animation: dock-in 400ms ease-out 440ms both;
+}
+body.is-home.is-home-enter .dock__nav .dock__link:nth-child(1) {
+  animation: dock-in 400ms ease-out 500ms both;
+}
+body.is-home.is-home-enter .dock__nav .dock__link:nth-child(2) {
+  animation: dock-in 400ms ease-out 560ms both;
+}
+
+/* Leaving home — dock out first (reverse order) */
+body.is-home.is-home-dock-exit .dock__nav .dock__link:nth-child(2) {
+  animation: dock-out 260ms ease-in both;
+}
+body.is-home.is-home-dock-exit .dock__nav .dock__link:nth-child(1) {
+  animation: dock-out 260ms ease-in 55ms both;
+}
+body.is-home.is-home-dock-exit .dock__details {
+  animation: dock-out 260ms ease-in 110ms both;
+}
+body.is-home.is-home-dock-exit .dock__logo {
+  animation: dock-out 260ms ease-in 165ms both;
+}
+
+/* Project detail — dock in after content */
+body.is-detail-enter .dock__logo {
+  animation: dock-in 400ms ease-out 150ms both;
+}
+body.is-detail-enter .dock__details {
+  animation: dock-in 400ms ease-out 200ms both;
+}
+body.is-detail-enter .dock__nav .dock__link:nth-child(1) {
+  animation: dock-in 400ms ease-out 280ms both;
+}
+body.is-detail-enter .dock__nav .dock__link:nth-child(2) {
+  animation: dock-in 400ms ease-out 340ms both;
+}
