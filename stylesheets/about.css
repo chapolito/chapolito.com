@@ -15,8 +15,8 @@
   box-sizing: border-box;
 }
 
-.reader.is-open:has(.about-overlay) .detail-back {
-  display: none;
+body.dock--top .about-page.about-overlay {
+  padding: calc(var(--dock-h) + var(--pad)) var(--pad) var(--pad);
 }
 
 .about {
@@ -41,7 +41,7 @@
   --about-card-shadow: 0 0 74px rgba(255, 255, 255, 0.06);
   --about-career-glow: 74px;
   width: min(100%, 1728px);
-  margin: 0 auto;
+  margin: -48px auto 0;
   color: var(--about-text-primary);
 }
 
@@ -84,10 +84,16 @@
 
 .about__hero-lede {
   margin: 0;
+  font-family: var(--font-mono);
   font-size: clamp(1rem, 1.042vw, 1.125rem);
   font-weight: 500;
   line-height: calc(26 / 18);
   color: var(--about-text-secondary);
+}
+
+.about__hero-lede strong {
+  font-weight: 700;
+  color: var(--about-text-primary);
 }
 
 .about__hero-collage {
@@ -230,6 +236,10 @@
 /* ---- career moments ---- */
 .about__career {
   margin-bottom: clamp(56px, 8vw, 96px);
+}
+
+.about__career .about__section-title {
+  margin-bottom: clamp(12px, 1.5vw, 16px);
 }
 
 .about__moments-track {
@@ -413,7 +423,7 @@
 /* Large desktop — tighten gap between collage and bio */
 @media (min-width: 1536px) {
   .about {
-    --about-bio-collage-gap: 0;
+    --about-bio-collage-gap: -24px;
   }
 }
 
