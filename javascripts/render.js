@@ -1,6 +1,7 @@
 /* ------------------------------------------------------------------
    Shared project renderer.
    Header → bento media strip → sections.
+   Story layout — editorial sections with full-bleed media (Social VR).
 ------------------------------------------------------------------ */
 (function () {
   function el(tag, cls, text) {
@@ -65,6 +66,55 @@
     return head;
   }
 
+  function buildStoryHead(p, d) {
+    var head = el("header", "pj-story__head");
+    head.appendChild(el("h1", "pj-story__title t-display", p.title));
+    if (d.lede) head.appendChild(el("p", "pj-story__lede", d.lede));
+
+    if (d.meta && d.meta.length) {
+      head.appendChild(el("div", "pj-story__rule", ""));
+      var meta = el("dl", "pj-story__meta");
+      d.meta.forEach(function (m) {
+        var item = el("div", "pj-story__meta-item");
+        item.appendChild(el("dt", "pj-story__meta-k t-label is-caps", m.k));
+        item.appendChild(el("dd", "pj-story__meta-v", m.v));
+        meta.appendChild(item);
+      });
+      head.appendChild(meta);
+    }
+
+    return head;
+  }
+
+  function buildStorySection(s) {
+    var sec = el("section", "pj-story__section pj-sec reveal");
+    if (s.title || s.intro) {
+      var copy = el("div", "pj-story__section-head");
+      if (s.title) copy.appendChild(el("h2", "pj-story__section-title t-display", s.title));
+      if (s.intro) copy.appendChild(el("p", "pj-story__section-intro", s.intro));
+      sec.appendChild(copy);
+    }
+
+    if (s.media && s.media.length) {
+      var grid = el("div", "pj-story__media pj-story__media--" + (s.layout || "grid2"));
+      s.media.forEach(function (m) {
+        grid.appendChild(media(m));
+      });
+      sec.appendChild(grid);
+    }
+
+    if (s.body) {
+      var bodyWrap = el("div", "pj-story__body");
+      var paragraphs = Array.isArray(s.body) ? s.body : [s.body];
+      paragraphs.forEach(function (text) {
+        bodyWrap.appendChild(el("p", "pj-story__body-p", text));
+      });
+      sec.appendChild(bodyWrap);
+    }
+
+    return sec;
+  }
+
   function buildBentoMedia(d, layout) {
     var wrap = el("div", "pj-bento__media pj-bento-media pj-bento-media--" + layout);
     var tiles = d.bentoTiles || [];
@@ -84,15 +134,33 @@
     return wrap;
   }
 
-  window.getProject = function (id) {
-    return (window.PROJECTS || []).filter(function (p) {
-      return p.id === id;
-    })[0];
-  };
+  function buildStoryHero(hero) {
+    var wrap = el("div", "pj-story__hero pj-sec reveal");
+    wrap.appendChild(media(hero));
+    return wrap;
+  }
 
-  window.renderProject = function (root, p) {
-    if (!root || !p) return;
-    var d = p.detail || {};
+  function buildStoryFootnote(text) {
+    var wrap = el("div", "pj-story__footnote pj-sec reveal");
+    wrap.appendChild(el("p", "pj-story__footnote-p", text));
+    return wrap;
+  }
+
+  function renderStory(root, p, d) {
+    root.className = "pj-doc pj-doc--story detail-split";
+    root.innerHTML = "";
+
+    var story = el("article", "pj-story");
+    story.appendChild(buildStoryHead(p, d));
+    if (d.hero) story.appendChild(buildStoryHero(d.hero));
+    if (d.footnote) story.appendChild(buildStoryFootnote(d.footnote));
+    (d.sections || []).forEach(function (s) {
+      story.appendChild(buildStorySection(s));
+    });
+    root.appendChild(story);
+  }
+
+  function renderBento(root, p, d) {
     var mediaLayout = resolveBentoMedia(p, d);
 
     root.className = "pj-doc detail-split";
@@ -123,6 +191,22 @@
     });
 
     root.appendChild(bento);
+  }
+
+  window.getProject = function (id) {
+    return (window.PROJECTS || []).filter(function (p) {
+      return p.id === id;
+    })[0];
+  };
+
+  window.renderProject = function (root, p) {
+    if (!root || !p) return;
+    var d = p.detail || {};
+    if (d.layout === "story") {
+      renderStory(root, p, d);
+      return;
+    }
+    renderBento(root, p, d);
   };
 
   window.initInview = function (scope) {
