@@ -9,11 +9,10 @@ Static design portfolio for Jesse O'Chapo, deployed to Amazon S3.
 | `index.html` | Home — bento bulge portfolio grid with overlay project reader |
 | `/{project-id}/` | Deep links to home + open project overlay (generated copies of `index.html`) |
 | `about/` | Deep link to home + open About overlay (generated copy of `index.html`) |
-| `contact/` | Site pages |
 | `horizon/`, `quest-vr/`, etc. | Legacy case studies |
 | `stylesheets/` | Site CSS — `all.css` for legacy pages; `tokens.css`, `home.css`, `bento-bulge.css`, etc. for home |
 | `javascripts/` | Site JS — `all.js` for legacy; `bento-bulge/` + `projects.js` for home |
-| `images/`, `fonts/` | Static assets |
+| `images/` | Static assets (raster, vector, video) |
 | `.well-known/` | SSL domain validation (keep when syncing to S3) |
 
 Pages load jQuery, SmoothState, and FastClick from CDNs with local fallbacks under `javascripts/vendor/`.

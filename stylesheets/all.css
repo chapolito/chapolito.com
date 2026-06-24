@@ -1976,7 +1976,9 @@ body:has(.identifier-wrapper.index) {
 }
 
 .social-links a img {
-  height: 1.75rem
+  height: 1.75rem;
+  filter: brightness(0);
+  opacity: .72
 }
 
 .colophon {
