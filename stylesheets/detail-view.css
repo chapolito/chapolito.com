@@ -783,12 +783,15 @@ body.dock--top .pj-doc--story.detail-split {
 .pj-story__hero {
   width: 100%;
   margin: 0 0 clamp(28px, 3vw, 40px);
-  padding: 0 8px;
+  padding: 0 var(--pad);
+  padding-left: max(var(--pad), var(--pj-story-inset));
   box-sizing: border-box;
 }
 
 .pj-story__hero .pj-fig {
-  aspect-ratio: 1712 / 796;
+  aspect-ratio: 992 / 400;
+  width: min(100%, 992px);
+  max-width: 992px;
   margin: 0;
   border-radius: 12px;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
@@ -801,7 +804,7 @@ body.dock--top .pj-doc--story.detail-split {
 .pj-story__hero .pj-fig video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .pj-story__footnote {
