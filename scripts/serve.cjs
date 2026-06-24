@@ -9,6 +9,7 @@ const path = require("path");
 const url = require("url");
 
 const root = path.resolve(__dirname, "..");
+const notFoundPage = path.join(root, "404.html");
 const port = Number(process.env.PORT) || 8080;
 
 const mime = {
@@ -56,8 +57,15 @@ function resolveFile(pathname) {
 const server = http.createServer((req, res) => {
   const file = resolveFile(url.parse(req.url).pathname);
   if (!file) {
-    res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
-    res.end("Not found");
+    fs.readFile(notFoundPage, (err, data) => {
+      if (err) {
+        res.writeHead(404, { "Content-Type": "text/plain; charset=utf-8" });
+        res.end("Not found");
+        return;
+      }
+      res.writeHead(404, { "Content-Type": mime[".html"] });
+      res.end(data);
+    });
     return;
   }
   fs.readFile(file, (err, data) => {
