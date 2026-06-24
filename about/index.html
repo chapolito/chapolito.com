@@ -1,11 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <meta http-equiv="refresh" content="0;url=/#about" />
-    <link rel="canonical" href="https://www.chapolito.com/#about" />
-    <title>About — Jesse O'Chapo</title>
-    <script>location.replace("/#about");</script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Portfolio of Jesse O'Chapo</title>
+    <meta name="description" content="Chapolito.com is the portfolio of Product Designer Jesse O'Chapo." />
+    <meta property="og:image" content="http://www.chapolito.com/images/og-image.jpg" />
+    <link rel="stylesheet" href="/stylesheets/tokens.css" />
+    <link rel="stylesheet" href="/stylesheets/project.css" />
+    <link rel="stylesheet" href="/stylesheets/dock.css" />
+    <link rel="stylesheet" href="/stylesheets/detail-view.css" />
+    <link rel="stylesheet" href="/stylesheets/about.css" />
+    <link rel="stylesheet" href="/stylesheets/home.css" />
+    <link rel="stylesheet" href="/javascripts/vendor/lil-gui.min.css" />
+    <link rel="stylesheet" href="/stylesheets/bento-bulge.css" />
   </head>
-  <body></body>
+  <body class="u-grain is-home is-home-pending bento-bulge-page">
+    <div class="home-bg" aria-hidden="true"></div>
+    <div class="u-glow" aria-hidden="true"></div>
+
+    <div class="stage" id="stage">
+      <section class="home-portfolio" id="portfolio" aria-label="Selected work">
+        <main class="grid grid--bulge" id="grid"></main>
+      </section>
+    </div>
+
+    <template id="about-template">
+      <article class="about">
+        <section class="about__hero" aria-labelledby="about-title">
+          <div class="about__hero-canvas">
+            <div class="about__hero-intro">
+              <div class="about__hero-copy">
+                <h1 class="about__hero-title t-display" id="about-title">About</h1>
+                <p class="about__hero-lede">
+                  <strong>Hello!</strong> I'm Jesse, a Principal Product Designer at Meta, based in Santa Cruz, CA.
+                  Previously, I designed at Life360, Fanpics, and MTV.
+                </p>
+              </div>
+            </div>
+
+            <div class="about__hero-collage">
+              <figure class="about__portrait">
+                <img
+                  src="/images/about/jesse-portrait.png"
+                  alt="Portrait of Jesse O'Chapo wearing yellow sunglasses and a green hoodie"
+                  width="426"
+                  height="426"
+                  loading="lazy"
+                />
+              </figure>
+              <figure class="about__photo about__photo--surf about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/surfing.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--wide about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/wood-handle.png" alt="" width="480" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--manta about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/diving-with-manta-rays.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--polaroid about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/jesse-and-caito.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--scalloped about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/scalloped-wood.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+              <figure class="about__photo about__photo--coffee about__photo-frame" aria-hidden="true">
+                <img src="/images/about/photos/coffee-table-wave.png" alt="" width="234" height="234" loading="lazy" />
+              </figure>
+            </div>
+          </div>
+        </section>
+
+        <section class="about__bio" aria-label="Bio">
+          <div class="about__bio-main">
+            <p>
+              I specialize in turning ambiguous zero-to-one initiatives into clear product direction. As a leader, I shape
+              work, set the bar for craft, mentor designers, and partner closely with PM and engineering leads to define
+              vision where no blueprint exists.
+            </p>
+            <p>
+              While I focus on product strategy and design leadership, I stay hands-on in high-fidelity design. Right now
+              that means integrating AI into my daily workflow as a creative thought partner for research, synthesis,
+              prototyping, and creating visual content that brings mocks to life.
+            </p>
+          </div>
+          <p class="about__bio-aside">
+            When I'm not furiously clicking in Figma &amp; walking Claude back from the ledge, I love to build things with
+            my hands and spend time in the ocean with my partner.
+          </p>
+        </section>
+
+        <section class="about__career" aria-labelledby="about-career">
+          <h2 class="about__section-title t-display" id="about-career">Career Moments</h2>
+          <div class="about__moments-track">
+            <ol class="about__moments">
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/starcraft.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">1998</p>
+                  <p class="about__moment-text">
+                    Built my first website to host Starcraft maps. The entire background was twinkling star GIFs.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/mtv.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2008</p>
+                  <p class="about__moment-text">
+                    After college I got my first full-time design job working on social networks for MTV &amp; VH1.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/meta.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2017</p>
+                  <p class="about__moment-text">
+                    After a decade of startups &amp; freelancing, I joined Meta to take on large-scale problems.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/oculus-vr.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2022</p>
+                  <p class="about__moment-text">
+                    Managed a VR team for a year. Learned to create impact through vision and influence, not just my own
+                    output. Ultimately, I missed being hands-on.
+                  </p>
+                </div>
+              </li>
+              <li class="about__moment">
+                <figure class="about__moment-art about__photo-frame about__photo-frame--career">
+                  <img src="/images/about/career/whats-next.png" alt="" width="280" height="280" loading="lazy" />
+                </figure>
+                <div class="about__moment-copy">
+                  <p class="about__moment-year t-display">2026</p>
+                  <p class="about__moment-text">
+                    At Meta I've grown from product designer to senior, staff, and now principal. I'm excited to start the
+                    next challenge this year.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </div>
+        </section>
+
+        <section class="about__contact" aria-labelledby="about-contact">
+          <h2 class="about__section-title t-display" id="about-contact">Contact</h2>
+          <ul class="about__contact-list">
+            <li class="about__contact-item">
+              <img class="about__contact-icon" src="/images/dock/icon-email.svg" alt="" width="24" height="24" />
+              <a href="mailto:jesse@chapolito.com">jesse@chapolito.com</a>
+            </li>
+            <li class="about__contact-item">
+              <img class="about__contact-icon" src="/images/dock/icon-linkedin.svg" alt="" width="24" height="24" />
+              <a href="https://www.linkedin.com/in/chapolito" rel="noopener noreferrer" target="_blank"
+                >linkedin.com/in/chapolito</a
+              >
+            </li>
+            <li class="about__contact-item">
+              <img class="about__contact-icon" src="/images/dock/icon-github.svg" alt="" width="24" height="24" />
+              <a href="https://github.com/chapolito" rel="noopener noreferrer" target="_blank">github.com/chapolito</a>
+            </li>
+          </ul>
+        </section>
+      </article>
+    </template>
+
+    <aside class="dock" aria-label="Site">
+      <div class="dock__backdrop" aria-hidden="true">
+        <div class="dock__blur dock__blur--1"></div>
+        <div class="dock__blur dock__blur--2"></div>
+        <div class="dock__blur dock__blur--3"></div>
+        <div class="dock__blur dock__blur--4"></div>
+        <div class="dock__blur dock__blur--5"></div>
+        <div class="dock__gradient"></div>
+      </div>
+      <div class="dock__content">
+        <a class="dock__logo" href="/" aria-label="Chapolito">
+          <img src="/images/chapolito-logo-footer.svg" alt="Chapolito" width="97" height="31" />
+        </a>
+        <p class="dock__details">
+          <span class="dock__name">Jesse O'Chapo</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__title">Product Designer</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__loc">Santa Cruz, CA</span>
+          <span class="dock__sep" aria-hidden="true">·</span>
+          <span class="dock__social">
+            <a class="dock__social-link" href="mailto:jesse@chapolito.com" aria-label="Email Jesse O'Chapo">
+              <img src="/images/dock/icon-email.svg" alt="" width="14" height="14" />
+            </a>
+            <a
+              class="dock__social-link"
+              href="https://www.linkedin.com/in/chapolito"
+              aria-label="LinkedIn profile"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <img src="/images/dock/icon-linkedin.svg" alt="" width="14" height="14" />
+            </a>
+            <a
+              class="dock__social-link"
+              href="https://github.com/chapolito"
+              aria-label="GitHub profile"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <img src="/images/dock/icon-github.svg" alt="" width="14" height="14" />
+            </a>
+          </span>
+        </p>
+        <nav class="dock__nav" aria-label="Site navigation">
+          <a class="dock__link is-active" href="#" data-view="portfolio">Projects</a>
+          <a class="dock__link" href="/about/" data-view="about">About</a>
+        </nav>
+      </div>
+    </aside>
+
+    <div class="reader" id="reader" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project">
+      <div class="reader__scrim" id="scrim"></div>
+      <button class="detail-close reader__back" id="close" type="button" aria-label="Close">
+        <span class="detail-close__glass" aria-hidden="true"></span>
+        <svg class="detail-close__icon" viewBox="0 0 56 56" width="56" height="56" aria-hidden="true">
+          <g transform="translate(28 28) rotate(45)">
+            <rect x="-1.42" y="-14.3" width="2.84" height="28.6" rx="1.42" />
+            <rect x="-14.3" y="-1.42" width="28.6" height="2.84" rx="1.42" />
+          </g>
+        </svg>
+      </button>
+      <div class="reader__panel" id="panel">
+        <div class="pj-doc" id="doc"></div>
+      </div>
+    </div>
+
+    <script src="/javascripts/projects.js"></script>
+    <script src="/javascripts/render.js"></script>
+    <script>
+      (function () {
+        var grid = document.getElementById("grid");
+        var projects = (window.PROJECTS || []).filter(function (p) {
+          return p.id !== "mk-play" && p.id !== "life360-messaging";
+        });
+
+        function tileVideoSrc(src) {
+          if (!src || !/\.mp4$/i.test(src)) return src;
+          if (/\.tile\.mp4$/i.test(src)) return src;
+          return src.replace(/\.mp4$/i, ".tile.mp4");
+        }
+
+        projects.forEach(function (p) {
+          var tile = document.createElement("article");
+          tile.className = "tile";
+          tile.dataset.id = p.id;
+          tile.dataset.orient = p.orientation || "landscape";
+          tile.dataset.fit = (p.tile && p.tile.fit) || "cover";
+          if (p.tile && (p.tile.align || p.tile.coverAlign)) {
+            tile.dataset.coverAlign = p.tile.align || p.tile.coverAlign;
+          }
+          if (p.tile && p.tile.insetShadow) {
+            tile.dataset.insetShadow = "true";
+          }
+          tile.tabIndex = 0;
+          tile.setAttribute("role", "button");
+          tile.setAttribute("aria-label", p.title + ", " + p.product);
+
+          var surface = document.createElement("div");
+          surface.className = "tile__surface";
+
+          var media = document.createElement("div");
+          media.className = "tile__media";
+          var m = p.tile || {};
+
+          if (m.type === "video") {
+            var v = document.createElement("video");
+            v.src = tileVideoSrc(m.src);
+            v.muted = true;
+            v.loop = true;
+            v.playsInline = true;
+            v.setAttribute("playsinline", "");
+            v.preload = "metadata";
+            v.setAttribute("data-inview", "");
+            media.appendChild(v);
+          } else if (m.src) {
+            var img = document.createElement("img");
+            img.src = m.src;
+            img.alt = p.title;
+            img.loading = "eager";
+            media.appendChild(img);
+          }
+
+          surface.appendChild(media);
+          tile.appendChild(surface);
+          tile.appendChild(document.createElement("div")).className = "tile__veil";
+
+          var label = document.createElement("div");
+          label.className = "tile__label";
+          var prod = document.createElement("p");
+          prod.className = "tile__product";
+          prod.textContent = p.product;
+          var title = document.createElement("h2");
+          title.className = "tile__title";
+          title.textContent = p.title;
+          label.appendChild(prod);
+          label.appendChild(title);
+          tile.appendChild(label);
+
+          grid.appendChild(tile);
+        });
+
+        if (window.initInview) window.initInview(grid);
+      })();
+    </script>
+    <script type="module">
+      import { initBentoBulge, getBulgeWhenReady } from "/javascripts/bento-bulge/index.js";
+      import { initBentoBulgeOverlays } from "/javascripts/bento-bulge/overlays.js";
+
+      function boot() {
+        requestAnimationFrame(function () {
+          requestAnimationFrame(function () {
+            const bulge = initBentoBulge({
+              bento: "#grid",
+              projects: "#portfolio",
+              cellSelector: ".tile",
+              hoverClass: "is-bulge-hovered",
+              cornerRadius: 8
+            });
+
+            initBentoBulgeOverlays({
+              whenBulgeReady: getBulgeWhenReady(),
+              onOpen(instant) {
+                bulge?.setOverlayOpen?.(true, { instant });
+              },
+              onClose() {
+                bulge?.setOverlayOpen?.(false);
+              }
+            });
+          });
+        });
+      }
+
+      boot();
+    </script>
+    <script>
+      (function (i, s, o, g, r, a, m) {
+        i["GoogleAnalyticsObject"] = r;
+        i[r] =
+          i[r] ||
+          function () {
+            (i[r].q = i[r].q || []).push(arguments);
+          };
+        i[r].l = 1 * new Date();
+        a = s.createElement(o);
+        m = s.getElementsByTagName(o)[0];
+        a.async = 1;
+        a.src = g;
+        m.parentNode.insertBefore(a, m);
+      })(window, document, "script", "//www.google-analytics.com/analytics.js", "ga");
+      ga("create", "UA-4247086-1", "auto");
+      ga("send", "pageview");
+    </script>
+  </body>
 </html>

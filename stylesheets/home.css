@@ -394,15 +394,10 @@ body.is-home .detail-split.is-instant .pj-cta,
 body.is-home .detail-split.is-instant .reveal {
   transform: none !important;
 }
-body.is-home.is-detail-enter .detail-back {
+body.is-home.is-detail-enter .detail-close {
   animation: none !important;
   opacity: 1 !important;
-  transform: translate(-50%, 0) !important;
-}
-body.is-home.is-detail-enter .reader:has(.about-overlay) .detail-back {
-  display: none !important;
-  opacity: 0 !important;
-  pointer-events: none;
+  transform: translate(0, 0) !important;
 }
 
 /* ---- responsive ---- */

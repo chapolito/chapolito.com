@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portfolio of Jesse O'Chapo</title>
-    <meta name="description" content="Chapolito.com is the portfolio of Principal Product Designer Jesse O'Chapo." />
+    <meta name="description" content="Chapolito.com is the portfolio of Product Designer Jesse O'Chapo." />
     <meta property="og:image" content="http://www.chapolito.com/images/og-image.jpg" />
     <link rel="stylesheet" href="/stylesheets/tokens.css" />
     <link rel="stylesheet" href="/stylesheets/project.css" />
@@ -27,14 +27,14 @@
 
     <template id="about-template">
       <article class="about">
-        <section class="about__hero" aria-labelledby="about-greeting">
+        <section class="about__hero" aria-labelledby="about-title">
           <div class="about__hero-canvas">
             <div class="about__hero-intro">
               <div class="about__hero-copy">
-                <h1 class="about__hero-title t-display" id="about-greeting">Hello! I'm Jesse.</h1>
+                <h1 class="about__hero-title t-display" id="about-title">About</h1>
                 <p class="about__hero-lede">
-                  I'm a Principal Product Designer at Meta, based in Santa Cruz, CA. Previously, I designed at Life360,
-                  Fanpics, and MTV.
+                  <strong>Hello!</strong> I'm Jesse, a Principal Product Designer at Meta, based in Santa Cruz, CA.
+                  Previously, I designed at Life360, Fanpics, and MTV.
                 </p>
               </div>
             </div>
@@ -163,14 +163,14 @@
               <a href="mailto:jesse@chapolito.com">jesse@chapolito.com</a>
             </li>
             <li class="about__contact-item">
-              <img class="about__contact-icon" src="/images/about/icons/phone.svg" alt="" width="24" height="24" />
-              <a href="tel:+17608140831">(760) 814-0831</a>
+              <img class="about__contact-icon" src="/images/dock/icon-linkedin.svg" alt="" width="24" height="24" />
+              <a href="https://www.linkedin.com/in/chapolito" rel="noopener noreferrer" target="_blank"
+                >linkedin.com/in/chapolito</a
+              >
             </li>
             <li class="about__contact-item">
-              <img class="about__contact-icon" src="/images/dock/icon-linkedin.svg" alt="" width="24" height="24" />
-              <a href="https://www.linkedin.com/in/chapolito/" rel="noopener noreferrer" target="_blank"
-                >https://www.linkedin.com/in/chapolito/</a
-              >
+              <img class="about__contact-icon" src="/images/dock/icon-github.svg" alt="" width="24" height="24" />
+              <a href="https://github.com/chapolito" rel="noopener noreferrer" target="_blank">github.com/chapolito</a>
             </li>
           </ul>
         </section>
@@ -193,7 +193,7 @@
         <p class="dock__details">
           <span class="dock__name">Jesse O'Chapo</span>
           <span class="dock__sep" aria-hidden="true">·</span>
-          <span class="dock__title">Principal Product Designer</span>
+          <span class="dock__title">Product Designer</span>
           <span class="dock__sep" aria-hidden="true">·</span>
           <span class="dock__loc">Santa Cruz, CA</span>
           <span class="dock__sep" aria-hidden="true">·</span>
@@ -223,18 +223,21 @@
         </p>
         <nav class="dock__nav" aria-label="Site navigation">
           <a class="dock__link is-active" href="#" data-view="portfolio">Projects</a>
-          <a class="dock__link" href="#about" data-view="about">About</a>
+          <a class="dock__link" href="/about/" data-view="about">About</a>
         </nav>
       </div>
     </aside>
 
     <div class="reader" id="reader" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-label="Project">
       <div class="reader__scrim" id="scrim"></div>
-      <button class="detail-back reader__back" id="close" type="button" aria-label="Back to home">
-        <svg class="detail-back__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="M19 12H5M11 6l-6 6 6 6" stroke-linecap="round" stroke-linejoin="round" />
+      <button class="detail-close reader__back" id="close" type="button" aria-label="Close">
+        <span class="detail-close__glass" aria-hidden="true"></span>
+        <svg class="detail-close__icon" viewBox="0 0 56 56" width="56" height="56" aria-hidden="true">
+          <g transform="translate(28 28) rotate(45)">
+            <rect x="-1.42" y="-14.3" width="2.84" height="28.6" rx="1.42" />
+            <rect x="-14.3" y="-1.42" width="28.6" height="2.84" rx="1.42" />
+          </g>
         </svg>
-        <span class="detail-back__label">Back to Home</span>
       </button>
       <div class="reader__panel" id="panel">
         <div class="pj-doc" id="doc"></div>
