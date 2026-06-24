@@ -57,6 +57,24 @@
   color: var(--pj-text-secondary);
 }
 
+.pj-meta-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pj-meta-brand__logo {
+  display: block;
+  width: 20px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.pj-meta-brand__name {
+  font: inherit;
+  color: inherit;
+}
+
 /* ---- media frames ---- */
 .pj-fig {
   position: relative;
