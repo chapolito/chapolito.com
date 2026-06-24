@@ -21,7 +21,7 @@ window.PROJECTS = [
     detail: {
       layout: "story",
       lede:
-        "Quests are the best selling VR devices ever. My focus was on helping people communicate and play with their friends.",
+        "Quests are the best-selling VR devices ever. My focus was helping people communicate and play together.",
       meta: [
         { k: "Project", brand: "meta", v: "Quest VR" },
         { k: "Role", v: "Product Designer" },
@@ -32,25 +32,25 @@ window.PROJECTS = [
         {
           title: "Navigator",
           intro:
-            "in 2024 we began redesigning the entire VR OS which resulted in the development of the Navigator: a single, accessible anywhere, menu to manage apps, social and settings.",
+            "In 2024, we redesigned the VR OS and created the Navigator: a single menu, accessible from anywhere, for apps, social, and settings.",
           layout: "grid2",
           media: [
             {
-              type: "image",
-              src: "/images/quest-vr/navigator-people-ui.png",
+              type: "video",
+              src: "/images/quest-vr/people-tab-loop.mp4",
               alt: "Quest Navigator People tab with friends in VR",
               fit: "cover",
             },
             {
-              type: "image",
-              src: "/images/quest-vr/navigator-apps.png",
-              alt: "Quest Navigator home screen with app tiles",
+              type: "video",
+              src: "/images/quest-vr/you-tab-loop.mp4",
+              alt: "Quest Navigator You tab with avatar and profile",
               fit: "cover",
             },
           ],
           body: [
             "I developed the initial direction on both the You and People tabs before handing off to senior designers to bring across the finish line.",
-            "This required coordinating across multiple teams to bring in their highest value features that deserved a spot: seamlessly editing/switching your avatar, Messaging/calling friends, easily joining/inviting them to play, and taking safety actions people nearby. It was as much of an exercise in how to make all these complex systems work together as it was to keep the feature set slimmed down and simple.",
+            "This required coordinating across multiple teams to bring in their highest value features. The challenge was integrating complex systems without bloating the feature set.",
           ],
         },
         {
@@ -60,26 +60,26 @@ window.PROJECTS = [
           media: [
             {
               type: "image",
-              src: "/images/quest-vr/active-status-profiles-ui.png",
+              src: "/images/quest-vr/active-status-migration.png",
               alt: "Profiles now control who sees your activity",
               fit: "cover",
             },
             {
               type: "image",
-              src: "/images/quest-vr/active-status-settings-ui.png",
+              src: "/images/quest-vr/active-status-settings.png",
               alt: "Active Status privacy settings with Joinable dropdown",
               fit: "cover",
             },
             {
               type: "image",
-              src: "/images/quest-vr/active-status-profile-ui.png",
-              alt: "Jesse profile with Active Status set to Joinable",
+              src: "/images/quest-vr/active-status-changes.png",
+              alt: "Active Status and Rich Presence settings showing Joinable, Online, and offline states",
               fit: "cover",
             },
           ],
           body: [
             "Previously, active status was a confusing mix of toggles to share your online status and current app. We expanded the capability set and simplified the selection to a single dropdown: Joinable, online, and offline. This resulted in a 300% increase in people joining their friend's games.",
-            "The simplified social privacy settings required a migration of existing settings, which was carefully designed and resulted in no measurable impact to retention or engagement.",
+            "The simplified social privacy settings required a migration of existing settings, which I carefully designed to minimize disruption; the result was no measurable impact to retention or engagement.",
           ],
         },
       ],
@@ -148,7 +148,7 @@ window.PROJECTS = [
         type: "video",
         src: "/images/horizon/Gaming-Profile-hero-image.mp4",
         alt: "Horizon mobile app showing gaming profiles and friends activity",
-        fit: "cover",
+        fit: "contain",
       },
       footnote:
         "This work is shipping in Summer 2026. I have a case study I can present showing the designs and process.",
