@@ -8,7 +8,7 @@ Static design portfolio for Jesse O'Chapo, deployed to Amazon S3.
 |------|---------|
 | `index.html` | Home — bento bulge portfolio grid with overlay project reader |
 | `/{project-id}/` | Deep links to home + open project overlay (generated copies of `index.html`) |
-| `about/` | Redirects to `/#about` on the home page |
+| `about/` | Deep link to home + open About overlay (generated copy of `index.html`) |
 | `contact/` | Site pages |
 | `horizon/`, `quest-vr/`, etc. | Legacy case studies |
 | `stylesheets/` | Site CSS — `all.css` for legacy pages; `tokens.css`, `home.css`, `bento-bulge.css`, etc. for home |
@@ -20,7 +20,7 @@ Pages load jQuery, SmoothState, and FastClick from CDNs with local fallbacks und
 
 ## Local preview
 
-Use the included static server (handles `/about` → `about/index.html`, which SmoothState needs):
+Use the included static server (serves `/about/` and project deep links like `/portal-household/`):
 
 ```bash
 cd "/path/to/chapolito/chapolito.com"

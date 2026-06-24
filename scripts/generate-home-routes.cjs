@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Copy index.html into {project-id}/index.html at the site root
- * so direct URLs like /portal-household/ work on static hosts (S3).
+ * Copy index.html into {project-id}/index.html and about/index.html
+ * so direct URLs like /portal-household/ and /about/ work on static hosts (S3).
  */
 const fs = require("fs");
 const path = require("path");
@@ -22,7 +22,7 @@ if (!fs.existsSync(shellIndex)) {
 }
 
 const template = fs.readFileSync(shellIndex, "utf8");
-ids.forEach((id) => {
+[...ids, "about"].forEach((id) => {
   const dir = path.join(root, id);
   fs.mkdirSync(dir, { recursive: true });
   fs.writeFileSync(path.join(dir, "index.html"), template);

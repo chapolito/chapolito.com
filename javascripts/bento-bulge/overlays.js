@@ -108,8 +108,13 @@ export function initBentoBulgeOverlays(options = {}) {
     return `/${encodeURIComponent(id)}/`;
   }
 
+  function isAboutLocation() {
+    const path = location.pathname.replace(/\/+$/, "") || "/";
+    return path === "/about";
+  }
+
   function aboutUrl() {
-    return "/#about";
+    return "/about/";
   }
 
   function setActiveNav(name) {
@@ -163,7 +168,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
   function teardownReader() {
     clearOpenPhaseTimer();
-    if (idFromLocation() || location.hash === "#about") {
+    if (idFromLocation() || isAboutLocation()) {
       history.replaceState({ home: true }, "", homeUrl());
     }
     panel.classList.remove("is-morphed");
@@ -369,7 +374,7 @@ export function initBentoBulgeOverlays(options = {}) {
       if (window.initInview) window.initInview(doc);
 
       if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
-      else if (location.hash !== "#about") history.replaceState({ about: true }, "", aboutUrl());
+      else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
       document.title = "About · Jesse O'Chapo";
       setActiveNav("about");
       if (!instant) focusAboutEntry();
@@ -396,7 +401,7 @@ export function initBentoBulgeOverlays(options = {}) {
     if (window.initInview) window.initInview(doc);
 
     if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
-    else if (location.hash !== "#about") history.replaceState({ about: true }, "", aboutUrl());
+    else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
     document.title = "About · Jesse O'Chapo";
     setActiveNav("about");
   }
@@ -418,7 +423,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
     if (!skipPop) {
       history.replaceState({ home: true }, "", homeUrl());
-    } else if (idFromLocation() || location.hash === "#about") {
+    } else if (idFromLocation() || isAboutLocation()) {
       history.replaceState({ home: true }, "", homeUrl());
     }
 
@@ -472,31 +477,24 @@ export function initBentoBulgeOverlays(options = {}) {
 
   function onHashChange() {
     if (isClosing) return;
-    if (location.hash === "#about" && !idFromLocation()) {
+    if (location.hash === "#about" && !isAboutLocation()) {
+      history.replaceState({ about: true }, "", aboutUrl());
       if (!aboutOpen) openAbout(true, true);
-      return;
-    }
-    if (aboutOpen && location.hash !== "#about") {
-      close(true);
     }
   }
 
   function onPopstate() {
     if (isClosing) return;
 
-    const id = idFromLocation();
-    if (id === "about") {
+    if (isAboutLocation()) {
       if (!aboutOpen) openAbout(true, true);
       return;
     }
+    const id = idFromLocation();
     if (id && window.getProject(id)) {
       if (openId === id) return;
       const tile = grid.querySelector(`.tile[data-id="${id}"]`);
       open(id, true, tile);
-      return;
-    }
-    if (location.hash === "#about" && !idFromLocation()) {
-      if (!aboutOpen) openAbout(true, true);
       return;
     }
     if (isOverlayOpen()) close(true);
@@ -559,22 +557,19 @@ export function initBentoBulgeOverlays(options = {}) {
     if (legacyId && window.getProject(legacyId) && !idFromLocation()) {
       history.replaceState({ id: legacyId }, "", projectUrl(legacyId));
     }
-    const initial = idFromLocation();
-    if (initial === "about") {
+    if (location.hash === "#about" && !isAboutLocation()) {
+      history.replaceState({ about: true }, "", aboutUrl());
+    }
+    if (isAboutLocation()) {
       markHomeReady();
       history.replaceState({ about: true }, "", aboutUrl());
       openAbout(true, true);
       return;
     }
+    const initial = idFromLocation();
     if (initial && window.getProject(initial)) {
       markHomeReady();
       open(initial, true, null, true);
-      return;
-    }
-    if (location.hash === "#about") {
-      document.body.classList.remove("is-home-pending");
-      markHomeReady();
-      openAbout(true, true);
       return;
     }
     history.replaceState({ home: true }, "", homeUrl());
