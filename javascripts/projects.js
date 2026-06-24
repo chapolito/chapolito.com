@@ -19,28 +19,68 @@ window.PROJECTS = [
     overlay: "split",
     tile: { type: "video", src: "/images/quest-vr/people-tab.mp4", fit: "cover", insetShadow: true },
     detail: {
+      layout: "story",
       lede:
-        "Finding friends and feeling their presence inside the headset. A People surface for Quest that makes social the front door, not a setting.",
+        "Quests are the best selling VR devices ever. My focus was on helping people communicate and play with their friends.",
       meta: [
-        { k: "Role", v: "Product Design" },
-        { k: "Platforms", v: "Mobile & VR apps" },
-        { k: "Date", v: "2023–2025" },
+        { k: "Project", v: "Meta · Quest VR" },
+        { k: "Role", v: "Product Designer" },
+        { k: "Platforms", v: "VR OS" },
+        { k: "Date", v: "2024–2025" },
       ],
-      hero: { type: "video", src: "/images/quest-vr/people-tab.mp4", fit: "cover" },
       sections: [
         {
-          kicker: "Presence",
-          title: "Friends, front and center",
-          body: "Who's online, what they're playing, and how to join, at a glance.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/quest-vr/people-tab.mp4", alt: "Quest People tab", fit: "cover" }],
+          title: "Navigator",
+          intro:
+            "in 2024 we began redesigning the entire VR OS which resulted in the development of the Navigator: a single, accessible anywhere, menu to manage apps, social and settings.",
+          layout: "grid2",
+          media: [
+            {
+              type: "image",
+              src: "/images/quest-vr/navigator-people-ui.png",
+              alt: "Quest Navigator People tab with friends in VR",
+              fit: "cover",
+            },
+            {
+              type: "image",
+              src: "/images/quest-vr/navigator-apps.png",
+              alt: "Quest Navigator home screen with app tiles",
+              fit: "cover",
+            },
+          ],
+          body: [
+            "I developed the initial direction on both the You and People tabs before handing off to senior designers to bring across the finish line.",
+            "This required coordinating across multiple teams to bring in their highest value features that deserved a spot: seamlessly editing/switching your avatar, Messaging/calling friends, easily joining/inviting them to play, and taking safety actions people nearby. It was as much of an exercise in how to make all these complex systems work together as it was to keep the feature set slimmed down and simple.",
+          ],
         },
         {
-          kicker: "One account",
-          title: "Sign in anywhere",
-          body: "Meta Accounts across VR, desktop, tablet, and phone.",
-          layout: "full",
-          media: [{ type: "image", src: "/images/home/meta-accounts.png", alt: "Meta Accounts across devices", fit: "cover" }],
+          title: "Active Status",
+          intro: "Prior to the Navigator, I redesigned active status and the social privacy settings.",
+          layout: "grid3",
+          media: [
+            {
+              type: "image",
+              src: "/images/quest-vr/active-status-profiles-ui.png",
+              alt: "Profiles now control who sees your activity",
+              fit: "cover",
+            },
+            {
+              type: "image",
+              src: "/images/quest-vr/active-status-settings-ui.png",
+              alt: "Active Status privacy settings with Joinable dropdown",
+              fit: "cover",
+            },
+            {
+              type: "image",
+              src: "/images/quest-vr/active-status-profile-ui.png",
+              alt: "Jesse profile with Active Status set to Joinable",
+              fit: "cover",
+            },
+          ],
+          body: [
+            "Previously, active status was a confusing mix of toggles to share your online status and current app. We expanded the capability set and simplified the selection to a single dropdown: Joinable, online, and offline. This resulted in a 300% increase in people joining their friend's games.",
+            "The simplified social privacy settings required a migration of existing settings, which was carefully designed and resulted in no measurable impact to retention or engagement.",
+          ],
         },
       ],
     },
@@ -88,30 +128,30 @@ window.PROJECTS = [
   {
     id: "horizon-mobile",
     title: "Gaming Profiles across Meta",
-    product: "Meta",
+    product: "Horizon",
     era: "Meta",
     orientation: "portrait",
     hover: "drift",
-    overlay: "magazine",
+    overlay: "split",
     tile: { type: "video", src: "/images/home/Gaming-Profile.tile.mp4", fit: "cover" },
     detail: {
+      layout: "story",
       lede:
-        "The Horizon mobile experience. Discovering worlds, friends, and games on the phone, then jumping in.",
+        "As Horizon expanded integrations across Facebook and Instagram, we defined the relationship between the apps and the profiles people used across Meta.",
       meta: [
-        { k: "Role", v: "Product Design" },
-        { k: "Platforms", v: "Mobile apps" },
-        { k: "Date", v: "2025–2026" },
+        { k: "Project", v: "Meta · Horizon" },
+        { k: "Role", v: "Product design lead of 6 designers" },
+        { k: "Platforms", v: "Mobile" },
+        { k: "Date", v: "2026" },
       ],
-      hero: { type: "video", src: "/images/home/horizon-mobile.mp4", fit: "cover" },
-      sections: [
-        {
-          kicker: "Discovery",
-          title: "Find a world, jump in",
-          body: "Browsing and social, designed for the phone in your hand.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/home/horizon-mobile.mp4", alt: "Horizon mobile", fit: "contain" }],
-        },
-      ],
+      hero: {
+        type: "video",
+        src: "/images/horizon/Gaming-Profile-hero-image.mp4",
+        alt: "Horizon mobile app showing gaming profiles and friends activity",
+        fit: "cover",
+      },
+      footnote:
+        "This work is shipping in Summer 2026. I have a case study I can present showing the designs and process.",
     },
   },
 
