@@ -14,6 +14,7 @@ These hold whether you are editing the site or designing in Figma.
 - **Craft bar:** every change should look intentional and polished. Prefer fewer, higher-quality elements over busy layouts.
 - **Accessibility:** meaningful `alt` text and `aria-label`s, sufficient contrast, respect reduced-motion and keyboard use.
 - **Consistency over novelty:** match what already exists (patterns, spacing, type, color) before inventing something new.
+- **Do the follow-up yourself:** if a next step is something you can do in this environment, do it — don't hand it off to the user. Examples: restart the dev server, run a script, regenerate routes, verify in the browser. Briefly report what you did (e.g. "I restarted the server to pick up the change."). Only ask the user when you genuinely need their input, credentials, or an action you can't perform.
 
 ### Content & language (website and Figma)
 
@@ -33,7 +34,7 @@ Static portfolio site, deployed to Amazon S3. See [README.md](README.md) for ful
 - **Layout:** follow the grid and CSS conventions in [.cursor/rules/chapolito-css-layout.mdc](.cursor/rules/chapolito-css-layout.mdc). Match the home page or a sibling case study before creating new structure.
 - **Home page:** `index.html` is the bento bulge portfolio — grid shell, dock, overlay reader, and WebGL surface in `javascripts/bento-bulge/`. Project content lives in [javascripts/projects.js](javascripts/projects.js).
 - **Page shell:** legacy case studies keep `#main` > `.identifier-wrapper` > `header.row` / `main` / `footer.row`. The home page uses `.stage`, `.grid`, `.dock`, and `.reader` instead.
-- **Assets:** images and video live under `images/`; fonts under `fonts/`. Keep `.well-known/` when syncing to S3.
+- **Assets:** images and video live under `images/`. Keep `.well-known/` when syncing to S3.
 - **JS:** case studies use jQuery + SmoothState + FastClick ([javascripts/all.js](javascripts/all.js)). The home page uses ES modules (Three.js bulge + overlays). Don't introduce another framework for small interactions.
 - **Local preview:** `npm start` then open `http://localhost:8080`. Run `npm run generate:home-routes` before deploy so `/{project-id}/` and `/about/` deep links resolve on S3.
 - **No inline styles for layout/spacing;** add scoped rules in the relevant stylesheet (`all.css` for legacy pages; `stylesheets/home.css` / `bento-bulge.css` for the home page).
