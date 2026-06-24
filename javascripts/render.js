@@ -39,6 +39,33 @@
     return p.orientation === "portrait" ? "hero-portrait" : "hero-center";
   }
 
+  function normalizeMetaItem(m) {
+    if (m.brand || m.k !== "Project" || typeof m.v !== "string") return m;
+    var match = m.v.match(/^Meta\s*[·•]\s*(.+)$/);
+    if (!match) return m;
+    return { k: m.k, brand: "meta", v: match[1] };
+  }
+
+  function buildMetaValue(m, valueClass) {
+    var item = normalizeMetaItem(m);
+    var dd = el("dd", valueClass);
+    if (item.brand === "meta") {
+      var row = el("span", "pj-meta-brand");
+      var logo = document.createElement("img");
+      logo.src = "/images/Meta-Logo.svg";
+      logo.alt = "Meta";
+      logo.className = "pj-meta-brand__logo";
+      logo.width = 20;
+      logo.height = 14;
+      row.appendChild(logo);
+      row.appendChild(el("span", "pj-meta-brand__name", item.v));
+      dd.appendChild(row);
+    } else {
+      dd.textContent = item.v;
+    }
+    return dd;
+  }
+
   function buildHead(p, d) {
     var head = el("header", "pj-head pj-bento__head");
     var copy = el("div", "pj-head__copy");
@@ -56,7 +83,7 @@
       metaItems.forEach(function (m) {
         var wrap = el("div", "pj-meta__item");
         wrap.appendChild(el("dt", "pj-meta__k t-label is-caps", m.k));
-        wrap.appendChild(el("dd", "pj-meta__v", m.v));
+        wrap.appendChild(buildMetaValue(m, "pj-meta__v"));
         dl.appendChild(wrap);
       });
       metaCol.appendChild(dl);
@@ -77,7 +104,7 @@
       d.meta.forEach(function (m) {
         var item = el("div", "pj-story__meta-item");
         item.appendChild(el("dt", "pj-story__meta-k t-label is-caps", m.k));
-        item.appendChild(el("dd", "pj-story__meta-v", m.v));
+        item.appendChild(buildMetaValue(m, "pj-story__meta-v"));
         meta.appendChild(item);
       });
       head.appendChild(meta);

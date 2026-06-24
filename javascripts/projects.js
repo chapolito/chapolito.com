@@ -23,7 +23,7 @@ window.PROJECTS = [
       lede:
         "Quests are the best selling VR devices ever. My focus was on helping people communicate and play with their friends.",
       meta: [
-        { k: "Project", v: "Meta · Quest VR" },
+        { k: "Project", brand: "meta", v: "Quest VR" },
         { k: "Role", v: "Product Designer" },
         { k: "Platforms", v: "VR OS" },
         { k: "Date", v: "2024–2025" },
@@ -139,7 +139,7 @@ window.PROJECTS = [
       lede:
         "As Horizon expanded integrations across Facebook and Instagram, we defined the relationship between the apps and the profiles people used across Meta.",
       meta: [
-        { k: "Project", v: "Meta · Horizon" },
+        { k: "Project", brand: "meta", v: "Horizon" },
         { k: "Role", v: "Product design lead of 6 designers" },
         { k: "Platforms", v: "Mobile" },
         { k: "Date", v: "2026" },
