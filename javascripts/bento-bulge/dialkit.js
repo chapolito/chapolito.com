@@ -25,7 +25,8 @@ export const defaultParams = {
   pressMorphSpeed: 14,
   pressDimOpacity: 0.35,
   overlayDimMorphSpeed: 7.5,
-  dprCap: 2
+  dprCap: 2,
+  dockTop: false
 };
 
 function loadParams() {
@@ -46,8 +47,17 @@ function saveParams(params) {
   }
 }
 
+export function syncDockPosition(params) {
+  document.body.classList.toggle("dock--top", Boolean(params.dockTop));
+}
+
 export function createDialkit(root, params, onChange) {
   root.querySelectorAll(".bento-bulge-dialkit").forEach((node) => node.remove());
+
+  const notify = () => {
+    syncDockPosition(params);
+    onChange();
+  };
 
   const shell = document.createElement("div");
   shell.className = "bento-bulge-dialkit";
@@ -64,33 +74,34 @@ export function createDialkit(root, params, onChange) {
   const gui = new GUI({ container: panel, title: "Bento bulge" });
 
   const debug = gui.addFolder("Debug");
-  debug.add(params, "showWireframe").name("wireframe").onChange(onChange);
-  debug.add(params, "showAlignmentOverlay").name("alignment").onChange(onChange);
-  debug.add(params, "enableVideos").name("videos").onChange(onChange);
-  debug.add(params, "pauseIdleVideos").name("pause idle videos").onChange(onChange);
+  debug.add(params, "dockTop").name("dock top").onChange(notify);
+  debug.add(params, "showWireframe").name("wireframe").onChange(notify);
+  debug.add(params, "showAlignmentOverlay").name("alignment").onChange(notify);
+  debug.add(params, "enableVideos").name("videos").onChange(notify);
+  debug.add(params, "pauseIdleVideos").name("pause idle videos").onChange(notify);
   debug
     .add(params, "hillRadiusScale", 1, 3, 0.01)
     .name("hill radius")
-    .onChange(onChange);
+    .onChange(notify);
   debug.close();
 
   const press = gui.addFolder("Press");
   press
     .add(params, "pressSpreadAdd", 0, 0.65, 0.01)
     .name("spread tighten")
-    .onChange(onChange);
+    .onChange(notify);
   press
     .add(params, "pressBulgeBoost", 0, 0.6, 0.01)
     .name("bulge depress")
-    .onChange(onChange);
+    .onChange(notify);
   press
     .add(params, "pressMorphSpeed", 4, 28, 1)
     .name("ripple speed")
-    .onChange(onChange);
+    .onChange(notify);
   press
     .add(params, "pressDimOpacity", 0.08, 0.65, 0.01)
     .name("idle dim on press")
-    .onChange(onChange);
+    .onChange(notify);
   press.close();
 
   const actions = {
@@ -100,7 +111,7 @@ export function createDialkit(root, params, onChange) {
     resetSettings() {
       Object.assign(params, defaultParams);
       gui.controllersRecursive().forEach((c) => c.updateDisplay());
-      onChange();
+      notify();
     }
   };
   gui.add(actions, "copySettings").name("Copy settings");
@@ -111,6 +122,8 @@ export function createDialkit(root, params, onChange) {
     toggle.setAttribute("aria-expanded", open ? "false" : "true");
     panel.hidden = open;
   });
+
+  syncDockPosition(params);
 
   function persist() {
     saveParams(params);

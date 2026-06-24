@@ -14,16 +14,16 @@ export function createCustomCursor() {
   document.body.appendChild(el);
   document.body.classList.add("bento-bulge-has-cursor");
 
-  const dockLinkSelector = ".dock a";
+  const linkCursorSelector = ".dock a";
 
-  function isOverDockLink(event) {
-    return Boolean(event.target.closest(dockLinkSelector));
+  function isLinkCursorTarget(event) {
+    return Boolean(event.target.closest(linkCursorSelector));
   }
 
   function onPointerMove(event) {
     el.style.setProperty("--x", `${event.clientX}px`);
     el.style.setProperty("--y", `${event.clientY}px`);
-    el.classList.toggle("is-dock-link", isOverDockLink(event));
+    el.classList.toggle("is-dock-link", isLinkCursorTarget(event));
     el.classList.remove("is-hidden");
   }
 

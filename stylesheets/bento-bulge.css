@@ -94,6 +94,11 @@
     padding-bottom: calc(125px + 12px);
   }
 
+  body.dock--top .bento-bulge-page .grid {
+    padding-top: calc(125px + 12px);
+    padding-bottom: 0;
+  }
+
   .bento-bulge-page .grid .tile[data-id] {
     grid-column: 1 / -1;
     grid-row: auto;
@@ -260,6 +265,14 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
   font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
 }
 
+body.dock--top .bento-bulge-dialkit {
+  top: auto;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: flex-end;
+}
+
 .bento-bulge-dialkit__toggle {
   display: inline-flex;
   align-items: center;
@@ -295,6 +308,11 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
   background: rgba(10, 10, 10, 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+}
+
+body.dock--top .bento-bulge-dialkit__panel {
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
 .bento-bulge-dialkit__panel .lil-gui {
@@ -384,7 +402,7 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   transform: scale(1);
-  transition: transform 200ms ease, opacity 120ms ease;
+  transition: transform 50ms ease, opacity 120ms ease;
 }
 
 .bento-bulge-cursor__dot::after {
@@ -436,7 +454,7 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
 
 .bento-bulge-cursor.is-hidden .bento-bulge-cursor__dot {
   opacity: 0;
-  transition: transform 200ms ease, opacity 120ms ease;
+  transition: transform 50ms ease, opacity 120ms ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
