@@ -63,44 +63,6 @@ window.PROJECTS = [
             "This required coordinating across multiple teams to bring in their highest value features. The challenge was integrating complex systems without bloating the feature set.",
           ],
         },
-        {
-          title: "Active Status",
-          intro: "Prior to the Navigator, I redesigned active status and the social privacy settings.",
-          mediaRows: [
-            {
-              layout: "full",
-              media: [
-                {
-                  type: "image",
-                  src: "/images/quest-vr/active-status-settings.png",
-                  alt: "Active Status privacy settings with Joinable dropdown",
-                  fit: "cover",
-                },
-              ],
-            },
-            {
-              layout: "double",
-              media: [
-                {
-                  type: "image",
-                  src: "/images/quest-vr/active-status-migration.png",
-                  alt: "Profiles now control who sees your activity",
-                  fit: "cover",
-                },
-                {
-                  type: "image",
-                  src: "/images/quest-vr/active-status-changes.png",
-                  alt: "Active Status and Rich Presence settings showing Joinable, Online, and offline states",
-                  fit: "cover",
-                },
-              ],
-            },
-          ],
-          body: [
-            "Previously, active status was a confusing mix of toggles to share your online status and current app. We expanded the capability set and simplified the selection to a single dropdown: Joinable, online, and offline. This resulted in a 300% increase in people joining their friend's games.",
-            "The simplified social privacy settings required a migration of existing settings, which I carefully designed to minimize disruption; the result was no measurable impact to retention or engagement.",
-          ],
-        },
       ],
     },
   },
@@ -178,6 +140,7 @@ window.PROJECTS = [
     tile: { type: "video", src: "/images/home/Gaming-Profile.tile.mp4", fit: "cover" },
     detail: {
       layout: "story",
+      storyColumn: "992",
       lede:
         "As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta.",
       meta: [
@@ -324,83 +287,110 @@ window.PROJECTS = [
       align: "top left"
     },
     detail: {
-      bentoMedia: "showcase",
-      bentoTiles: [
-        {
-          area: "left",
-          media: {
-            type: "image",
-            src: "/images/portal/household-mode/household-mode-specs.png",
-            alt: "Household Mode animation specs",
-            fit: "cover",
-          },
-        },
-        {
-          area: "right-top",
-          media: {
-            type: "image",
-            src: "/images/portal/household-messaging.png",
-            alt: "Household messaging contact card",
-            fit: "cover",
-          },
-        },
-        {
-          area: "right-bottom",
-          media: {
-            type: "image",
-            src: "/images/portal/marketing2.jpg",
-            alt: "Portal in the living room",
-            fit: "cover",
-          },
-        },
-      ],
+      layout: "story",
+      storyColumn: "992",
       lede:
-        "Portal was Meta's video-calling device for the home. Household Mode let everyone in a home keep their own profile, contacts, and privacy on one shared device, switching between people without friction.",
+        "Household mode let parents restrict the contacts and apps anyone in the home could use on a shared Portal.",
       meta: [
-        { k: "Role", v: "Product Design" },
-        { k: "Platforms", v: "Portal & TV apps" },
-        { k: "Date", v: "2019–2021" },
+        { k: "Project", brand: "meta", v: "Portal" },
+        { k: "Role", v: "Product Designer" },
+        { k: "Platforms", v: "Portal & Portal TV" },
+        { k: "Date", v: "2021" },
       ],
-      hero: { type: "video", src: "/images/portal/household-mode/household-mode-animation.mp4", fit: "cover" },
       sections: [
         {
-          kicker: "The shape of it",
-          title: "One device, many people",
-          body:
-            "A shared device needs a calm way to know who's using it. I designed the switch between people to feel personal and quick, never like a login screen.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/portal/household-mode/household-mode-animation.mp4", alt: "Household Mode profile switching", fit: "cover" }],
-        },
-        {
-          kicker: "Verify instantly",
-          title: "Access without signing in",
-          body:
-            "Household Mode pairs with voice and face verification so the device knows who's asking. You don't manually log in to reach your contacts and apps — biometrics verify you instantly and put your profile forward.",
-          layout: "grid2",
-          media: [
-            { type: "video", src: "/images/home/portal-voice-recognition.mp4", alt: "Voice verification on Portal", fit: "cover" },
-            { type: "video", src: "/images/portal/biometrics-voice.mp4", alt: "Voice and face biometrics on Portal", fit: "cover" },
+          intro:
+            "The primary use case was for parents to set limits for kids — controlling who could be contacted and which apps were available on a device the whole family shared.",
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/portal/household-mode/household-mode-animation.mp4",
+                  alt: "Household Mode profile switching on Portal",
+                  fit: "cover",
+                  overlay: {
+                    src: "/images/portal/household-mode/household-mode-specs.png",
+                    alt: "Household mode animation specifications",
+                  },
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/household-mode/Household-Mode-label.jpg",
+                  alt: "Household mode label on Portal home screen",
+                  fit: "cover",
+                },
+                {
+                  type: "video",
+                  src: "/images/portal/household-mode/Household-mode-is-on.mp4",
+                  alt: "Household mode discovery on Portal",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/household-mode/Household-mode-discovery.jpg",
+                  alt: "Household mode promo and app restriction settings on Portal",
+                  fit: "cover",
+                },
+              ],
+            },
           ],
         },
         {
-          kicker: "Detail",
-          title: "Spec'd for motion",
-          body: "Motion specs handed to engineering, plus the shared messaging contact card.",
-          layout: "grid2",
-          media: [
-            { type: "image", src: "/images/portal/household-mode/household-mode-specs.png", alt: "Household Mode animation specs", fit: "cover" },
-            { type: "image", src: "/images/portal/household-messaging.png", alt: "Household messaging contact card", fit: "cover" },
-          ],
-        },
-        {
-          kicker: "In context",
-          title: "Built for the living room",
-          body: "Portal in the wild. The product these flows lived inside.",
-          layout: "grid3",
-          media: [
-            { type: "image", src: "/images/portal/marketing1.jpg", alt: "Portal", fit: "cover" },
-            { type: "image", src: "/images/portal/marketing2.jpg", alt: "Portal", fit: "cover" },
-            { type: "image", src: "/images/portal/marketing3.jpg", alt: "Portal", fit: "cover" },
+          title: "Meta Accounts",
+          intro:
+            "Alongside household mode, I worked as part of a cross-Meta effort to launch the UI of Meta Accounts and was responsible for the Portal experience. Linking a Meta account and Facebook profile meant people could use one account to manage household mode.",
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/meta-accounts/Meta-accounts-across-devices.jpg",
+                  alt: "Meta Accounts setup across Portal, Quest, mobile, and desktop",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/meta-accounts/Meta-accounts-login.jpg",
+                  alt: "Who's using Portal profile picker",
+                  fit: "cover",
+                },
+                {
+                  type: "video",
+                  src: "/images/portal/meta-accounts/accounts-center-tv.mp4",
+                  alt: "Accounts Center on Portal TV",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/meta-accounts/Meta-accounts-setup-confirmation.jpg",
+                  alt: "Meta account added confirmation on Portal",
+                  fit: "cover",
+                },
+              ],
+            },
           ],
         },
       ],

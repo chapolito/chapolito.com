@@ -13,6 +13,7 @@
 
   function media(m) {
     var fig = el("figure", "pj-fig pj-fig--" + (m.fit || "cover"));
+    if (m.overlay) fig.classList.add("pj-fig--video-overlay");
     if (m.label) fig.classList.add("pj-fig--labeled");
     var node;
     if (m.type === "video") {
@@ -31,6 +32,14 @@
       node.loading = "lazy";
     }
     fig.appendChild(node);
+    if (m.overlay && m.overlay.src) {
+      var overlay = document.createElement("img");
+      overlay.src = m.overlay.src;
+      overlay.alt = m.overlay.alt || "";
+      overlay.className = "pj-fig__overlay";
+      overlay.loading = "lazy";
+      fig.appendChild(overlay);
+    }
     if (m.label) {
       var badge = el("span", "pj-fig__label t-label", m.label);
       fig.appendChild(badge);
