@@ -537,7 +537,7 @@ body.is-detail-closing .about-page.about-overlay .about {
   background: rgba(255, 255, 255, 0.25);
 }
 
-.detail-close:active .detail-close__icon g {
+.detail-close:active .detail-close__icon path {
   fill: rgba(255, 255, 255, 1);
 }
 
@@ -561,7 +561,7 @@ body.is-detail-closing .about-page.about-overlay .about {
   flex-shrink: 0;
 }
 
-.detail-close__icon g {
+.detail-close__icon path {
   fill: rgba(255, 255, 255, 0.6);
   transition: fill var(--d-1) var(--e-out);
 }
@@ -583,8 +583,8 @@ body.is-detail-enter .detail-close,
     background: rgba(255, 255, 255, 0.2);
   }
 
-  .detail-close:hover .detail-close__icon g,
-  .detail-close:focus-visible .detail-close__icon g {
+  .detail-close:hover .detail-close__icon path,
+  .detail-close:focus-visible .detail-close__icon path {
     fill: rgba(255, 255, 255, 1);
   }
 
