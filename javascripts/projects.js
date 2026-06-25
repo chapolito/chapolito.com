@@ -107,7 +107,7 @@ window.PROJECTS = [
 
   {
     id: "horizon-chat",
-    title: "World Chat",
+    title: "In-game Communication",
     product: "Horizon",
     era: "Meta",
     orientation: "landscape",
@@ -116,29 +116,52 @@ window.PROJECTS = [
     overlay: "dock",
     tile: { type: "video", src: "/images/home/World-Comms.tile.mp4", fit: "cover" },
     detail: {
+      layout: "story",
+      storyColumn: "992",
       lede:
-        "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication (text chat, voice, and emotes), including the in-game menu, and changed the default modality from voice to text.",
+        "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication — text chat, voice, and emotes — including the in-game menu, and changed the default modality from voice to text.",
       meta: [
-        { k: "Role", v: "Design lead · team of 3" },
-        { k: "Platforms", v: "Mobile apps" },
+        { k: "Project", brand: "meta", v: "Horizon" },
+        { k: "Role", v: "Design lead, guiding 3 designers" },
+        { k: "Platforms", v: "Mobile & VR" },
         { k: "Date", v: "2025–2026" },
       ],
-      hero: { type: "video", src: "/images/home/horizon-world-chat.mp4", fit: "cover" },
       sections: [
         {
-          kicker: "The redesign",
-          title: "Talking inside a world",
-          body:
+          title: "Voice → Text",
+          intro:
             "Communication in VR has to work while you're moving, playing, and present with others. We rebuilt text chat completely and made it the calm default.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/home/horizon-world-chat.mp4", alt: "Horizon world chat", fit: "cover" }],
-        },
-        {
-          kicker: "On the go",
-          title: "Horizon, on mobile",
-          body: "Bringing the world to the phone in your pocket.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/home/horizon-mobile.mp4", alt: "Horizon mobile", fit: "contain" }],
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/home/World-Comms.tile.mp4",
+                  alt: "Horizon world chat on mobile",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/horizon/emotes-menu-vr.jpg",
+                  alt: "Emotes menu in Horizon VR",
+                  fit: "cover",
+                },
+                {
+                  type: "video",
+                  src: "/images/horizon/vr-concept-prototype.mp4",
+                  alt: "VR concept prototype for in-world communication",
+                  fit: "cover",
+                  label: "Concept prototype",
+                },
+              ],
+            },
+          ],
         },
       ],
     },
