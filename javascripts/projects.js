@@ -20,6 +20,7 @@ window.PROJECTS = [
     tile: { type: "video", src: "/images/quest-vr/people-tab.mp4", fit: "cover", insetShadow: true },
     detail: {
       layout: "story",
+      storyColumn: "992",
       lede:
         "Quests are the best-selling VR devices ever. My focus was helping people communicate and play together.",
       meta: [
@@ -33,19 +34,28 @@ window.PROJECTS = [
           title: "Navigator",
           intro:
             "In 2024, we redesigned the VR OS and created the Navigator: a single menu, accessible from anywhere, for apps, social, and settings.",
-          layout: "grid2",
-          media: [
+          mediaRows: [
             {
-              type: "video",
-              src: "/images/quest-vr/people-tab-loop.mp4",
-              alt: "Quest Navigator People tab with friends in VR",
-              fit: "cover",
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/quest-vr/people-tab-loop.mp4",
+                  alt: "Quest Navigator People tab with friends in VR",
+                  fit: "cover",
+                },
+              ],
             },
             {
-              type: "video",
-              src: "/images/quest-vr/you-tab-loop.mp4",
-              alt: "Quest Navigator You tab with avatar and profile",
-              fit: "cover",
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/quest-vr/you-tab-loop.mp4",
+                  alt: "Quest Navigator You tab with avatar and profile",
+                  fit: "cover",
+                },
+              ],
             },
           ],
           body: [
@@ -56,25 +66,34 @@ window.PROJECTS = [
         {
           title: "Active Status",
           intro: "Prior to the Navigator, I redesigned active status and the social privacy settings.",
-          layout: "grid3",
-          media: [
+          mediaRows: [
             {
-              type: "image",
-              src: "/images/quest-vr/active-status-migration.png",
-              alt: "Profiles now control who sees your activity",
-              fit: "cover",
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/quest-vr/active-status-settings.png",
+                  alt: "Active Status privacy settings with Joinable dropdown",
+                  fit: "cover",
+                },
+              ],
             },
             {
-              type: "image",
-              src: "/images/quest-vr/active-status-settings.png",
-              alt: "Active Status privacy settings with Joinable dropdown",
-              fit: "cover",
-            },
-            {
-              type: "image",
-              src: "/images/quest-vr/active-status-changes.png",
-              alt: "Active Status and Rich Presence settings showing Joinable, Online, and offline states",
-              fit: "cover",
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/quest-vr/active-status-migration.png",
+                  alt: "Profiles now control who sees your activity",
+                  fit: "cover",
+                },
+                {
+                  type: "image",
+                  src: "/images/quest-vr/active-status-changes.png",
+                  alt: "Active Status and Rich Presence settings showing Joinable, Online, and offline states",
+                  fit: "cover",
+                },
+              ],
             },
           ],
           body: [
@@ -137,10 +156,10 @@ window.PROJECTS = [
     detail: {
       layout: "story",
       lede:
-        "As Horizon expanded integrations across Facebook and Instagram, we defined the relationship between the apps and the profiles people used across Meta.",
+        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta.",
       meta: [
         { k: "Project", brand: "meta", v: "Horizon" },
-        { k: "Role", v: "Product design lead of 6 designers" },
+        { k: "Role", v: "Design lead, guiding 5 designers" },
         { k: "Platforms", v: "Mobile" },
         { k: "Date", v: "2026" },
       ],
@@ -150,8 +169,11 @@ window.PROJECTS = [
         alt: "Horizon mobile app showing gaming profiles and friends activity",
         fit: "contain",
       },
-      footnote:
-        "This work is shipping in Summer 2026. I have a case study I can present showing the designs and process.",
+      footnote: {
+        lead: "This work is scheduled to ship in Summer 2026.",
+        body:
+          "I can share the full case study during a portfolio review, including how we defined a shared gaming profile across Meta, aligned teams around a unified vision, and designed the foundations for profiles across Facebook and Instagram.",
+      },
     },
   },
 
@@ -162,35 +184,101 @@ window.PROJECTS = [
     era: "Meta",
     orientation: "portrait",
     hover: "bloom",
-    overlay: "drop",
+    overlay: "split",
     tile: { type: "video", src: "/images/home/FB-Watch.tile.mp4", fit: "cover" },
     detail: {
-      lede:
-        "Portal brought Facebook to the living room. I designed and shipped the first versions of Facebook Watch and Facebook Live for TV — lean-back video and live broadcasting, built for a shared device on the couch.",
+      layout: "story",
+      storyColumn: "992",
+      lede: "I designed two apps: Facebook Live and Facebook Watch for Portal devices.",
       meta: [
-        { k: "Role", v: "Product Design" },
-        { k: "Platforms", v: "Portal & TV apps" },
-        { k: "Date", v: "2019–2021" },
+        { k: "Project", brand: "meta", v: "Portal" },
+        { k: "Role", v: "Product Designer" },
+        { k: "Platforms", v: "Portal & Portal TV" },
+        { k: "Date", v: "2019–2020" },
       ],
-      hero: { type: "video", src: "/images/portal/watch-tv-video-chaining.mp4", fit: "cover" },
       sections: [
         {
-          kicker: "Watch",
-          title: "Video made for the living room",
-          body:
-            "Facebook Watch on Portal — browsing shows at a distance, smart chaining between episodes, and a UI tuned for shared viewing on the couch.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/portal/watch-tv-video-chaining.mp4", alt: "Facebook Watch on Portal", fit: "cover" }],
+          title: "Facebook Live",
+          intro:
+            "Portal owners loved making video calls and the ease of hands-free calling with Smart Camera — the AI-powered camera that kept everyone on screen. We wanted to bring that magic to more experiences, like going live on Facebook.",
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/facebook-on-portal/FB-Live-woman-on-portal.jpg",
+                  alt: "Facebook Live on Portal with Smart Camera and live comments",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/facebook-on-portal/FB-Watch-loading-screen.jpg",
+                  alt: "Facebook Live splash screen on Portal",
+                  fit: "cover",
+                },
+                {
+                  type: "image",
+                  src: "/images/portal/facebook-on-portal/FB-Watch-prototype.jpg",
+                  alt: "Start Live Video setup on Portal",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/facebook-on-portal/FB-Live-TV.jpg",
+                  alt: "Facebook Live on Portal TV with audience comments",
+                  fit: "cover",
+                },
+              ],
+            },
+          ],
+          body: [
+            "Launched in early 2020, we immediately saw people using it to reach their audiences while sheltering in place. People were using Portals to broadcast sermons, share thoughts on pandemic job loss, and provide FAQs on social distancing.",
+          ],
         },
         {
-          kicker: "Live",
-          title: "Go live from the couch",
-          body:
-            "Facebook Live on Portal let anyone broadcast to friends and groups from the device already in the room — no phone propped on a shelf.",
-          layout: "grid2",
-          media: [
-            { type: "video", src: "/images/portal/fb-live.mp4", alt: "Facebook Live on Portal", fit: "cover" },
-            { type: "image", src: "/images/portal/facebook-live.png", alt: "Facebook Live interface on Portal", fit: "cover" },
+          title: "Facebook Watch",
+          intro:
+            "In addition to video calls and going live, people used their Portals to consume media. I adapted Facebook Watch so people could easily watch their favorite shows and videos from creators.",
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/portal/facebook-on-portal/FB-Watch-video-chaining.mp4",
+                  alt: "Facebook Watch on Portal playing Red Table Talk",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/portal/facebook-on-portal/FB-Watch-tv-icon.jpg",
+                  alt: "Facebook Watch app on Portal TV home screen",
+                  fit: "cover",
+                },
+                {
+                  type: "image",
+                  src: "/images/portal/facebook-on-portal/FB-Watch-browse.jpg",
+                  alt: "Facebook Watch browse experience on Portal",
+                  fit: "cover",
+                },
+              ],
+            },
           ],
         },
       ],

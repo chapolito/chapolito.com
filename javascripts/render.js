@@ -113,6 +113,15 @@
     return head;
   }
 
+  function buildStoryMediaRow(row) {
+    var layout = row.layout || ((row.media || []).length === 1 ? "full" : "double");
+    var grid = el("div", "pj-story__media pj-story__media--" + layout);
+    (row.media || []).forEach(function (m) {
+      grid.appendChild(media(m));
+    });
+    return grid;
+  }
+
   function buildStorySection(s) {
     var sec = el("section", "pj-story__section pj-sec reveal");
     if (s.title || s.intro) {
@@ -122,7 +131,13 @@
       sec.appendChild(copy);
     }
 
-    if (s.media && s.media.length) {
+    if (s.mediaRows && s.mediaRows.length) {
+      var stack = el("div", "pj-story__media-stack");
+      s.mediaRows.forEach(function (row) {
+        stack.appendChild(buildStoryMediaRow(row));
+      });
+      sec.appendChild(stack);
+    } else if (s.media && s.media.length) {
       var grid = el("div", "pj-story__media pj-story__media--" + (s.layout || "grid2"));
       s.media.forEach(function (m) {
         grid.appendChild(media(m));
@@ -167,9 +182,16 @@
     return wrap;
   }
 
-  function buildStoryFootnote(text) {
+  function buildStoryFootnote(footnote) {
     var wrap = el("div", "pj-story__footnote pj-sec reveal");
-    wrap.appendChild(el("p", "pj-story__footnote-p", text));
+    var p = el("p", "pj-story__footnote-p");
+    if (footnote && typeof footnote === "object") {
+      p.appendChild(el("strong", "pj-story__footnote-lead", footnote.lead));
+      p.appendChild(document.createTextNode(" " + footnote.body));
+    } else {
+      p.textContent = footnote;
+    }
+    wrap.appendChild(p);
     return wrap;
   }
 
@@ -178,6 +200,7 @@
     root.innerHTML = "";
 
     var story = el("article", "pj-story");
+    if (d.storyColumn === "992") story.classList.add("pj-story--col-992");
     story.appendChild(buildStoryHead(p, d));
     if (d.hero) story.appendChild(buildStoryHero(d.hero));
     if (d.footnote) story.appendChild(buildStoryFootnote(d.footnote));
