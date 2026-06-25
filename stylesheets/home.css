@@ -380,6 +380,7 @@ body.is-home .detail-split.is-instant .pj-cta,
 body.is-home .detail-split.is-instant .reveal {
   animation: none !important;
   opacity: 1 !important;
+  filter: none !important;
 }
 body.is-home .about-page.about-overlay.is-instant,
 body.is-home.is-detail-enter .about-page.about-overlay.is-instant,
@@ -387,12 +388,14 @@ body.is-home .about-page.about-overlay.is-instant .about {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
+  filter: none !important;
 }
 body.is-home .detail-split.is-instant .pj-head,
 body.is-home .detail-split.is-instant .pj-sec,
 body.is-home .detail-split.is-instant .pj-cta,
 body.is-home .detail-split.is-instant .reveal {
   transform: none !important;
+  filter: none !important;
 }
 body.is-home.is-detail-enter .detail-close {
   animation: none !important;
