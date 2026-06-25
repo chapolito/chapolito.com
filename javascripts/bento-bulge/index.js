@@ -12,7 +12,7 @@ import {
 } from "./field.js";
 import { createTextureManager } from "./textures.js";
 import { createSurface } from "./surface.js";
-import { createDialkit, initParams } from "./dialkit.js";
+import { initParams } from "./dialkit.js";
 import { createCustomCursor } from "./cursor.js";
 import { getEffectiveDpr } from "./dpr.js";
 import { createPerfMonitor, isPerfEnabled, noopPerf } from "./perf.js";
@@ -62,7 +62,17 @@ function canUseWebGL() {
 function clearDomLayers(layout) {
   layout.cells.forEach((cell) => {
     cell.el.style.opacity = "";
+    cell.el.style.removeProperty("--bento-label-opacity");
     cell.el.classList.remove("is-bulge-dom-hidden");
+  });
+}
+
+function syncLabelOpacity(layout, field) {
+  layout.cells.forEach((cell) => {
+    cell.el.style.setProperty(
+      "--bento-label-opacity",
+      String(field.cellDimAmounts[cell.index] ?? 0)
+    );
   });
 }
 
@@ -115,17 +125,14 @@ export function initBentoBulge(options = {}) {
   const perf = isPerfEnabled() ? createPerfMonitor() : noopPerf;
 
   const customCursor = createCustomCursor();
-  let onParamsChange = function () {};
 
   const capability = canUseWebGL();
   if (!capability.ok) {
     console.info("[bento-bulge] fallback:", capability.reason);
-    const dialkit = createDialkit(document.body, params, () => onParamsChange());
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
     const fallbackApi = {
       dispose: () => {
         customCursor.dispose();
-        dialkit.dispose();
         perf.dispose();
       },
       params,
@@ -149,15 +156,12 @@ export function initBentoBulge(options = {}) {
       return null;
     }
     console.warn("[bento-bulge] grid has no measurable size");
-    const dialkit = createDialkit(document.body, params, () => onParamsChange());
     const failApi = {
       dispose: () => {
         customCursor.dispose();
-        dialkit.dispose();
         perf.dispose();
       },
       params,
-      dialkit,
       setOverlayOpen() {}
     };
     resolveWhenReady(failApi);
@@ -167,7 +171,6 @@ export function initBentoBulge(options = {}) {
 
   promoteGridVideos(layout, params.pauseIdleVideos);
 
-  const dialkit = createDialkit(document.body, params, () => onParamsChange());
   const field = createBulgeField(params);
   const textureManager = createTextureManager(params.cornerRadius);
   const maxVideos = () => params.maxConcurrentVideoTextures;
@@ -183,11 +186,9 @@ export function initBentoBulge(options = {}) {
     const failApi = {
       dispose: () => {
         customCursor.dispose();
-        dialkit.dispose();
         perf.dispose();
       },
       params,
-      dialkit,
       setOverlayOpen() {}
     };
     resolveWhenReady(failApi);
@@ -386,6 +387,7 @@ export function initBentoBulge(options = {}) {
     lastTime = now;
 
     updateBulgeField(field, params, dt, { overlayOpen });
+    syncLabelOpacity(layout, field);
 
     const continuous = wantsContinuousRender();
     const shouldDraw = continuous || needsRender;
@@ -403,18 +405,6 @@ export function initBentoBulge(options = {}) {
     bento.style.setProperty("--bento-dim-opacity", String(params.dimOpacity));
   }
 
-  function handleParamsChange() {
-    dialkit.persist();
-    applyDimOpacityVar();
-    remeasure();
-    if (activeCellData) {
-      setCellTarget(field, activeCellData, params, layout);
-    }
-    syncVideoPlayback();
-    markDirty();
-  }
-
-  onParamsChange = handleParamsChange;
   applyDimOpacityVar();
 
   function remeasure() {
@@ -451,6 +441,7 @@ export function initBentoBulge(options = {}) {
       snapCellDims(field);
       field.targetOverlayDim = overlayDimAmount();
       snapOverlayDim(field);
+      syncLabelOpacity(layout, field);
       surface.updateFromField(field, params);
       syncVideoPlayback(null);
       markDirty();
@@ -634,7 +625,6 @@ export function initBentoBulge(options = {}) {
     textureManager.dispose();
     surface.dispose();
     customCursor.dispose();
-    dialkit.dispose();
     perf.dispose();
     bento.classList.remove("grid--bulge-active");
     if (instance === api) instance = null;
@@ -647,11 +637,11 @@ export function initBentoBulge(options = {}) {
     setOverlayOpen,
     setTilePress,
     syncVideoPlayback,
-    onParamsChange: handleParamsChange,
     whenReady: whenReadyPromise
   };
 
   surface.updateFromField(field, params);
+  syncLabelOpacity(layout, field);
   surface.updateVideoSlots(initialVideoState);
   syncVideoMedia();
   finishBootRender();
