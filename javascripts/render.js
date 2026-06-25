@@ -13,6 +13,7 @@
 
   function media(m) {
     var fig = el("figure", "pj-fig pj-fig--" + (m.fit || "cover"));
+    if (m.label) fig.classList.add("pj-fig--labeled");
     var node;
     if (m.type === "video") {
       node = document.createElement("video");
@@ -30,6 +31,10 @@
       node.loading = "lazy";
     }
     fig.appendChild(node);
+    if (m.label) {
+      var badge = el("span", "pj-fig__label t-label", m.label);
+      fig.appendChild(badge);
+    }
     return fig;
   }
 
