@@ -9,7 +9,6 @@
     "serve": "npm run start"
   },
   "dependencies": {
-    "lil-gui": "^0.21.0",
     "three": "^0.184.0"
   }
 }

@@ -68,7 +68,6 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
 
   const uniforms = {
     uAtlas: { value: atlasTexture },
-    uShowAlignment: { value: 0 },
     uBulgeAmount: { value: 0 },
     uMaxDisplacement: { value: width * params.maxDisplacementRatio },
     uPlaneSize: { value: new THREE.Vector2(width, height) },
@@ -100,7 +99,6 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uScreenBulgeScale: { value: params.screenBulgeScale ?? 5 },
     uCameraDistance: { value: params.enablePerspective ? width * 1.1 : 1000 },
     uPerspectiveComp: { value: params.enablePerspective ? 1 : 0 },
-    uShowWireframe: { value: params.showWireframe ? 1 : 0 },
     uSubdivisions: { value: subdivisions }
   };
 
@@ -203,9 +201,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     if (camera.isPerspectiveCamera) {
       uniforms.uCameraDistance.value = layout.width * 1.1;
     }
-    uniforms.uShowAlignment.value = params.showAlignmentOverlay ? 1 : 0;
     uniforms.uCornerRadius.value = params.cornerRadius || 8;
-    uniforms.uShowWireframe.value = params.showWireframe ? 1 : 0;
     uniforms.uSubdivisions.value = params.subdivisions;
   }
 

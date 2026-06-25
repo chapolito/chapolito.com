@@ -66,7 +66,6 @@ export const fragmentShader = /* glsl */ `
 precision highp float;
 
 uniform sampler2D uAtlas;
-uniform float uShowAlignment;
 uniform vec2 uPlaneSize;
 uniform int uCellCount;
 uniform vec4 uCellRects[25];
@@ -95,8 +94,6 @@ uniform float uCellCoverAnchorX[${MAX_CELLS}];
 uniform float uCellCoverAnchorY[${MAX_CELLS}];
 uniform float uCellInsetShadow[${MAX_CELLS}];
 uniform float uOverlayDim;
-uniform float uShowWireframe;
-uniform float uSubdivisions;
 
 varying vec2 vUv;
 varying float vHeight;
@@ -272,25 +269,6 @@ void main() {
       dimFactor = mix(dimFactor, uPressDimOpacity, uPressExtraDim);
     }
     alpha *= dimFactor;
-  }
-
-  if (uShowAlignment > 0.5 && idx >= 0) {
-    vec4 rect = uCellRects[idx];
-    float d = cellRoundedDist(uv, rect);
-    float dPx = abs(d / max(length(vec2(dFdx(d), dFdy(d))), 0.0001));
-    if (dPx < 1.5) {
-      color = mix(color, vec3(0.2, 0.9, 0.5), 0.85);
-    }
-  }
-
-  if (uShowWireframe > 0.5) {
-    vec2 gridUV = vUv * uSubdivisions;
-    vec2 grid = abs(fract(gridUV - 0.5) - 0.5);
-    vec2 gridWidth = fwidth(gridUV) * 0.75;
-    vec2 lineAA = smoothstep(vec2(0.0), gridWidth, grid);
-    float line = 1.0 - lineAA.x * lineAA.y;
-    color = mix(color, vec3(1.0), line * 0.3);
-    alpha = max(alpha, line * 0.3);
   }
 
   gl_FragColor = vec4(color, alpha * uOverlayDim);
