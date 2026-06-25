@@ -307,7 +307,7 @@ window.PROJECTS = [
           area: "left",
           media: {
             type: "image",
-            src: "/images/portal/household-mode-specs.png",
+            src: "/images/portal/household-mode/household-mode-specs.png",
             alt: "Household Mode animation specs",
             fit: "cover",
           },
@@ -338,7 +338,7 @@ window.PROJECTS = [
         { k: "Platforms", v: "Portal & TV apps" },
         { k: "Date", v: "2019–2021" },
       ],
-      hero: { type: "video", src: "/images/portal/household-mode-animation.mp4", fit: "cover" },
+      hero: { type: "video", src: "/images/portal/household-mode/household-mode-animation.mp4", fit: "cover" },
       sections: [
         {
           kicker: "The shape of it",
@@ -346,7 +346,7 @@ window.PROJECTS = [
           body:
             "A shared device needs a calm way to know who's using it. I designed the switch between people to feel personal and quick, never like a login screen.",
           layout: "full",
-          media: [{ type: "video", src: "/images/portal/household-mode-animation.mp4", alt: "Household Mode profile switching", fit: "cover" }],
+          media: [{ type: "video", src: "/images/portal/household-mode/household-mode-animation.mp4", alt: "Household Mode profile switching", fit: "cover" }],
         },
         {
           kicker: "Verify instantly",
@@ -365,7 +365,7 @@ window.PROJECTS = [
           body: "Motion specs handed to engineering, plus the shared messaging contact card.",
           layout: "grid2",
           media: [
-            { type: "image", src: "/images/portal/household-mode-specs.png", alt: "Household Mode animation specs", fit: "cover" },
+            { type: "image", src: "/images/portal/household-mode/household-mode-specs.png", alt: "Household Mode animation specs", fit: "cover" },
             { type: "image", src: "/images/portal/household-messaging.png", alt: "Household messaging contact card", fit: "cover" },
           ],
         },
