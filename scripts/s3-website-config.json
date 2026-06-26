@@ -1,0 +1,50 @@
+{
+  "IndexDocument": {
+    "Suffix": "index.html"
+  },
+  "ErrorDocument": {
+    "Key": "404.html"
+  },
+  "RoutingRules": [
+    {
+      "Condition": { "KeyPrefixEquals": "free-design-resources/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "portal/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "horizon/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "quest-vr/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "life360/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "messenger-kids/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "fanpics/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "spritzr/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "the-wiki-game/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    },
+    {
+      "Condition": { "KeyPrefixEquals": "quest-for-business/" },
+      "Redirect": { "ReplaceKeyWith": "index.html", "HttpRedirectCode": "301" }
+    }
+  ]
+}
