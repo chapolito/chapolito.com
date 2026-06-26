@@ -7,10 +7,11 @@ export const defaultParams = {
   hillFlatness: 0.6,
   screenBulgeScale: 6,
   dimOpacity: 0.65,
-  dimMorphSpeed: 6,
-  subdivisions: 20,
+  dimMorphSpeed: 9,
+  dimMorphSpeedOut: 26,
+  subdivisions: 14,
   enablePerspective: false,
-  maxConcurrentVideoTextures: 6,
+  maxConcurrentVideoTextures: 5,
   cornerRadius: 8,
   enableVideos: true,
   pauseIdleVideos: false,
@@ -19,7 +20,7 @@ export const defaultParams = {
   pressMorphSpeed: 14,
   pressDimOpacity: 0.35,
   overlayDimMorphSpeed: 7.5,
-  dprCap: 2
+  dprCap: 1.5
 };
 
 export function initParams() {

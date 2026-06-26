@@ -63,15 +63,20 @@ function clearDomLayers(layout) {
   layout.cells.forEach((cell) => {
     cell.el.style.opacity = "";
     cell.el.style.removeProperty("--bento-label-opacity");
+    cell.el.style.removeProperty("--bento-label-blur");
     cell.el.classList.remove("is-bulge-dom-hidden");
   });
 }
 
 function syncLabelOpacity(layout, field) {
   layout.cells.forEach((cell) => {
+    const dim = field.cellDimAmounts[cell.index] ?? 0;
+    // Cut the low-opacity tail so blurred text doesn't linger as a smear.
+    const opacity = dim < 0.04 ? 0 : dim;
+    cell.el.style.setProperty("--bento-label-opacity", String(opacity));
     cell.el.style.setProperty(
-      "--bento-label-opacity",
-      String(field.cellDimAmounts[cell.index] ?? 0)
+      "--bento-label-blur",
+      opacity <= 0 ? "0px" : `${Math.min(5, (1 - dim) * 5)}px`
     );
   });
 }
@@ -262,7 +267,6 @@ export function initBentoBulge(options = {}) {
       );
     }
     return (
-      pointerInside ||
       isFieldMorphing(field) ||
       isDimMorphing(field) ||
       field.bulgeAmount > 0.01 ||
@@ -313,6 +317,7 @@ export function initBentoBulge(options = {}) {
   function syncVideoMedia() {
     syncVideoPlayback(null);
     if (overlayOpen) return;
+    textureManager.markVideoSlotsDirty();
     const videoState = textureManager.syncVideoSlotsAndAtlas(
       layout,
       dpr,
@@ -419,6 +424,7 @@ export function initBentoBulge(options = {}) {
     layout = measureCells(bento, dpr, cellOpts);
     invalidateRectCache();
     surface.resize(layout);
+    textureManager.markVideoSlotsDirty();
     const videoState = textureManager.syncVideoSlotsAndAtlas(
       layout,
       dpr,
@@ -569,13 +575,16 @@ export function initBentoBulge(options = {}) {
     }
     if (!cell.video) return;
 
-    const onVideoReady = () => scheduleSyncVideoMedia();
+    const onVideoReady = () => {
+      textureManager.markVideoSlotsDirty();
+      scheduleSyncVideoMedia();
+    };
     cell.video.addEventListener("loadeddata", onVideoReady);
     cell.video.addEventListener("canplay", onVideoReady);
     cell.video.addEventListener("playing", onVideoReady);
   });
 
-  textureManager.bindVideoFrameWatchers(layout.cells, markDirty);
+  textureManager.bindVideoFrameWatchers(layout.cells, initialVideoState.cellSlots, markDirty);
 
   document.addEventListener("pointermove", onPointerMoveWrapped, { passive: true });
   document.documentElement.addEventListener("mouseleave", onPointerLeaveWrapped);

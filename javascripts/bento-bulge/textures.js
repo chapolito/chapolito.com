@@ -207,8 +207,11 @@ export function createTextureManager(cornerRadius = 8) {
   lastCellSlots.fill(-1);
   let atlasBuilt = false;
   let lastSlotCount = 0;
+  let lastVideoState = null;
+  let videoSlotsDirty = true;
   let rebuildRaf = 0;
   let pendingRebuild = null;
+  let onFrameCallback = null;
 
   function ensureVideoTexture(cell) {
     if (!isVideoReady(cell.video)) return null;
@@ -287,12 +290,13 @@ export function createTextureManager(cornerRadius = 8) {
     });
   }
 
-  function bindVideoFrameWatchers(cells, onFrame) {
+  function bindVideoFrameWatchers(cells, cellSlots, onFrame) {
     frameUnwatchers.forEach((stop) => stop());
     frameUnwatchers.length = 0;
+    onFrameCallback = onFrame;
 
     cells
-      .filter((cell) => cell.hasVideo && cell.video)
+      .filter((cell) => cell.hasVideo && cell.video && cellSlots[cell.index] >= 0)
       .forEach((cell) => {
         const video = cell.video;
 
@@ -316,6 +320,11 @@ export function createTextureManager(cornerRadius = 8) {
       });
   }
 
+  function rebindVideoFrameWatchers(cells) {
+    if (!onFrameCallback) return;
+    bindVideoFrameWatchers(cells, lastCellSlots, onFrameCallback);
+  }
+
   return {
     canvas,
     texture,
@@ -337,21 +346,38 @@ export function createTextureManager(cornerRadius = 8) {
 
     bindVideoFrameWatchers,
 
+    markVideoSlotsDirty() {
+      videoSlotsDirty = true;
+    },
+
+    getVideoState() {
+      return lastVideoState;
+    },
+
     syncVideoSlots(layout, enableVideos, maxConcurrent = MAX_VIDEO_SLOTS) {
       const state = buildVideoSlots(layout, enableVideos, maxConcurrent);
       lastCellSlots = state.cellSlots;
       lastSlotCount = state.slots.length;
+      lastVideoState = state;
+      videoSlotsDirty = false;
       return state;
     },
 
     syncVideoSlotsAndAtlas(layout, dpr, enableVideos, maxConcurrent = MAX_VIDEO_SLOTS) {
+      if (!videoSlotsDirty && lastVideoState) {
+        return lastVideoState;
+      }
+
       const prev = lastCellSlots;
       const state = buildVideoSlots(layout, enableVideos, maxConcurrent);
       const changed = state.cellSlots.some((slot, i) => slot !== prev[i]);
       lastCellSlots = state.cellSlots;
       lastSlotCount = state.slots.length;
+      lastVideoState = state;
+      videoSlotsDirty = false;
       if (changed) {
         scheduleRebuild(layout, dpr, state.cellSlots);
+        rebindVideoFrameWatchers(layout.cells);
       }
       return state;
     },
