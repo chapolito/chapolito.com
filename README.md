@@ -51,17 +51,20 @@ git commit -m "Remove Middleman fingerprint hashes and duplicate build artifacts
 
 ## Deploying to S3
 
-Before syncing, regenerate home project routes (copies `index.html` into each `/{project-id}/index.html` so direct URLs work on refresh):
+Deploy is manual and intentional. Staging first, production after review.
 
 ```bash
-node scripts/generate-home-routes.cjs
+aws login
+npm run deploy:staging
+# review http://staging.chapolito.com
+npm run deploy:prod
 ```
 
-Sync the site root to your bucket (adjust bucket name and profile):
+The deploy script (`scripts/deploy.cjs`) regenerates deep-link routes, vendors Three.js, syncs with correct `Cache-Control` headers (HTML: `no-cache`, assets: 1-day TTL), and on production updates CloudFront legacy redirects and invalidates the CDN cache.
 
-```bash
-aws s3 sync . s3://your-bucket-name/ --exclude ".git/*" --exclude "scripts/*" --exclude "README.md"
-```
+Config: `scripts/deploy.config.json`. Optional machine-specific AWS profile: `scripts/deploy.config.local.json` (gitignored), e.g. `{ "awsProfile": "chapolito" }`.
+
+Preview without uploading: `DEPLOY_DRY_RUN=1 npm run deploy:staging`
 
 ### Legacy URL redirects
 

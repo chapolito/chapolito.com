@@ -1,0 +1,19 @@
+{
+  "region": "us-east-1",
+  "cacheControl": {
+    "html": "no-cache",
+    "assets": "public, max-age=86400"
+  },
+  "targets": {
+    "staging": {
+      "bucket": "staging.chapolito.com",
+      "url": "http://staging.chapolito.com"
+    },
+    "prod": {
+      "bucket": "www.chapolito.com",
+      "url": "https://www.chapolito.com",
+      "cloudFrontDistributionId": "E2ZNQK8QHKTTQ9",
+      "preserveWellKnown": true
+    }
+  }
+}

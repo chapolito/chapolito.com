@@ -2,6 +2,7 @@
 *.swp
 *~
 .env.local
+scripts/deploy.config.local.json
 node_modules/
 .vercel
 .cursor/*

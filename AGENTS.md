@@ -36,7 +36,8 @@ Static portfolio site, deployed to Amazon S3. See [README.md](README.md) for ful
 - **Page shell:** the site is a single home shell (`.stage`, `.grid`, `.dock`, `.reader`). Case studies and About open in the overlay reader — not standalone HTML pages.
 - **Assets:** images and video live under `images/`. Keep `.well-known/` when syncing to S3.
 - **JS:** the home page uses ES modules (Three.js bulge + overlays). Don't introduce another framework for small interactions.
-- **Local preview:** `npm start` then open `http://localhost:8080`. Run `npm run generate:home-routes` before deploy so `/{project-id}/` and `/about/` deep links resolve on S3.
+- **Local preview:** `npm start` then open `http://localhost:8080`.
+- **Deploy:** `npm run deploy:staging` first, then `npm run deploy:prod` after user review. See [.cursor/skills/deploy/SKILL.md](.cursor/skills/deploy/SKILL.md). Do not use raw `aws s3 sync` — the deploy script sets cache headers and invalidates CloudFront on prod.
 - **No inline styles for layout/spacing;** add scoped rules in the relevant modular stylesheet (`home.css`, `bento-bulge.css`, `detail-view.css`, `about.css`, etc.).
 - **WebGL + fallback parity:** any interaction or visual state driven by the bento bulge WebGL path (`javascripts/bento-bulge/`) must also work when WebGL is unavailable — coarse pointer, reduced motion, low memory, or context failure. The fallback uses DOM tiles and CSS (see `initFallbackHover` and overlay rules on `.grid.grid--bulge` without `.grid--bulge-active`). Shader-only effects need a CSS or DOM equivalent on the fallback path; do not rely on `.experimental-bento__surface` alone.
 
