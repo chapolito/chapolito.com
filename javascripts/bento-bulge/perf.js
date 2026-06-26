@@ -12,26 +12,33 @@ export function createPerfMonitor() {
   el.setAttribute("aria-hidden", "true");
   document.body.appendChild(el);
 
-  let renders = 0;
-  let renderWindowStart = performance.now();
-  let rendersPerSec = 0;
+  const renderTimes = [];
   let lastRenderMs = 0;
   let coalesceHits = 0;
   let dirtySignals = 0;
+
+  function pruneRenderTimes(now) {
+    while (renderTimes.length && now - renderTimes[0] > 1000) {
+      renderTimes.shift();
+    }
+  }
+
+  function renderRate(now = performance.now()) {
+    pruneRenderTimes(now);
+    if (renderTimes.length < 2) return renderTimes.length;
+    const windowMs = now - renderTimes[0];
+    if (windowMs < 250) return renderTimes.length;
+    return Math.round((renderTimes.length / windowMs) * 1000);
+  }
 
   function recordDirty() {
     dirtySignals += 1;
   }
 
   function recordRender(frameMs) {
-    renders += 1;
     lastRenderMs = frameMs;
-    const now = performance.now();
-    if (now - renderWindowStart >= 1000) {
-      rendersPerSec = renders;
-      renders = 0;
-      renderWindowStart = now;
-    }
+    renderTimes.push(performance.now());
+    pruneRenderTimes(renderTimes[renderTimes.length - 1]);
   }
 
   function recordCoalesce() {
@@ -40,7 +47,8 @@ export function createPerfMonitor() {
 
   function update(extra = {}) {
     el.textContent = [
-      `render/s ${rendersPerSec}`,
+      `render/s ${renderRate()}`,
+      extra.mode ? extra.mode : "",
       `last ${lastRenderMs.toFixed(1)}ms`,
       `dirty ${dirtySignals}`,
       `coalesce ${coalesceHits}`,
