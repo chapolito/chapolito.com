@@ -1,3 +1,5 @@
+import { PAGE_META, projectMeta, setPageMeta } from "../page-meta.js";
+
 const TX_OUT = 400;
 const TX_IN = 400;
 const TX_DELAY = 150;
@@ -198,7 +200,7 @@ export function initBentoBulgeOverlays(options = {}) {
     doc.innerHTML = "";
     clearOverlayState();
     restoreHomeEnter();
-    document.title = "Bento bulge — Jesse O'Chapo";
+    setPageMeta(PAGE_META.home);
     setActiveNav("portfolio");
     isClosing = false;
   }
@@ -340,7 +342,7 @@ export function initBentoBulgeOverlays(options = {}) {
       window.initInview(doc);
       if (!skipPush) history.pushState({ id }, "", projectUrl(id));
       else history.replaceState({ id }, "", projectUrl(id));
-      document.title = `${p.title} · Jesse O'Chapo`;
+      setPageMeta(projectMeta(p));
       setActiveNav("portfolio");
       return;
     }
@@ -349,7 +351,7 @@ export function initBentoBulgeOverlays(options = {}) {
     window.initInview(doc);
 
     if (!skipPush) history.pushState({ id }, "", projectUrl(id));
-    document.title = `${p.title} · Jesse O'Chapo`;
+    setPageMeta(projectMeta(p));
     setActiveNav("portfolio");
   }
 
@@ -385,7 +387,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
       if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
       else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
-      document.title = "About · Jesse O'Chapo";
+      setPageMeta(PAGE_META.about);
       setActiveNav("about");
       if (!instant) focusAboutEntry();
       return;
@@ -413,7 +415,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
     if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
     else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
-    document.title = "About · Jesse O'Chapo";
+    setPageMeta(PAGE_META.about);
     setActiveNav("about");
   }
 
