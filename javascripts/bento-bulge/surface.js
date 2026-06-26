@@ -40,9 +40,9 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
-    antialias: shouldUseAntialias(),
+    antialias: shouldUseAntialias(dpr),
     premultipliedAlpha: false,
-    powerPreference: "high-performance"
+    powerPreference: "default"
   });
   renderer.setPixelRatio(dpr);
   renderer.setSize(width, height, false);

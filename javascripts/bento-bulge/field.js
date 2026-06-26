@@ -121,8 +121,13 @@ export function updateBulgeField(field, params, dt, options = {}) {
   field.projectStrength = damp(field.projectStrength, field.targetProjectStrength, morph, dt);
   field.bulgeAmount = damp(field.bulgeAmount, field.targetBulgeAmount, morph * 1.2, dt);
 
+  const dimMorphOut = params.dimMorphSpeedOut ?? dimMorph * 3.5;
+
   for (let i = 0; i < field.cellDimAmounts.length; i++) {
-    field.cellDimAmounts[i] = damp(field.cellDimAmounts[i], field.cellDimTargets[i], dimMorph, dt);
+    const current = field.cellDimAmounts[i];
+    const target = field.cellDimTargets[i];
+    const lambda = target >= current ? dimMorph : dimMorphOut;
+    field.cellDimAmounts[i] = damp(current, target, lambda, dt);
   }
 }
 

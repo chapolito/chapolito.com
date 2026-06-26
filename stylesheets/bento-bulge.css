@@ -283,14 +283,17 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
 }
 
 /*
- * WebGL path — label fade tracks uCellDimAmount (set per tile in index.js) so
- * text opacity matches tile dim morph; no CSS blur (fallback rack-focus only).
+ * WebGL path — label motion tracks uCellDimAmount (index.js) so text matches
+ * tile dim morph; blur + shift + scale restore the rack-focus reveal on enter.
  */
 .bento-bulge-page .grid.grid--bulge-active .tile__label {
-  opacity: var(--bento-label-opacity, 0);
-  filter: none;
-  --bento-label-shift: 10px;
-  transform: translateY(calc((1 - var(--bento-label-opacity, 0)) * var(--bento-label-shift)));
+  --bento-label-t: var(--bento-label-opacity, 0);
+  --bento-label-shift: 12px;
+  opacity: var(--bento-label-t);
+  filter: blur(var(--bento-label-blur, 5px));
+  transform:
+    translateY(calc((1 - var(--bento-label-t)) * var(--bento-label-shift)))
+    scale(calc(0.93 + 0.07 * var(--bento-label-t)));
   transition: none;
 }
 
