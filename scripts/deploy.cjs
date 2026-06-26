@@ -71,7 +71,49 @@ function excludeArgs(extra = []) {
   return [...SYNC_EXCLUDES, ...extra].flatMap((pattern) => ["--exclude", pattern]);
 }
 
-function syncToS3(config, target, { dryRun, htmlOnly, cacheControl }) {
+const HTML_SKIP_DIRS = new Set([".git", "node_modules", "scripts", ".cursor"]);
+
+function collectHtmlFiles(dir, files = [], rel = "") {
+  for (const name of fs.readdirSync(dir)) {
+    const abs = path.join(dir, name);
+    const relPath = rel ? `${rel}/${name}` : name;
+    const stat = fs.statSync(abs);
+    if (stat.isDirectory()) {
+      if (HTML_SKIP_DIRS.has(name)) {
+        continue;
+      }
+      collectHtmlFiles(abs, files, relPath);
+    } else if (name.endsWith(".html")) {
+      if (relPath.startsWith(".well-known/")) {
+        continue;
+      }
+      files.push(relPath);
+    }
+  }
+  return files;
+}
+
+function uploadHtmlFiles(config, target, { dryRun, cacheControl }) {
+  const files = collectHtmlFiles(ROOT);
+  for (const rel of files) {
+    const args = [
+      "s3",
+      "cp",
+      path.join(ROOT, rel),
+      `s3://${target.bucket}/${rel}`,
+      "--cache-control",
+      cacheControl,
+      "--content-type",
+      "text/html",
+    ];
+    if (dryRun) {
+      args.push("--dryrun");
+    }
+    run("aws", [...awsBaseArgs(config), ...args]);
+  }
+}
+
+function syncToS3(config, target, { dryRun, cacheControl }) {
   const args = [
     "s3",
     "sync",
@@ -80,13 +122,10 @@ function syncToS3(config, target, { dryRun, htmlOnly, cacheControl }) {
     ...excludeArgs(target.preserveWellKnown ? [".well-known/*"] : []),
     "--cache-control",
     cacheControl,
+    "--exclude",
+    "*.html",
+    "--delete",
   ];
-
-  if (htmlOnly) {
-    args.push("--include", "*.html", "--exclude", "*");
-  } else {
-    args.push("--exclude", "*.html", "--delete");
-  }
 
   if (dryRun) {
     args.push("--dryrun");
@@ -151,14 +190,12 @@ function main() {
   console.log(`\nSyncing assets (cache-control: ${config.cacheControl.assets}) ...`);
   syncToS3(config, target, {
     dryRun,
-    htmlOnly: false,
     cacheControl: config.cacheControl.assets,
   });
 
-  console.log(`\nSyncing HTML (cache-control: ${config.cacheControl.html}) ...`);
-  syncToS3(config, target, {
+  console.log(`\nUploading HTML (cache-control: ${config.cacheControl.html}) ...`);
+  uploadHtmlFiles(config, target, {
     dryRun,
-    htmlOnly: true,
     cacheControl: config.cacheControl.html,
   });
 
