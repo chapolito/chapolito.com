@@ -211,7 +211,6 @@ export function createTextureManager(cornerRadius = 8) {
   let videoSlotsDirty = true;
   let rebuildRaf = 0;
   let pendingRebuild = null;
-  let onFrameCallback = null;
 
   function ensureVideoTexture(cell) {
     if (!isVideoReady(cell.video)) return null;
@@ -265,10 +264,14 @@ export function createTextureManager(cornerRadius = 8) {
   function rebuildStaticNow(layout, dpr, cellSlots = lastCellSlots) {
     const w = Math.max(1, Math.floor(layout.width * dpr));
     const h = Math.max(1, Math.floor(layout.height * dpr));
-    canvas.width = w;
-    canvas.height = h;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, layout.width, layout.height);
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w;
+      canvas.height = h;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    } else {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, layout.width, layout.height);
+    }
 
     layout.cells.forEach((cell) => {
       drawStaticCell(ctx, cell, radius, cellSlots);
@@ -290,40 +293,11 @@ export function createTextureManager(cornerRadius = 8) {
     });
   }
 
-  function bindVideoFrameWatchers(cells, cellSlots, onFrame) {
-    frameUnwatchers.forEach((stop) => stop());
-    frameUnwatchers.length = 0;
-    onFrameCallback = onFrame;
-
-    cells
-      .filter((cell) => cell.hasVideo && cell.video && cellSlots[cell.index] >= 0)
-      .forEach((cell) => {
-        const video = cell.video;
-
-        if (typeof video.requestVideoFrameCallback === "function") {
-          let active = true;
-          const loop = () => {
-            if (!active) return;
-            onFrame();
-            video.requestVideoFrameCallback(loop);
-          };
-          video.requestVideoFrameCallback(loop);
-          frameUnwatchers.push(() => {
-            active = false;
-          });
-          return;
-        }
-
-        const handler = () => onFrame();
-        video.addEventListener("timeupdate", handler);
-        frameUnwatchers.push(() => video.removeEventListener("timeupdate", handler));
-      });
+  function bindVideoFrameWatchers() {
+    // Video redraws are driven by the main tick loop in index.js.
   }
 
-  function rebindVideoFrameWatchers(cells) {
-    if (!onFrameCallback) return;
-    bindVideoFrameWatchers(cells, lastCellSlots, onFrameCallback);
-  }
+  function rebindVideoFrameWatchers() {}
 
   return {
     canvas,

@@ -10,7 +10,7 @@ import {
   isFieldMorphing,
   isDimMorphing
 } from "./field.js";
-import { createTextureManager } from "./textures.js";
+import { createTextureManager, isVideoReady } from "./textures.js";
 import { createSurface } from "./surface.js";
 import { initParams } from "./dialkit.js";
 import { createCustomCursor } from "./cursor.js";
@@ -73,11 +73,14 @@ function syncLabelOpacity(layout, field) {
     const dim = field.cellDimAmounts[cell.index] ?? 0;
     // Cut the low-opacity tail so blurred text doesn't linger as a smear.
     const opacity = dim < 0.04 ? 0 : dim;
-    cell.el.style.setProperty("--bento-label-opacity", String(opacity));
-    cell.el.style.setProperty(
-      "--bento-label-blur",
-      opacity <= 0 ? "0px" : `${Math.min(5, (1 - dim) * 5)}px`
-    );
+    const blur = opacity <= 0 ? 0 : Math.min(5, (1 - dim) * 5);
+    const prevOpacity = cell.el.style.getPropertyValue("--bento-label-opacity");
+    const prevBlur = cell.el.style.getPropertyValue("--bento-label-blur");
+    const nextOpacity = String(opacity);
+    const nextBlur = `${blur}px`;
+    if (prevOpacity === nextOpacity && prevBlur === nextBlur) return;
+    cell.el.style.setProperty("--bento-label-opacity", nextOpacity);
+    cell.el.style.setProperty("--bento-label-blur", nextBlur);
   });
 }
 
@@ -224,6 +227,11 @@ export function initBentoBulge(options = {}) {
   let gridVisible = true;
   let cachedRect = null;
   let cachedRectTime = 0;
+  let lastPlaybackHitIndex = -1;
+  let lastDrawAt = 0;
+  let wasContinuous = false;
+
+  const MORPH_MAX_FPS = 60;
 
   function isSystemActive() {
     return running && tabVisible && (gridVisible || !readyFired);
@@ -242,9 +250,16 @@ export function initBentoBulge(options = {}) {
     cachedRect = null;
   }
 
-  function markDirty() {
+  function markDirty(options = {}) {
     if (!isSystemActive()) return;
-    if (needsRender) perf.recordCoalesce();
+    if (!options.force && readyFired && wantsContinuousRender()) {
+      perf.recordCoalesce();
+      return;
+    }
+    if (needsRender) {
+      perf.recordCoalesce();
+      return;
+    }
     needsRender = true;
     perf.recordDirty();
     scheduleFrame();
@@ -261,17 +276,10 @@ export function initBentoBulge(options = {}) {
     if (overlayOpen) {
       return (
         isFieldMorphing(field) ||
-        field.bulgeAmount > 0.01 ||
-        field.projectStrength > 0.01 ||
         Math.abs(field.overlayDim - field.targetOverlayDim) > 0.008
       );
     }
-    return (
-      isFieldMorphing(field) ||
-      isDimMorphing(field) ||
-      field.bulgeAmount > 0.01 ||
-      field.projectStrength > 0.01
-    );
+    return isFieldMorphing(field) || isDimMorphing(field);
   }
 
   function pauseGridVideos() {
@@ -280,30 +288,78 @@ export function initBentoBulge(options = {}) {
     });
   }
 
+  const IDLE_VIDEO_MS = 1000 / 24;
+  let videoLoopTimer = 0;
+
+  function stopVideoLoop() {
+    if (videoLoopTimer) {
+      clearTimeout(videoLoopTimer);
+      videoLoopTimer = 0;
+    }
+  }
+
+  function scheduleVideoLoop() {
+    if (videoLoopTimer || !hasPlayingVideos() || wantsContinuousRender()) return;
+    videoLoopTimer = window.setTimeout(() => {
+      videoLoopTimer = 0;
+      if (!running || !isSystemActive() || !hasPlayingVideos() || wantsContinuousRender()) return;
+      needsRender = true;
+      scheduleFrame();
+      scheduleVideoLoop();
+    }, IDLE_VIDEO_MS);
+  }
+
+  function syncVideoLoop() {
+    if (!hasPlayingVideos() || wantsContinuousRender()) {
+      stopVideoLoop();
+      return;
+    }
+    scheduleVideoLoop();
+  }
+
+  function hasPlayingVideos() {
+    if (!params.enableVideos || overlayOpen) return false;
+    return layout.cells.some((cell) => cell.hasVideo && cell.video && !cell.video.paused);
+  }
+
   function syncVideoPlayback(activeHit = activeCellData) {
     if (!params.enableVideos) return;
 
     if (overlayOpen) {
       pauseGridVideos();
+      lastPlaybackHitIndex = -1;
       return;
     }
+
+    const hitIndex = activeHit?.index ?? -1;
+    let playbackChanged = hitIndex !== lastPlaybackHitIndex;
 
     layout.cells.forEach((cell) => {
       if (!cell.video) return;
 
       if (!params.pauseIdleVideos) {
-        if (cell.video.paused) cell.video.play().catch(() => {});
+        if (cell.video.paused) {
+          cell.video.play().catch(() => {});
+          playbackChanged = true;
+        }
         return;
       }
 
       const isActive = activeHit && cell.index === activeHit.index;
       if (isActive) {
-        if (cell.video.paused) cell.video.play().catch(() => {});
+        if (cell.video.paused) {
+          cell.video.play().catch(() => {});
+          playbackChanged = true;
+        }
       } else if (!cell.video.paused) {
         cell.video.pause();
+        playbackChanged = true;
       }
     });
-    markDirty();
+
+    lastPlaybackHitIndex = hitIndex;
+    if (playbackChanged) markDirty();
+    syncVideoLoop();
   }
 
   function performHandoff() {
@@ -315,8 +371,9 @@ export function initBentoBulge(options = {}) {
   }
 
   function syncVideoMedia() {
-    syncVideoPlayback(null);
     if (overlayOpen) return;
+
+    const prevSlots = textureManager.getVideoState()?.cellSlots;
     textureManager.markVideoSlotsDirty();
     const videoState = textureManager.syncVideoSlotsAndAtlas(
       layout,
@@ -324,8 +381,17 @@ export function initBentoBulge(options = {}) {
       params.enableVideos,
       maxVideos()
     );
+    const slotsChanged =
+      !prevSlots || videoState.cellSlots.some((slot, i) => slot !== prevSlots[i]);
+    if (!slotsChanged) {
+      syncVideoLoop();
+      return;
+    }
+
+    syncVideoPlayback();
     surface.updateVideoSlots(videoState);
-    markDirty();
+    markDirty({ force: true });
+    syncVideoLoop();
   }
 
   let syncVideoMediaRaf = 0;
@@ -375,6 +441,7 @@ export function initBentoBulge(options = {}) {
     const frameMs = performance.now() - frameStart;
     perf.recordRender(frameMs);
     perf.update({
+      mode: wantsContinuousRender() ? "morph" : "idle",
       videos: layout.cells.filter((c) => c.hasVideo && c.video && !c.video.paused).length,
       slots: textureManager.getSlotCount()
     });
@@ -383,6 +450,7 @@ export function initBentoBulge(options = {}) {
       slowFrames += 1;
       if (slowFrames >= 3 && params.maxConcurrentVideoTextures > 2) {
         params.maxConcurrentVideoTextures = Math.max(2, params.maxConcurrentVideoTextures - 1);
+        textureManager.markVideoSlotsDirty();
         slowFrames = 0;
       }
     } else {
@@ -403,14 +471,33 @@ export function initBentoBulge(options = {}) {
     syncLabelOpacity(layout, field);
 
     const continuous = wantsContinuousRender();
+    if (wasContinuous && !continuous) needsRender = true;
+    wasContinuous = continuous;
+
     const shouldDraw = continuous || needsRender;
-    if (!shouldDraw) return;
+    if (!shouldDraw) {
+      if (!continuous) syncVideoLoop();
+      return;
+    }
+
+    const morphThrottle =
+      continuous && MORPH_MAX_FPS > 0 && !needsRender;
+    const minDrawInterval = morphThrottle ? 1000 / MORPH_MAX_FPS : 0;
+    if (morphThrottle && now - lastDrawAt < minDrawInterval) {
+      stopVideoLoop();
+      scheduleFrame();
+      return;
+    }
 
     drawFrame();
+    lastDrawAt = now;
     needsRender = false;
 
     if (continuous) {
+      stopVideoLoop();
       scheduleFrame();
+    } else {
+      syncVideoLoop();
     }
   }
 
@@ -504,16 +591,19 @@ export function initBentoBulge(options = {}) {
     const hit = cellAtPoint(layout.cells, containerRect, event.clientX, event.clientY);
 
     if (!inside || !hit) {
-      activeCellData = null;
-      syncHoveredTileClass(null);
-      syncVideoPlayback(null);
-      setCellTarget(field, null, params, layout);
+      if (activeCellData !== null) {
+        activeCellData = null;
+        syncHoveredTileClass(null);
+        syncVideoPlayback(null);
+        setCellTarget(field, null, params, layout);
+      }
       return;
     }
 
+    const hitChanged = activeCellData?.index !== hit.index;
     activeCellData = hit;
     syncHoveredTileClass(hit);
-    syncVideoPlayback(hit);
+    if (hitChanged) syncVideoPlayback(hit);
     setCellTarget(field, hit, params, layout);
   }
 
@@ -531,15 +621,21 @@ export function initBentoBulge(options = {}) {
   function onPointerMoveWrapped(event) {
     if (overlayOpen) return;
     onPointerMove(event);
+    if (wantsContinuousRender()) {
+      if (!rafScheduled) scheduleFrame();
+      return;
+    }
     markDirty();
-    scheduleFrame();
   }
 
   function onPointerLeaveWrapped(event) {
     if (overlayOpen) return;
     onPointerLeave(event);
+    if (wantsContinuousRender()) {
+      if (!rafScheduled) scheduleFrame();
+      return;
+    }
     markDirty();
-    scheduleFrame();
   }
 
   function onVisibilityChange() {
@@ -548,8 +644,10 @@ export function initBentoBulge(options = {}) {
       syncVideoPlayback();
       markDirty();
       scheduleFrame();
+      syncVideoLoop();
     } else {
       pauseGridVideos();
+      stopVideoLoop();
       rafScheduled = false;
     }
   }
@@ -576,15 +674,16 @@ export function initBentoBulge(options = {}) {
     if (!cell.video) return;
 
     const onVideoReady = () => {
+      if (cell.video.dataset.bentoBulgeMediaReady === "true") return;
+      if (!isVideoReady(cell.video)) return;
+      cell.video.dataset.bentoBulgeMediaReady = "true";
       textureManager.markVideoSlotsDirty();
       scheduleSyncVideoMedia();
     };
-    cell.video.addEventListener("loadeddata", onVideoReady);
-    cell.video.addEventListener("canplay", onVideoReady);
-    cell.video.addEventListener("playing", onVideoReady);
+    cell.video.addEventListener("loadeddata", onVideoReady, { once: true });
+    cell.video.addEventListener("canplay", onVideoReady, { once: true });
+    if (isVideoReady(cell.video)) onVideoReady();
   });
-
-  textureManager.bindVideoFrameWatchers(layout.cells, initialVideoState.cellSlots, markDirty);
 
   document.addEventListener("pointermove", onPointerMoveWrapped, { passive: true });
   document.documentElement.addEventListener("mouseleave", onPointerLeaveWrapped);
@@ -599,8 +698,10 @@ export function initBentoBulge(options = {}) {
         scheduleSyncVideoMedia();
         markDirty();
         scheduleFrame();
+        syncVideoLoop();
       } else {
         pauseGridVideos();
+        stopVideoLoop();
         rafScheduled = false;
       }
     },
@@ -638,6 +739,7 @@ export function initBentoBulge(options = {}) {
     clearTimeout(resizeTimer);
     clearTimeout(clearHoverTimer);
     if (syncVideoMediaRaf) cancelAnimationFrame(syncVideoMediaRaf);
+    stopVideoLoop();
     clearDomLayers(layout);
     textureManager.dispose();
     surface.dispose();
@@ -664,6 +766,7 @@ export function initBentoBulge(options = {}) {
   finishBootRender();
   needsRender = true;
   scheduleFrame();
+  syncVideoLoop();
 
   instance = api;
   window.BentoBulge = api;
