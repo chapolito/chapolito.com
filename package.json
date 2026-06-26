@@ -4,6 +4,8 @@
   "type": "module",
   "scripts": {
     "generate:home-routes": "node scripts/generate-home-routes.cjs",
+    "apply:s3-redirects": "node scripts/apply-s3-website-config.cjs",
+    "apply:cloudfront-redirects": "node scripts/apply-cloudfront-redirects.cjs",
     "vendor:three": "cp node_modules/three/build/three.core.min.js node_modules/three/build/three.module.min.js javascripts/vendor/",
     "start": "node scripts/generate-home-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
     "serve": "npm run start"

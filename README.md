@@ -63,6 +63,28 @@ Sync the site root to your bucket (adjust bucket name and profile):
 aws s3 sync . s3://your-bucket-name/ --exclude ".git/*" --exclude "scripts/*" --exclude "README.md"
 ```
 
+### Legacy URL redirects
+
+Removed sections (`/free-design-resources/`, old `/portal/`, `/horizon/`, etc.) should 301 to home so bookmarks and search results do not 404.
+
+**If the site is behind CloudFront** (typical for `https://chapolito.com`), use a CloudFront Function — S3 routing rules are ignored when the origin is the S3 REST API endpoint:
+
+```bash
+aws login   # refresh credentials if needed
+node scripts/apply-cloudfront-redirects.cjs
+# optional: attach to your distribution in one step
+CLOUDFRONT_DISTRIBUTION_ID=E123EXAMPLE node scripts/apply-cloudfront-redirects.cjs
+```
+
+**If you serve directly from the S3 static website endpoint**, apply bucket routing rules instead:
+
+```bash
+aws login
+S3_BUCKET=www.chapolito.com npm run apply:s3-redirects
+```
+
+Config lives in `scripts/s3-website-config.json` and `scripts/cloudfront-legacy-redirects.js`. Live routes (`/portal-voice/`, `/horizon-chat/`, `/quest-people/`, etc.) are excluded from redirects.
+
 ## Maintenance notes
 
 This tree was exported from a [Middleman](https://middlemanapp.com/) build. Fingerprints like `all-26efebbe.css` were stripped so filenames are stable for editing in Cursor. The cleanup script lives at `scripts/cleanup-middleman-hashes.pl` if you need to re-run similar logic on a future S3 pull.
