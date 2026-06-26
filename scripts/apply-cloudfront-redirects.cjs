@@ -18,7 +18,7 @@ const path = require("node:path");
 const functionName = process.env.CLOUDFRONT_FUNCTION_NAME || "chapolito-legacy-redirects";
 const distributionId = process.env.CLOUDFRONT_DISTRIBUTION_ID || "";
 const codePath = path.join(__dirname, "cloudfront-legacy-redirects.js");
-const code = fs.readFileSync(codePath, "utf8");
+const codeFileArg = `fileb://${codePath}`;
 
 function awsJson(args) {
   const out = execFileSync("aws", args, { encoding: "utf8" });
@@ -44,7 +44,7 @@ try {
     "--function-config",
     "Comment=301 legacy portfolio paths to home,Runtime=cloudfront-js-2.0",
     "--function-code",
-    code,
+    codeFileArg,
   ]);
   etag = updated.ETag;
 } catch (err) {
@@ -58,7 +58,7 @@ try {
     "--function-config",
     "Comment=301 legacy portfolio paths to home,Runtime=cloudfront-js-2.0",
     "--function-code",
-    code,
+    codeFileArg,
   ]);
   etag = created.ETag;
 }

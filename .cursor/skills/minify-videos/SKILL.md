@@ -4,12 +4,16 @@ description: >-
   Audit and re-encode MP4/WebM videos for chapolito.com with quality-preserving
   FFmpeg settings (tile vs detail presets). Use when the user asks to minify,
   compress, optimize, or shrink videos, create .tile.mp4 variants, reduce home
-  grid video payload, or re-encode case study media.
+  grid video payload, or re-encode case study media. For batch images + videos
+  together, use minify-assets instead.
+disable-model-invocation: true
 ---
 
 # Minify videos (chapolito.com)
 
 Re-encode portfolio videos for web delivery without the mushy look from aggressive compression. Prefer **automatic execution** with these defaults — only spin up a side-by-side review page when the user asks to preview first.
+
+For **images + videos in one pass**, use the personal [minify-assets](file:///Users/jessechapo/.agents/skills/minify-assets/SKILL.md) skill (`npm run minify:assets`).
 
 ## Prerequisites
 
@@ -27,7 +31,7 @@ Re-encode portfolio videos for web delivery without the mushy look from aggressi
 
 **Detail** when: `projects.js` `detail` sections, legacy case study `<video>` tags, or any full-width in-page media.
 
-If a file is already at the target resolution, fps ≤ target, and under ~1 Mbps — **skip re-encoding**.
+If a file is already at the target resolution, fps ≤ target, and under ~1 Mbps — **skip re-encoding**. The [minify-assets](file:///Users/jessechapo/.agents/skills/minify-assets/SKILL.md) scripts enforce this via manifest + ffprobe.
 
 ## FFmpeg commands
 
@@ -115,11 +119,11 @@ Only when the user wants to compare before swapping:
 
 ## Helper script
 
-`scripts/minify-videos.sh` wraps the presets:
+Personal skill (works in any repo):
 
 ```bash
-scripts/minify-videos.sh tile  images/quest-vr/people-tab.mp4 images/quest-vr/people-tab.tile.mp4
-scripts/minify-videos.sh detail images/quest-vr/people-tab-loop.mp4
+~/.agents/skills/minify-assets/scripts/minify-videos.sh --root . tile  images/quest-vr/people-tab.mp4
+~/.agents/skills/minify-assets/scripts/minify-videos.sh --root . detail images/quest-vr/people-tab-loop.mp4
 ```
 
-See script for `tile` | `detail` usage and in-place output when output path is omitted.
+Or from chapolito.com: `npm run minify:videos` for all MP4s, or `npm run minify:assets` for images + videos.
