@@ -1,4 +1,4 @@
-// CloudFront Function (viewer-request) — 301 legacy paths to home.
+// CloudFront Function (viewer-request) - 301 legacy paths to home.
 // Prefixes use a trailing slash or exact match so live routes stay reachable
 // (e.g. /portal-voice/, /horizon-chat/, /life360-messaging/, /quest-people/).
 

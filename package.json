@@ -8,7 +8,11 @@
     "apply:cloudfront-redirects": "node scripts/apply-cloudfront-redirects.cjs",
     "vendor:three": "cp node_modules/three/build/three.core.min.js node_modules/three/build/three.module.min.js javascripts/vendor/",
     "start": "node scripts/generate-home-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
-    "serve": "npm run start"
+    "serve": "npm run start",
+    "minify:images": "bash scripts/minify-assets.sh --images-only",
+    "minify:videos": "bash scripts/minify-assets.sh --videos-only",
+    "minify:assets": "bash scripts/minify-assets.sh",
+    "minify:seed": "bash scripts/minify-seed-manifest.sh"
   },
   "dependencies": {
     "three": "^0.184.0"
