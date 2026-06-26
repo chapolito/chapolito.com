@@ -76,6 +76,12 @@ function syncLabelOpacity(layout, field) {
   });
 }
 
+function bootDomGridVideos(bento, cellOpts, params) {
+  if (!params.enableVideos) return;
+  const layout = measureCells(bento, 1, cellOpts);
+  promoteGridVideos(layout, params.pauseIdleVideos);
+}
+
 function promoteGridVideos(layout, pauseIdleVideos = false) {
   const cells = layout.cells
     .filter((cell) => cell.hasVideo && cell.video)
@@ -129,6 +135,7 @@ export function initBentoBulge(options = {}) {
   const capability = canUseWebGL();
   if (!capability.ok) {
     console.info("[bento-bulge] fallback:", capability.reason);
+    bootDomGridVideos(bento, cellOpts, params);
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
     const fallbackApi = {
       dispose: () => {
@@ -182,6 +189,7 @@ export function initBentoBulge(options = {}) {
     surface = createSurface(bento, layout, params, textureManager.texture, textureManager.emptyTexture);
   } catch (err) {
     console.error("[bento-bulge] WebGL surface failed:", err);
+    bootDomGridVideos(bento, cellOpts, params);
     initFallbackHover(bento, cellOpts.cellSelector, hoverClass);
     const failApi = {
       dispose: () => {

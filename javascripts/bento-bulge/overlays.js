@@ -140,10 +140,23 @@ export function initBentoBulgeOverlays(options = {}) {
     }, DOCK_EXIT_MS);
   }
 
-  function staggerSections() {
-    doc.querySelectorAll(".pj-sec").forEach((sec, i) => {
-      sec.style.setProperty("--reveal-i", String(i));
+  function staggerReveals(selector) {
+    doc.querySelectorAll(selector).forEach((el, i) => {
+      el.style.setProperty("--reveal-i", String(i));
     });
+  }
+
+  function setupReveals(selector, instant) {
+    staggerReveals(selector);
+    doc.querySelectorAll(selector).forEach((n) => {
+      n.classList.add("reveal");
+      if (instant || coarsePointer || reduceMotion) n.classList.add("in");
+    });
+    if (!instant && !coarsePointer && !reduceMotion) {
+      requestAnimationFrame(() => {
+        window.initReveal(doc);
+      });
+    }
   }
 
   function startTilePress(tile, id) {
@@ -258,6 +271,11 @@ export function initBentoBulgeOverlays(options = {}) {
     panel.focus({ preventScroll: true });
   }
 
+  function focusProjectClose() {
+    if (coarsePointer) return;
+    closeBtn.focus({ preventScroll: true });
+  }
+
   function openOverlayCommon(instant, options = {}) {
     const isAbout = options.about === true;
     clearOpenPhaseTimer();
@@ -281,7 +299,7 @@ export function initBentoBulgeOverlays(options = {}) {
       onOpen(instant);
       if (!instant) {
         if (isAbout) focusAboutEntry();
-        else closeBtn.focus();
+        else focusProjectClose();
       }
       return;
     }
@@ -290,7 +308,7 @@ export function initBentoBulgeOverlays(options = {}) {
     startOpenTransition();
     if (!instant) {
       if (isAbout) focusAboutEntry();
-      else closeBtn.focus();
+      else focusProjectClose();
     }
   }
 
@@ -314,14 +332,11 @@ export function initBentoBulgeOverlays(options = {}) {
 
     window.renderProject(doc, p);
     doc.classList.add("detail-split");
-    staggerSections();
     reader.setAttribute("aria-label", "Project");
     openOverlayCommon(instant);
 
     if (instant) {
-      doc.querySelectorAll(".pj-sec").forEach((n) => {
-        n.classList.add("reveal", "in");
-      });
+      setupReveals(".pj-sec", true);
       window.initInview(doc);
       if (!skipPush) history.pushState({ id }, "", projectUrl(id));
       else history.replaceState({ id }, "", projectUrl(id));
@@ -330,14 +345,8 @@ export function initBentoBulgeOverlays(options = {}) {
       return;
     }
 
-    doc.querySelectorAll(".pj-sec").forEach((n) => {
-      n.classList.add("reveal");
-      if (coarsePointer || reduceMotion) n.classList.add("in");
-    });
+    setupReveals(".pj-sec", false);
     window.initInview(doc);
-    requestAnimationFrame(() => {
-      window.initReveal(doc);
-    });
 
     if (!skipPush) history.pushState({ id }, "", projectUrl(id));
     document.title = `${p.title} · Jesse O'Chapo`;
@@ -372,6 +381,7 @@ export function initBentoBulgeOverlays(options = {}) {
       document.body.classList.add("is-detail-open", "is-detail-enter");
 
       if (window.initInview) window.initInview(doc);
+      setupReveals(".about .reveal", false);
 
       if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
       else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
@@ -399,6 +409,7 @@ export function initBentoBulgeOverlays(options = {}) {
     openOverlayCommon(instant, { about: true });
 
     if (window.initInview) window.initInview(doc);
+    setupReveals(".about .reveal", instant);
 
     if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
     else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
@@ -437,8 +448,17 @@ export function initBentoBulgeOverlays(options = {}) {
 
   function onPointerUp(e) {
     if (!activePress) return;
-    if (e.target.closest && e.target.closest(".tile") === activePress.tile) {
-      activePress.tile.classList.remove("is-pressed");
+    const press = activePress;
+    if (e.target.closest && e.target.closest(".tile") === press.tile) {
+      press.tile.classList.remove("is-pressed");
+      window.BentoBulge?.setTilePress?.(press.tile, false);
+      activePress = null;
+      // Coarse pointer: open on release — startOpenTransition() before click
+      // disables grid pointer-events and suppresses the synthetic click on touch.
+      if (coarsePointer) {
+        open(press.id, false, press.tile);
+        return;
+      }
       startOpenTransition();
       return;
     }
@@ -448,6 +468,8 @@ export function initBentoBulgeOverlays(options = {}) {
   function onGridClick(e) {
     if (isOverlayActive()) return;
     if (e.defaultPrevented) return;
+    // Touch taps are handled in onPointerUp; keep click for mouse + reduced-motion touch.
+    if (coarsePointer && !reduceMotion) return;
     const tile = e.target.closest && e.target.closest(".tile");
     if (!tile || !grid.contains(tile)) return;
     const id = tile.dataset.id;
