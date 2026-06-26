@@ -4,65 +4,58 @@ globs: "{**/*.html,stylesheets/**/*.css}"
 alwaysApply: false
 ---
 
-# Chapolito layout (HTML + stylesheets/all.css)
+# Chapolito layout (home + overlay case studies)
 
-Use the site's existing layout system. Do not introduce Tailwind, a second global stylesheet, or CSS Grid as the primary page grid.
+Use the site's existing layout system. Do not introduce Tailwind, a CSS build step, or a second global stylesheet for the home page.
 
-## Page shell
-
-```html
-<div id='main'>
-  <div class='identifier-wrapper …'>
-    <header class='row'>…</header>
-    <main>…</main>
-    <footer class='row'>…</footer>
-  </div>
-</div>
-```
-
-Match a sibling page first (case study, `free-design-resources`, or home) before inventing structure.
-
-## Grid
-
-- Container: `.row` (flex, wrap)
-- Columns: `.col-{xs|sm|md|lg|xl}-{n}` and `.col-{bp}-offset-{n}` only if defined in `stylesheets/all.css` (~lines 218–613)
-- 26-column system; prefer existing column recipes over arbitrary widths or flex hacks
-
-**Canonical content column** (case studies, resources):
+## Home page shell
 
 ```html
-<div class='row'>
-  <div class='col-xs-offset-2 col-xs-22 col-sm-offset-4 col-sm-18 col-md-offset-6 col-md-14 col-lg-offset-7 col-lg-12'>
-    …
-  </div>
+<div class="stage" id="stage">
+  <section class="home-portfolio" id="portfolio">
+    <main class="grid grid--bulge" id="grid"></main>
+  </section>
 </div>
+<aside class="dock">…</aside>
+<aside class="reader" id="reader">…</aside>
 ```
 
-## Breakpoints (grid class prefixes)
+Match `index.html` and sibling generated routes (`/{project-id}/`, `/about/`) before inventing structure.
 
-| Prefix | `min-width` | ~px at 16px root |
-|--------|-------------|------------------|
-| xs | default | all viewports |
-| sm | 48em | 768px |
-| md | 62em | 992px |
-| lg | 75em | 1200px |
-| xl | 96em | 1536px |
+## Stylesheets
 
-- **HTML layout:** use `col-{xs|sm|md|lg|xl}-*` — do not assume Bootstrap breakpoints (`xl` here is 96em, not 1200px).
-- **New `@media` in `all.css`:** prefer these `em` values when adding layout queries.
-- Many case-study blocks also use `px` (`768px`, `992px`, `1200px`, etc.). When editing those sections, match surrounding units; do not convert the whole file in a small change.
+| Area | Sheets |
+|------|--------|
+| Home grid + dock | `tokens.css`, `home.css`, `bento-bulge.css`, `dock.css` |
+| Overlay reader / case studies | `project.css`, `detail-view.css` (+ home sheets above) |
+| About overlay | `about.css` (+ home sheets above) |
+
+Case study content is rendered into `.reader` from `javascripts/projects.js` — not standalone HTML pages.
+
+## Grid (home bento)
+
+- Container: `.grid.grid--bulge` inside `.home-portfolio`
+- Tile placement: `data-id` selectors in `bento-bulge.css` / `home.css`
+- Spacing tokens: `--pad`, `--dock-h`, `--overlay-content-top` in `tokens.css` / `detail-view.css`
+
+## Breakpoints (common in modular sheets)
+
+| Query | Typical use |
+|-------|-------------|
+| `600px` | Mobile single-column bento |
+| `768px` | Tablet / about inline layout |
+| `900px` | Detail split stack |
+| `1200px` | Desktop artboard insets |
+
+When editing, match surrounding units in the file you are changing.
 
 ## When classes are not enough
 
-- Add scoped rules in `all.css` under `.identifier-wrapper` / page classes (e.g. `.horizon-page__title`), BEM-like naming.
-- Use vertical rhythm from existing typography (`1.75rem` line-height, `7rem` section spacing) instead of magic pixel margins.
+- Add scoped rules in the relevant modular sheet (`home.css`, `bento-bulge.css`, `detail-view.css`, `about.css`).
+- Use existing tokens (`--pad`, type scales in `tokens.css`) instead of magic pixel margins.
 
 ## Avoid
 
 - Inline `style` for layout/spacing
-- Ad-hoc `display:flex` / percentage widths where grid classes exist
-- Reading all of `all.css` when grep + a sibling page + lines ~218–613 suffice
-
-**Good:** `.row` + standard content column classes above.
-
-**Bad:** `<div style="display:flex; gap:20px">` or `width: 65%` without grid classes.
+- A new global stylesheet for the home page
+- Reading entire stylesheets when grep + a sibling section suffices
