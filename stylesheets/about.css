@@ -11,7 +11,7 @@
 .about-page.about-overlay {
   min-height: 0;
   width: 100%;
-  padding: var(--pad) var(--pad) var(--dock-h);
+  padding: var(--overlay-content-top) var(--pad) var(--dock-h);
   box-sizing: border-box;
 }
 
@@ -33,6 +33,7 @@
   --about-bio-collage-gap: clamp(24px, 4vw, 48px);
   --about-radius: 48px;
   --about-photo-stroke: rgba(255, 255, 255, 0.1);
+  --about-photo-stroke-width: 1px;
   --about-photo-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
   --about-card-shadow: 0 0 74px rgba(255, 255, 255, 0.06);
   --about-career-glow: 74px;
@@ -42,13 +43,19 @@
 }
 
 .about-page.about-overlay .about {
-  opacity: 0;
-  transform: translateY(10px);
-  filter: blur(5px);
+  margin: 0 auto;
 }
 
-.about-page.about-overlay.is-revealed .about,
-.about-page.about-overlay.is-instant .about {
+.about-page.about-overlay.is-revealed .about__hero-intro,
+.about-page.about-overlay.is-instant .about__hero-intro,
+body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
+  animation: none;
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+.about-page.about-overlay.is-instant .about .reveal {
   opacity: 1;
   transform: none;
   filter: none;
@@ -66,6 +73,10 @@
 
 .about__hero-intro {
   padding-top: var(--about-hero-intro-top);
+}
+
+.about-page.about-overlay .about__hero-intro {
+  padding-top: 0;
 }
 
 .about__hero-copy {
@@ -106,7 +117,7 @@
   z-index: 2;
   left: calc(960 / var(--about-artboard) * 100%);
   top: calc((146 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
-  width: calc(426 / var(--about-artboard) * 100%);
+  width: calc(424 / var(--about-artboard) * 100%);
   margin: 0;
   border-radius: 50%;
   overflow: hidden;
@@ -114,26 +125,40 @@
 }
 
 .about__portrait img {
+  position: relative;
+  z-index: 0;
   display: block;
   width: 100%;
   height: auto;
 }
 
-/* Photo Frame — Figma parent styling applied in CSS */
+/* Photo frame — radius, drop shadow/glow, and inset stroke in CSS (not baked into assets) */
 .about__photo-frame {
   overflow: hidden;
-  border: 0.555px solid var(--about-photo-stroke);
   border-radius: var(--about-radius);
   box-shadow: var(--about-photo-shadow);
 }
 
 .about__photo-frame--career {
-  border-width: 1px;
+  position: relative;
   box-shadow: var(--about-card-shadow);
+}
+
+.about__portrait::after,
+.about__photo-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 var(--about-photo-stroke-width) var(--about-photo-stroke);
+  pointer-events: none;
 }
 
 .about__photo-frame img,
 .about__moment-art img {
+  position: relative;
+  z-index: 0;
   display: block;
   width: 100%;
   height: 100%;
@@ -442,7 +467,7 @@
 
 /* ---- mobile ---- */
 @media (max-width: 767px) {
-  .about__hero-intro {
+  .about-page:not(.about-overlay) .about__hero-intro {
     padding-top: 8px;
     padding-left: 0;
   }
