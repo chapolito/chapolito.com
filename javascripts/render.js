@@ -84,7 +84,6 @@
     var head = el("header", "pj-head pj-bento__head");
     var copy = el("div", "pj-head__copy");
     copy.appendChild(el("h1", "pj-title t-display", p.title));
-    if (d.lede) copy.appendChild(el("p", "pj-lede", d.lede));
     head.appendChild(copy);
 
     var metaItems = [];
@@ -96,7 +95,7 @@
       var dl = el("dl", "pj-meta");
       metaItems.forEach(function (m) {
         var wrap = el("div", "pj-meta__item");
-        wrap.appendChild(el("dt", "pj-meta__k t-label is-caps", m.k));
+        wrap.appendChild(el("dt", "pj-meta__k t-label", m.k));
         wrap.appendChild(buildMetaValue(m, "pj-meta__v"));
         dl.appendChild(wrap);
       });
@@ -110,14 +109,13 @@
   function buildStoryHead(p, d) {
     var head = el("header", "pj-story__head");
     head.appendChild(el("h1", "pj-story__title t-display", p.title));
-    if (d.lede) head.appendChild(el("p", "pj-story__lede", d.lede));
 
     if (d.meta && d.meta.length) {
       head.appendChild(el("div", "pj-story__rule", ""));
       var meta = el("dl", "pj-story__meta");
       d.meta.forEach(function (m) {
         var item = el("div", "pj-story__meta-item");
-        item.appendChild(el("dt", "pj-story__meta-k t-label is-caps", m.k));
+        item.appendChild(el("dt", "pj-story__meta-k t-label", m.k));
         item.appendChild(buildMetaValue(m, "pj-story__meta-v"));
         meta.appendChild(item);
       });
@@ -138,10 +136,9 @@
 
   function buildStorySection(s) {
     var sec = el("section", "pj-story__section pj-sec reveal");
-    if (s.title || s.intro) {
+    if (s.title) {
       var copy = el("div", "pj-story__section-head");
-      if (s.title) copy.appendChild(el("h2", "pj-story__section-title t-display", s.title));
-      if (s.intro) copy.appendChild(el("p", "pj-story__section-intro", s.intro));
+      copy.appendChild(el("h2", "pj-story__section-title t-display", s.title));
       sec.appendChild(copy);
     }
 
@@ -217,6 +214,14 @@
     if (d.storyColumn === "992") story.classList.add("pj-story--col-992");
     story.appendChild(buildStoryHead(p, d));
     if (d.hero) story.appendChild(buildStoryHero(d.hero));
+    if (d.body) {
+      var leadBody = el("div", "pj-story__body pj-sec reveal");
+      var leadParagraphs = Array.isArray(d.body) ? d.body : [d.body];
+      leadParagraphs.forEach(function (text) {
+        leadBody.appendChild(el("p", "pj-story__body-p", text));
+      });
+      story.appendChild(leadBody);
+    }
     if (d.footnote) story.appendChild(buildStoryFootnote(d.footnote));
     (d.sections || []).forEach(function (s) {
       story.appendChild(buildStorySection(s));
@@ -239,11 +244,10 @@
 
     (d.sections || []).forEach(function (s) {
       var sec = el("section", "pj-sec pj-bento__sec");
-      if (s.title || s.body || s.kicker) {
+      if (s.title || s.kicker) {
         var sh = el("div", "pj-sechead");
         if (s.kicker) sh.appendChild(el("span", "pj-kicker t-grad", s.kicker));
         if (s.title) sh.appendChild(el("h2", "pj-sectitle t-display", s.title));
-        if (s.body) sh.appendChild(el("p", "pj-body", s.body));
         sec.appendChild(sh);
       }
       var grid = el("div", "pj-grid pj-grid--" + (s.layout || "full"));
@@ -251,6 +255,7 @@
         grid.appendChild(media(m));
       });
       sec.appendChild(grid);
+      if (s.body) sec.appendChild(el("p", "pj-body", s.body));
       bento.appendChild(sec);
     });
 

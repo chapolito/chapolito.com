@@ -41,14 +41,21 @@
   padding-top: clamp(14px, 1.8vw, 22px);
   border-top: 1px solid var(--line);
 }
-.pj-meta__item { display: grid; gap: 5px; }
-.pj-meta__k {
+.pj-meta__item { display: grid; gap: 0; }
+.pj-meta__k,
+.pj-story__meta-k {
   margin: 0;
+  font-style: italic;
   font-weight: 700;
+  letter-spacing: 0;
+  text-transform: lowercase;
   color: var(--pj-text-tertiary);
 }
 .pj-doc .pj-meta__k.t-label {
   color: var(--pj-text-tertiary);
+}
+.pj-doc .pj-story__meta-k.t-label {
+  color: rgba(255, 255, 255, 0.4);
 }
 .pj-meta__v {
   margin: 0;

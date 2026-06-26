@@ -187,7 +187,7 @@ body.is-home.is-home-enter .stage {
     filter var(--d-2) var(--e-out);
 }
 .tile__product {
-  margin: 0 0 5px;
+  margin: 0 0 2px;
   font-family: var(--font-mono);
   font-weight: 700;
   font-size: 0.72rem;
