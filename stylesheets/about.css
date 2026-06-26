@@ -32,6 +32,7 @@
   --about-bio-gap: 62px;
   --about-bio-collage-gap: clamp(24px, 4vw, 48px);
   --about-radius: 48px;
+  --about-photo-fill: #000;
   --about-photo-stroke: rgba(255, 255, 255, 0.1);
   --about-photo-stroke-width: 1px;
   --about-photo-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
@@ -119,6 +120,8 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
   top: calc((146 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(424 / var(--about-artboard) * 100%);
   margin: 0;
+  aspect-ratio: 1;
+  background-color: var(--about-photo-fill);
   border-radius: 50%;
   overflow: hidden;
   box-shadow: var(--about-photo-shadow);
@@ -135,6 +138,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 /* Photo frame — radius, drop shadow/glow, and inset stroke in CSS (not baked into assets) */
 .about__photo-frame {
   overflow: hidden;
+  background-color: var(--about-photo-fill);
   border-radius: var(--about-radius);
   box-shadow: var(--about-photo-shadow);
 }

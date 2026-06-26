@@ -12,7 +12,9 @@
     "minify:images": "bash scripts/minify-assets.sh --images-only",
     "minify:videos": "bash scripts/minify-assets.sh --videos-only",
     "minify:assets": "bash scripts/minify-assets.sh",
-    "minify:seed": "bash scripts/minify-seed-manifest.sh"
+    "minify:seed": "bash scripts/minify-seed-manifest.sh",
+    "deploy:staging": "node scripts/deploy.cjs staging",
+    "deploy:prod": "node scripts/deploy.cjs prod"
   },
   "dependencies": {
     "three": "^0.184.0"
