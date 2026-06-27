@@ -22,7 +22,7 @@ window.PROJECTS = [
       layout: "story",
       storyColumn: "992",
       lede:
-        "Quests are the best-selling VR devices ever. My focus was helping people communicate and play together.",
+        "Quests are the best-selling VR devices ever. My focus was helping people communicate and play together in VR. As part of a broader redesign of the VR OS in 2024, we created the Navigator: a single menu accessible from anywhere for apps, social, and settings. I developed the initial direction for the You and People tabs before handing off to senior designers to bring the experience across the finish line.",
       meta: [
         { k: "Project", brand: "meta", v: "Quest VR" },
         { k: "Role", v: "Product Designer" },
@@ -33,7 +33,7 @@ window.PROJECTS = [
         {
           title: "Navigator",
           intro:
-            "In 2024, we redesigned the VR OS and created the Navigator: a single menu, accessible from anywhere, for apps, social, and settings.",
+            "Quests are the best-selling VR devices ever. My focus was helping people communicate and play together in VR. As part of a broader redesign of the VR OS in 2024, we created the Navigator: a single menu accessible from anywhere for apps, social, and settings. I developed the initial direction for the You and People tabs before handing off to senior designers to bring the experience across the finish line.",
           mediaRows: [
             {
               layout: "full",
@@ -59,7 +59,6 @@ window.PROJECTS = [
             },
           ],
           body: [
-            "I developed the initial direction on both the You and People tabs before handing off to senior designers to bring across the finish line.",
             "This required coordinating across multiple teams to bring in their highest value features. The challenge was integrating complex systems without bloating the feature set.",
           ],
         },
@@ -80,8 +79,10 @@ window.PROJECTS = [
     detail: {
       layout: "story",
       storyColumn: "992",
-      lede:
-        "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication — text chat, voice, and emotes — including the in-game menu, and changed the default modality from voice to text.",
+      lede: [
+        "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication across text chat, voice, and emotes, including the in-game menu experience.",
+        "Communication in VR has to work while people are moving, playing, and present with others. We rebuilt text chat from the ground up and made it the calm default modality.",
+      ],
       meta: [
         { k: "Project", brand: "meta", v: "Horizon" },
         { k: "Role", v: "Design lead, guiding 3 designers" },
@@ -91,8 +92,10 @@ window.PROJECTS = [
       sections: [
         {
           title: "Voice → Text",
-          intro:
-            "Communication in VR has to work while you're moving, playing, and present with others. We rebuilt text chat completely and made it the calm default.",
+          intro: [
+            "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication across text chat, voice, and emotes, including the in-game menu experience.",
+            "Communication in VR has to work while people are moving, playing, and present with others. We rebuilt text chat from the ground up and made it the calm default modality.",
+          ],
           mediaRows: [
             {
               layout: "full",
@@ -143,6 +146,8 @@ window.PROJECTS = [
       storyColumn: "992",
       lede:
         "As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta.",
+      intro:
+        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta.",
       meta: [
         { k: "Project", brand: "meta", v: "Horizon" },
         { k: "Role", v: "Design lead, guiding 5 designers" },
@@ -175,7 +180,8 @@ window.PROJECTS = [
     detail: {
       layout: "story",
       storyColumn: "992",
-      lede: "I designed two apps: Facebook Live and Facebook Watch for Portal devices.",
+      lede:
+        "Portal owners loved making video calls and the ease of hands-free calling with Smart Camera — the AI-powered camera that kept everyone on screen. We wanted to bring that magic to more experiences, like going live on Facebook.",
       meta: [
         { k: "Project", brand: "meta", v: "Portal" },
         { k: "Role", v: "Product Designer" },
@@ -290,7 +296,7 @@ window.PROJECTS = [
       layout: "story",
       storyColumn: "992",
       lede:
-        "Household mode let parents restrict the contacts and apps anyone in the home could use on a shared Portal.",
+        "Household mode let parents restrict the contacts and apps anyone in the home could use on a shared Portal. The primary use case was for parents to set limits for kids — controlling who could be contacted and which apps were available on a device the whole family shared.",
       meta: [
         { k: "Project", brand: "meta", v: "Portal" },
         { k: "Role", v: "Product Designer" },
@@ -300,7 +306,7 @@ window.PROJECTS = [
       sections: [
         {
           intro:
-            "The primary use case was for parents to set limits for kids — controlling who could be contacted and which apps were available on a device the whole family shared.",
+            "Household mode let parents restrict the contacts and apps anyone in the home could use on a shared Portal. The primary use case was for parents to set limits for kids — controlling who could be contacted and which apps were available on a device the whole family shared.",
           mediaRows: [
             {
               layout: "full",
