@@ -27,9 +27,12 @@ function upsertMeta(selector, attrs) {
 
 export function projectMeta(project) {
   const lede = project.detail?.lede;
+  const description = Array.isArray(lede)
+    ? lede.join(" ")
+    : lede || `${project.title} — a case study by Product Designer Jesse O'Chapo.`;
   return {
     title: `${project.title} · Jesse O'Chapo`,
-    description: lede || `${project.title} — a case study by Product Designer Jesse O'Chapo.`,
+    description,
     url: `${SITE_ORIGIN}/${encodeURIComponent(project.id)}/`,
   };
 }

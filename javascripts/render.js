@@ -103,7 +103,23 @@
       head.appendChild(metaCol);
     }
 
+    if (d.lede) appendLedes(head, d.lede, "pj-lede");
+
     return head;
+  }
+
+  function appendLedes(parent, lede, className) {
+    var paragraphs = Array.isArray(lede) ? lede : [lede];
+    paragraphs.forEach(function (text) {
+      parent.appendChild(el("p", className, text));
+    });
+  }
+
+  function buildStorySectionHead(title, intro) {
+    var copy = el("div", "pj-story__section-head");
+    if (title) copy.appendChild(el("h2", "pj-story__section-title t-display", title));
+    if (intro) appendLedes(copy, intro, "pj-story__section-intro");
+    return copy;
   }
 
   function buildStoryHead(p, d) {
@@ -136,10 +152,8 @@
 
   function buildStorySection(s) {
     var sec = el("section", "pj-story__section pj-sec reveal");
-    if (s.title) {
-      var copy = el("div", "pj-story__section-head");
-      copy.appendChild(el("h2", "pj-story__section-title t-display", s.title));
-      sec.appendChild(copy);
+    if (s.title || s.intro) {
+      sec.appendChild(buildStorySectionHead(s.title, s.intro));
     }
 
     if (s.mediaRows && s.mediaRows.length) {
@@ -212,16 +226,14 @@
 
     var story = el("article", "pj-story");
     if (d.storyColumn === "992") story.classList.add("pj-story--col-992");
+    if (d.intro) story.classList.add("pj-story--lead");
     story.appendChild(buildStoryHead(p, d));
-    if (d.hero) story.appendChild(buildStoryHero(d.hero));
-    if (d.body) {
-      var leadBody = el("div", "pj-story__body pj-sec reveal");
-      var leadParagraphs = Array.isArray(d.body) ? d.body : [d.body];
-      leadParagraphs.forEach(function (text) {
-        leadBody.appendChild(el("p", "pj-story__body-p", text));
-      });
-      story.appendChild(leadBody);
+    if (d.intro) {
+      var lead = el("div", "pj-story__lead pj-sec reveal");
+      lead.appendChild(buildStorySectionHead(null, d.intro));
+      story.appendChild(lead);
     }
+    if (d.hero) story.appendChild(buildStoryHero(d.hero));
     if (d.footnote) story.appendChild(buildStoryFootnote(d.footnote));
     (d.sections || []).forEach(function (s) {
       story.appendChild(buildStorySection(s));
@@ -244,10 +256,11 @@
 
     (d.sections || []).forEach(function (s) {
       var sec = el("section", "pj-sec pj-bento__sec");
-      if (s.title || s.kicker) {
+      if (s.title || s.body || s.kicker) {
         var sh = el("div", "pj-sechead");
         if (s.kicker) sh.appendChild(el("span", "pj-kicker t-grad", s.kicker));
         if (s.title) sh.appendChild(el("h2", "pj-sectitle t-display", s.title));
+        if (s.body) sh.appendChild(el("p", "pj-body", s.body));
         sec.appendChild(sh);
       }
       var grid = el("div", "pj-grid pj-grid--" + (s.layout || "full"));
@@ -255,7 +268,6 @@
         grid.appendChild(media(m));
       });
       sec.appendChild(grid);
-      if (s.body) sec.appendChild(el("p", "pj-body", s.body));
       bento.appendChild(sec);
     });
 
