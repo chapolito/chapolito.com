@@ -1,10 +1,9 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&display=swap");
 @import "fonts.css";
 
 /* ------------------------------------------------------------------
    Chapolito 2026 — concept design tokens (v2)
    Pulled from the case-study deck:
-     · Type  — Neue Plak Wide Bold headlines + IBM Plex Mono
+     · Type  — Adieu headlines + IBM Plex Mono
      · Color — plum→black radial bg (rgb 42,33,48 → #000)
      · Accent gradient — light purple → light orange (deck section titles)
    Refined, understated, craft-forward. No cyan.
@@ -47,7 +46,7 @@
   --line-2: rgba(255, 255, 255, 0.16);
 
   /* type */
-  --font-display: "Neue Plak Wide", system-ui, sans-serif;
+  --font-display: "Adieu", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
 
   /* motion */
@@ -99,6 +98,48 @@ button { font: inherit; }
   line-height: 1.02;
 }
 .t-mono { font-family: var(--font-mono); font-weight: 600; }
+
+.ibm-plex-mono-regular {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-style: normal;
+}
+
+.ibm-plex-mono-medium {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-style: normal;
+}
+
+.ibm-plex-mono-semibold {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.ibm-plex-mono-bold {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-style: normal;
+}
+
+.ibm-plex-mono-regular-italic {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-style: italic;
+}
+
+.ibm-plex-mono-semibold-italic {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-style: italic;
+}
+
+.ibm-plex-mono-bold-italic {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-style: italic;
+}
 
 /* gradient text (light purple → light orange) — background spans text width only */
 .t-grad {
