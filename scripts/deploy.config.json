@@ -1,7 +1,7 @@
 {
   "region": "us-east-1",
   "cacheControl": {
-    "html": "no-cache",
+    "html": "no-cache, no-store, must-revalidate",
     "assets": "public, max-age=86400"
   },
   "targets": {
