@@ -26,6 +26,7 @@ const mime = {
   ".ico": "image/x-icon",
   ".woff": "font/woff",
   ".woff2": "font/woff2",
+  ".otf": "font/otf",
   ".ttf": "font/ttf",
   ".eot": "application/vnd.ms-fontobject",
   ".ai": "application/postscript",
