@@ -87,7 +87,7 @@ body.is-home-enter .grid .tile {
   box-sizing: border-box;
 }
 
-/* Header — copy left (title + lede), meta right */
+/* Header — title + meta row, lede below */
 .detail-split .pj-bento__head {
   position: relative;
   z-index: 1;
@@ -110,10 +110,15 @@ body.is-home-enter .grid .tile {
 }
 
 .detail-split .pj-bento__head .pj-lede {
-  margin: 0;
+  grid-column: 1 / -1;
+  margin: clamp(16px, 2vw, 28px) 0 0;
   max-width: 72ch;
   font-size: clamp(1.02rem, 1.55vw, 1.32rem);
   line-height: 1.58;
+}
+
+.detail-split .pj-bento__head .pj-lede + .pj-lede {
+  margin-top: clamp(12px, 1.25vw, 16px);
 }
 
 .detail-split .pj-head__meta {
@@ -486,6 +491,7 @@ body.is-detail-enter .detail-split .pj-bento__media,
 body.is-detail-enter .detail-split .pj-sec,
 body.is-detail-enter .detail-split .pj-cta,
 body.is-detail-enter .pj-doc--story .pj-story__head,
+body.is-detail-enter .pj-doc--story .pj-story__lead,
 body.is-detail-enter .pj-doc--story .pj-story__hero,
 body.is-detail-enter .pj-doc--story .pj-story__footnote,
 body.is-detail-enter .pj-doc--story .pj-story__section,
@@ -497,6 +503,7 @@ body.is-detail-closing .detail-split .pj-bento__media,
 body.is-detail-closing .detail-split .pj-sec,
 body.is-detail-closing .detail-split .pj-cta,
 body.is-detail-closing .pj-doc--story .pj-story__head,
+body.is-detail-closing .pj-doc--story .pj-story__lead,
 body.is-detail-closing .pj-doc--story .pj-story__hero,
 body.is-detail-closing .pj-doc--story .pj-story__footnote,
 body.is-detail-closing .pj-doc--story .pj-story__section,
@@ -651,7 +658,7 @@ body.is-detail-closing .detail-close {
 }
 
 .pj-story__title {
-  margin: 0 0 24px;
+  margin: 0 0 20px;
   font-size: clamp(1.8rem, 2.708vw, 3.25rem);
   line-height: calc(72 / 52);
   letter-spacing: 0;
@@ -664,13 +671,17 @@ body.is-detail-closing .detail-close {
 }
 
 .pj-story__lede {
-  margin: 0;
+  margin: clamp(24px, 2.5vw, 32px) 0 0;
   max-width: var(--pj-story-copy-max);
   font-family: var(--font-mono);
   font-size: clamp(1rem, 1.042vw, 1.125rem);
   font-weight: 500;
   line-height: calc(26 / 18);
   color: var(--pj-story-text-secondary);
+}
+
+.pj-story__lede + .pj-story__lede {
+  margin-top: clamp(12px, 1.25vw, 16px);
 }
 
 .pj-story__rule {
@@ -715,6 +726,14 @@ body.is-detail-closing .detail-close {
   margin-bottom: clamp(48px, 6vw, 80px);
 }
 
+.pj-story__lead {
+  margin-bottom: 0;
+}
+
+.pj-story__lead .pj-story__section-head {
+  margin-bottom: clamp(24px, 2.5vw, 32px);
+}
+
 .pj-story__section-head {
   padding: 0 var(--pad);
   padding-left: max(var(--pad), var(--pj-story-inset));
@@ -723,7 +742,7 @@ body.is-detail-closing .detail-close {
 }
 
 .pj-story__section-title {
-  margin: 0 0 clamp(16px, 1.5vw, 24px);
+  margin: 0 0 clamp(16px, 1.5vw, 20px);
   font-size: clamp(1.5rem, 1.95vw, 2.125rem);
   line-height: 1;
   letter-spacing: 0;
@@ -737,6 +756,18 @@ body.is-detail-closing .detail-close {
   font-weight: 500;
   line-height: calc(26 / 18);
   color: var(--pj-story-text-secondary);
+}
+
+.pj-story__section-intro + .pj-story__section-intro {
+  margin-top: clamp(12px, 1.25vw, 16px);
+}
+
+.pj-story__section-title:not(:last-child) {
+  margin-bottom: clamp(16px, 1.5vw, 20px);
+}
+
+.pj-story__section-title:last-child {
+  margin-bottom: 0;
 }
 
 .pj-story__media {
@@ -868,7 +899,19 @@ body.is-detail-closing .detail-close {
 
 .pj-story--col-992 .pj-story__head {
   padding-top: var(--overlay-content-top);
-  padding-bottom: 96px;
+  padding-bottom: clamp(32px, 4vw, 48px);
+}
+
+.pj-story--col-992.pj-story--lead .pj-story__head {
+  padding-bottom: 0;
+}
+
+.pj-story--col-992 .pj-story__lead .pj-story__section-head {
+  margin-top: clamp(16px, 2vw, 24px);
+  margin-bottom: clamp(24px, 2.5vw, 32px);
+  padding-left: 0;
+  padding-right: 0;
+  max-width: none;
 }
 
 .pj-story--col-992 .pj-story__section {
@@ -1008,6 +1051,8 @@ body.is-detail-enter .pj-doc--story.is-revealed .pj-story__head {
 
 .pj-doc--story.is-revealed .pj-story__hero.reveal,
 .pj-doc--story.is-instant .pj-story__hero.reveal,
+.pj-doc--story.is-revealed .pj-story__lead.reveal,
+.pj-doc--story.is-instant .pj-story__lead.reveal,
 .pj-doc--story.is-revealed .pj-story__footnote.reveal,
 .pj-doc--story.is-instant .pj-story__footnote.reveal,
 .pj-doc--story.is-revealed .pj-story__section.reveal,
@@ -1104,6 +1149,10 @@ body.is-detail-enter .pj-doc--story.is-revealed .pj-story__head {
 
   .pj-story--col-992 .pj-story__head {
     padding-bottom: 40px;
+  }
+
+  .pj-story--col-992.pj-story--lead .pj-story__head {
+    padding-bottom: 0;
   }
 
   .pj-story--col-992 .pj-story__section {
