@@ -18,6 +18,33 @@ export function parseCoverAlign(raw) {
   return { x, y };
 }
 
+function measureStatement(el) {
+  const wrap = el.querySelector(".tile__statement");
+  if (!wrap) return null;
+  const wrapStyle = getComputedStyle(wrap);
+  const lines = [...wrap.querySelectorAll(".tile__statement-line")].map((node) => {
+    const style = getComputedStyle(node);
+    const fontSize = parseFloat(style.fontSize) || 16;
+    const lineHeightRaw = parseFloat(style.lineHeight);
+    return {
+      text: node.textContent || "",
+      font: `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`,
+      color: style.color || "#ffffff",
+      letterSpacing: style.letterSpacing || "normal",
+      lineHeight: Number.isFinite(lineHeightRaw) ? lineHeightRaw : fontSize * 1.12,
+      maxWidth: parseFloat(style.maxWidth) || 0
+    };
+  });
+  return {
+    lines,
+    paddingTop: parseFloat(wrapStyle.paddingTop) || 0,
+    paddingRight: parseFloat(wrapStyle.paddingRight) || 0,
+    paddingBottom: parseFloat(wrapStyle.paddingBottom) || 0,
+    paddingLeft: parseFloat(wrapStyle.paddingLeft) || 0,
+    gap: parseFloat(wrapStyle.rowGap || wrapStyle.gap) || 0
+  };
+}
+
 export function measureCells(container, dpr, options = {}) {
   const cellSelector = options.cellSelector || ".tile";
   const imgSelector = options.imgSelector || ".tile__media img";
@@ -47,6 +74,7 @@ export function measureCells(container, dpr, options = {}) {
     const mediaFit = fit === "contain" || fit === "fill" ? fit : "cover";
     const fitHeight = mediaFit === "contain";
     const coverAnchor = parseCoverAlign(el.dataset.coverAlign);
+    const isStatement = el.dataset.static === "true" || el.classList.contains("tile--statement");
 
     return {
       el,
@@ -72,9 +100,12 @@ export function measureCells(container, dpr, options = {}) {
       coverAnchorX: coverAnchor.x,
       coverAnchorY: coverAnchor.y,
       insetShadow: el.dataset.insetShadow === "true",
+      isStatement,
+      statement: isStatement ? measureStatement(el) : null,
       img,
       video,
       veilFromTop:
+        el.dataset.id === "quest-people" ||
         el.dataset.id === "horizon-mobile" ||
         el.dataset.id === "portal-voice" ||
         el.dataset.id === "portal-household"

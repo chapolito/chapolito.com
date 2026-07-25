@@ -93,6 +93,7 @@ uniform float uCellVeilFromTop[${MAX_CELLS}];
 uniform float uCellCoverAnchorX[${MAX_CELLS}];
 uniform float uCellCoverAnchorY[${MAX_CELLS}];
 uniform float uCellInsetShadow[${MAX_CELLS}];
+uniform float uCellSolidFill[${MAX_CELLS}];
 uniform float uOverlayDim;
 
 varying vec2 vUv;
@@ -192,11 +193,24 @@ vec3 applyCellBorder(vec3 color, float edgeDistPx, float strength) {
   return mix(color, vec3(1.0), borderMix * 0.1 * strength);
 }
 
-vec3 applyInsetShadow(vec3 color, float edgeDistPx) {
-  // inset 0 0 90px 90px #222229 (2× Figma spec)
-  float insetReach = 180.0;
-  float vignette = smoothstep(0.0, insetReach, edgeDistPx);
-  vec3 shadow = vec3(0.133333, 0.133333, 0.160784);
+vec3 applyInsetShadow(vec3 color, vec2 local, vec4 rect) {
+  // Edge vignette scaled to cell size: strong enough on mobile tiles without
+  // collapsing to a peephole, capped on large desktop cells.
+  vec2 cellPx = max(rect.zw * uPlaneSize, vec2(1.0));
+  float minSide = min(cellPx.x, cellPx.y);
+  float insetReach = clamp(minSide * 0.28, 52.0, 120.0);
+  float cornerR = max(insetReach, uCornerRadius);
+  vec2 p = (local - 0.5) * cellPx;
+  vec2 halfSize = cellPx * 0.5;
+  float edgeDist = max(-sdRoundedBox(p, halfSize, cornerR), 0.0);
+  // On small tiles, hold the dark longer (higher opacity mid-ring).
+  float smallBoost = 1.0 - smoothstep(260.0, 520.0, minSide);
+  float vignette = pow(smoothstep(0.0, insetReach, edgeDist), mix(1.0, 1.55, smallBoost));
+  vec3 shadow = mix(
+    vec3(0.133333, 0.133333, 0.160784), // #222229 desktop
+    vec3(0.08, 0.08, 0.10),             // denser on mobile
+    smallBoost
+  );
   return mix(shadow, color, vignette);
 }
 
@@ -235,6 +249,12 @@ void main() {
       color = sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0));
     }
     alpha = 1.0;
+  } else if (idx >= 0 && uCellSolidFill[idx] > 0.5) {
+    // Statement tiles — solid fill in-shader; atlas carries type only.
+    vec3 solid = vec3(0.133333, 0.133333, 0.160784); // #222229
+    vec4 atlasSample = texture2D(uAtlas, uv);
+    color = mix(solid, atlasSample.rgb, atlasSample.a);
+    alpha = 1.0;
   } else {
     vec4 atlasSample = texture2D(uAtlas, uv);
     color = atlasSample.rgb;
@@ -247,18 +267,23 @@ void main() {
     float cellDist = cellRoundedDist(uv, rect);
     float edgeDistPx = distToEdgePx(cellDist);
 
-    if (uCellVideoSlot[idx] >= 0.0) {
+    if (uCellVideoSlot[idx] >= 0.0 || uCellSolidFill[idx] > 0.5) {
       alpha *= cellShapeAlpha(cellDist);
     }
 
-    float veilStrength = vBulgeAmount > 0.001 ? uCellDimAmount[idx] : 0.0;
+    // Skip legibility veil on statement tiles — no label over video.
+    float veilStrength =
+      vBulgeAmount > 0.001 && uCellSolidFill[idx] < 0.5
+        ? uCellDimAmount[idx]
+        : 0.0;
     color = applyLegibilityVeil(color, local, veilStrength, uCellVeilFromTop[idx]);
-    if (uCellInsetShadow[idx] > 0.5) {
-      color = applyInsetShadow(color, edgeDistPx);
-    }
     float borderStrength = 1.0 - uPressExtraDim;
-    if (borderStrength > 0.001) {
+    // Skip hairline on inset-vignette tiles — against solid edge fill it reads as a sharp glow.
+    if (borderStrength > 0.001 && uCellInsetShadow[idx] < 0.5) {
       color = applyCellBorder(color, edgeDistPx, borderStrength);
+    }
+    if (uCellInsetShadow[idx] > 0.5) {
+      color = applyInsetShadow(color, local, rect);
     }
   }
 

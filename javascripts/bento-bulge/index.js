@@ -64,6 +64,7 @@ function clearDomLayers(layout) {
     cell.el.style.opacity = "";
     cell.el.style.removeProperty("--bento-label-opacity");
     cell.el.style.removeProperty("--bento-label-blur");
+    cell.el.style.removeProperty("--bento-statement-opacity");
     cell.el.classList.remove("is-bulge-dom-hidden");
   });
 }
@@ -78,9 +79,18 @@ function syncLabelOpacity(layout, field) {
     const prevBlur = cell.el.style.getPropertyValue("--bento-label-blur");
     const nextOpacity = String(opacity);
     const nextBlur = `${blur}px`;
-    if (prevOpacity === nextOpacity && prevBlur === nextBlur) return;
-    cell.el.style.setProperty("--bento-label-opacity", nextOpacity);
-    cell.el.style.setProperty("--bento-label-blur", nextBlur);
+    if (prevOpacity !== nextOpacity || prevBlur !== nextBlur) {
+      cell.el.style.setProperty("--bento-label-opacity", nextOpacity);
+      cell.el.style.setProperty("--bento-label-blur", nextBlur);
+    }
+
+    if (cell.isStatement) {
+      // Intro copy stays fully readable — don't rack-focus dim with neighbor tiles.
+      const prevStatement = cell.el.style.getPropertyValue("--bento-statement-opacity");
+      if (prevStatement !== "1") {
+        cell.el.style.setProperty("--bento-statement-opacity", "1");
+      }
+    }
   });
 }
 
@@ -711,6 +721,16 @@ export function initBentoBulge(options = {}) {
 
   const resizeObserver = new ResizeObserver(onResizeDebounced);
   resizeObserver.observe(bento);
+
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => {
+      if (!running) return;
+      layout = measureCells(bento, dpr, cellOpts);
+      textureManager.rebuildStatic(layout, dpr);
+      markDirty({ force: true });
+      scheduleFrame();
+    });
+  }
 
   function setTilePress(tileEl, pressing) {
     if (overlayOpen) return;

@@ -4,6 +4,7 @@ const TX_OUT = 400;
 const TX_IN = 400;
 const TX_DELAY = 150;
 const DOCK_EXIT_MS = 340;
+const READER_TITLE_ID = "reader-overlay-title";
 
 export function initBentoBulgeOverlays(options = {}) {
   const grid = document.querySelector(options.grid || "#grid");
@@ -181,6 +182,32 @@ export function initBentoBulgeOverlays(options = {}) {
     }
   }
 
+  function setReaderProjectLabel() {
+    const title = doc.querySelector(".pj-title, .pj-story__title");
+    if (!title) {
+      reader.setAttribute("aria-label", "Project");
+      reader.removeAttribute("aria-labelledby");
+      return;
+    }
+    title.id = READER_TITLE_ID;
+    reader.setAttribute("aria-labelledby", READER_TITLE_ID);
+    reader.removeAttribute("aria-label");
+  }
+
+  function setReaderAboutLabel() {
+    reader.setAttribute("aria-label", "About");
+    reader.removeAttribute("aria-labelledby");
+    const titled = doc.querySelector(`#${READER_TITLE_ID}`);
+    if (titled) titled.removeAttribute("id");
+  }
+
+  function clearReaderLabel() {
+    reader.setAttribute("aria-label", "Project");
+    reader.removeAttribute("aria-labelledby");
+    const titled = doc.querySelector(`#${READER_TITLE_ID}`);
+    if (titled) titled.removeAttribute("id");
+  }
+
   function teardownReader() {
     clearOpenPhaseTimer();
     if (idFromLocation() || isAboutLocation()) {
@@ -191,7 +218,7 @@ export function initBentoBulgeOverlays(options = {}) {
     reader.setAttribute("aria-hidden", "true");
     reader.setAttribute("hidden", "");
     reader.setAttribute("inert", "");
-    reader.setAttribute("aria-label", "Project");
+    clearReaderLabel();
     closeBtn.removeAttribute("aria-hidden");
     document.body.style.overflow = "";
     openId = null;
@@ -334,7 +361,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
     window.renderProject(doc, p);
     doc.classList.add("detail-split");
-    reader.setAttribute("aria-label", "Project");
+    setReaderProjectLabel();
     openOverlayCommon(instant);
 
     if (instant) {
@@ -368,7 +395,7 @@ export function initBentoBulgeOverlays(options = {}) {
       openId = null;
       aboutOpen = true;
       mountAboutContent();
-      reader.setAttribute("aria-label", "About");
+      setReaderAboutLabel();
       reader.classList.add("reader--ov-split", "is-open");
       reader.removeAttribute("hidden");
       reader.removeAttribute("inert");
@@ -407,7 +434,7 @@ export function initBentoBulgeOverlays(options = {}) {
     openId = null;
     aboutOpen = true;
     mountAboutContent();
-    reader.setAttribute("aria-label", "About");
+    setReaderAboutLabel();
     openOverlayCommon(instant, { about: true });
 
     if (window.initInview) window.initInview(doc);
@@ -473,7 +500,7 @@ export function initBentoBulgeOverlays(options = {}) {
     // Touch taps are handled in onPointerUp; keep click for mouse + reduced-motion touch.
     if (coarsePointer && !reduceMotion) return;
     const tile = e.target.closest && e.target.closest(".tile");
-    if (!tile || !grid.contains(tile)) return;
+    if (!tile || !grid.contains(tile) || tile.dataset.static === "true") return;
     const id = tile.dataset.id;
     if (!id) return;
     e.preventDefault();
@@ -547,7 +574,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
   grid.querySelectorAll(".tile").forEach((tile) => {
     const id = tile.dataset.id;
-    if (!id) return;
+    if (!id || tile.dataset.static === "true") return;
 
     tile.addEventListener("pointerdown", (e) => {
       if (e.button !== 0 || isOverlayActive()) return;

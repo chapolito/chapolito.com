@@ -65,77 +65,19 @@
 .dock__content {
   position: relative;
   z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: baseline;
-  align-content: end;
-  gap: 1rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
   height: 125px;
   padding: 0 clamp(16px, 2.6vw, 46px) 24px;
   box-sizing: border-box;
   pointer-events: auto;
-}
-.dock__logo {
-  display: flex;
-  flex-shrink: 0;
-  line-height: 0;
-  justify-self: start;
-  grid-column: 1;
-}
-/* Logo viewBox 0 0 314 100 — typographic baseline ~y 71, descender to ~y 87 */
-.dock__logo img {
-  display: block;
-  height: 26px;
-  width: auto;
-  transform: translateY(calc(26px * (87 - 71) / 100));
-}
-.dock__details {
-  margin: 0;
-  grid-column: 2;
-  justify-self: center;
-  text-align: center;
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 0.78rem;
-  line-height: 1;
-  white-space: nowrap;
-}
-.dock__name {
-  font-family: var(--font-mono);
-  font-weight: 700;
-  color: rgba(255, 255, 255, 1);
-}
-.dock__title { font-weight: 600; color: #fff; opacity: 0.55; }
-.dock__sep { font-weight: 400; color: #fff; opacity: 0.38; }
-.dock__loc { font-weight: 500; color: #fff; opacity: 0.42; }
-.dock__social {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.85rem;
-  margin-left: 0.15rem;
-  vertical-align: middle;
-}
-.dock__social-link {
-  display: inline-flex;
-  line-height: 0;
-  opacity: 0.6;
-  transition: opacity 150ms ease-out;
-}
-.dock__social-link img {
-  display: block;
-  width: 14px;
-  height: 14px;
-}
-@media (hover: hover) {
-  .dock__social-link:hover { opacity: 1; }
 }
 .dock__nav {
   display: flex;
   align-items: baseline;
   gap: 1.75rem;
   flex-shrink: 0;
-  justify-self: end;
-  grid-column: 3;
 }
 .dock__link {
   position: relative;
@@ -165,13 +107,6 @@
   .dock__link:hover { color: rgba(255, 255, 255, 0.88); }
   .dock__link:hover::after { opacity: 1; transform: translateY(-4px); }
 }
-@media (max-width: 47.99em) {
-  .dock__content {
-    grid-template-columns: auto 1fr;
-  }
-  .dock__details { display: none; }
-  .dock__nav { grid-column: 2; }
-}
 
 /* dock nav stagger — home + detail */
 @keyframes dock-in {
@@ -196,23 +131,13 @@
 }
 
 /* Hidden before home enter */
-body.is-home.is-home-pending .dock__logo,
-body.is-home.is-home-pending .dock__details,
 body.is-home.is-home-pending .dock__link,
-body.is-home.is-home-dock-pending .dock__logo,
-body.is-home.is-home-dock-pending .dock__details,
 body.is-home.is-home-dock-pending .dock__link {
   opacity: 0;
   transform: translateY(16px);
 }
 
 /* Home load — dock after content */
-body.is-home.is-home-enter .dock__logo {
-  animation: dock-in 400ms ease-out 380ms both;
-}
-body.is-home.is-home-enter .dock__details {
-  animation: dock-in 400ms ease-out 440ms both;
-}
 body.is-home.is-home-enter .dock__nav .dock__link:nth-child(1) {
   animation: dock-in 400ms ease-out 500ms both;
 }
@@ -227,20 +152,8 @@ body.is-home.is-home-dock-exit .dock__nav .dock__link:nth-child(2) {
 body.is-home.is-home-dock-exit .dock__nav .dock__link:nth-child(1) {
   animation: dock-out 260ms ease-in 55ms both;
 }
-body.is-home.is-home-dock-exit .dock__details {
-  animation: dock-out 260ms ease-in 110ms both;
-}
-body.is-home.is-home-dock-exit .dock__logo {
-  animation: dock-out 260ms ease-in 165ms both;
-}
 
 /* Project detail — dock in after content */
-body.is-detail-enter .dock__logo {
-  animation: dock-in 400ms ease-out 150ms both;
-}
-body.is-detail-enter .dock__details {
-  animation: dock-in 400ms ease-out 200ms both;
-}
 body.is-detail-enter .dock__nav .dock__link:nth-child(1) {
   animation: dock-in 400ms ease-out 280ms both;
 }

@@ -1262,11 +1262,7 @@ body.is-detail-enter .detail-split {
 
 @media (prefers-reduced-motion: reduce) {
   body.is-home.is-home-pending .stage,
-  body.is-home.is-home-pending .dock__logo,
-  body.is-home.is-home-pending .dock__details,
   body.is-home.is-home-pending .dock__link,
-  body.is-home.is-home-dock-pending .dock__logo,
-  body.is-home.is-home-dock-pending .dock__details,
   body.is-home.is-home-dock-pending .dock__link {
     opacity: 1;
     transform: none;
@@ -1282,8 +1278,6 @@ body.is-detail-enter .detail-split {
   .pj-doc--story .pj-story__footnote,
   .pj-doc--story .pj-story__section,
   .detail-close,
-  .dock__logo,
-  .dock__details,
   .dock__link,
   body.is-home.is-home-enter .stage {
     animation: none !important;

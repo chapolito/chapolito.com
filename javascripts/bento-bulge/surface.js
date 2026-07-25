@@ -8,6 +8,7 @@ function createCellUniforms(cells) {
   const coverAnchorX = new Float32Array(MAX_CELLS);
   const coverAnchorY = new Float32Array(MAX_CELLS);
   const insetShadow = new Float32Array(MAX_CELLS);
+  const solidFill = new Float32Array(MAX_CELLS);
   for (let i = 0; i < MAX_CELLS; i++) {
     const cell = cells[i];
     if (cell) {
@@ -16,15 +17,17 @@ function createCellUniforms(cells) {
       coverAnchorX[i] = cell.coverAnchorX ?? 0.5;
       coverAnchorY[i] = cell.coverAnchorY ?? 0.5;
       insetShadow[i] = cell.insetShadow ? 1 : 0;
+      solidFill[i] = cell.isStatement ? 1 : 0;
     } else {
       rects.push(new THREE.Vector4(0, 0, 0, 0));
       veilFromTop[i] = 0;
       coverAnchorX[i] = 0.5;
       coverAnchorY[i] = 0.5;
       insetShadow[i] = 0;
+      solidFill[i] = 0;
     }
   }
-  return { rects, veilFromTop, coverAnchorX, coverAnchorY, insetShadow };
+  return { rects, veilFromTop, coverAnchorX, coverAnchorY, insetShadow, solidFill };
 }
 
 export function createSurface(bento, layout, params, atlasTexture, emptyTexture) {
@@ -77,6 +80,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uCellCoverAnchorX: { value: cellUniforms.coverAnchorX },
     uCellCoverAnchorY: { value: cellUniforms.coverAnchorY },
     uCellInsetShadow: { value: cellUniforms.insetShadow },
+    uCellSolidFill: { value: cellUniforms.solidFill },
     uCornerRadius: { value: params.cornerRadius || 8 },
     uCellVideoSlot: { value: cellVideoSlot },
     uVideoSlotCount: { value: 0 },
@@ -167,6 +171,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uniforms.uCellCoverAnchorX.value = cellUniforms.coverAnchorX;
     uniforms.uCellCoverAnchorY.value = cellUniforms.coverAnchorY;
     uniforms.uCellInsetShadow.value = cellUniforms.insetShadow;
+    uniforms.uCellSolidFill.value = cellUniforms.solidFill;
     if (camera.isPerspectiveCamera) {
       camera.aspect = w / h;
       camera.position.set(w * 0.5, h * 0.5, w * 1.1);

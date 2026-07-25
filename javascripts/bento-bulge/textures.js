@@ -103,11 +103,63 @@ function drawVideoCover(ctx, video, x, y, w, h, mediaFit, cornerRadius, anchorX 
   return true;
 }
 
+function wrapTextLines(ctx, text, maxWidth) {
+  const words = String(text || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!words.length) return [];
+  if (!(maxWidth > 0)) return [words.join(" ")];
+
+  const lines = [];
+  let current = words[0];
+  for (let i = 1; i < words.length; i++) {
+    const next = `${current} ${words[i]}`;
+    if (ctx.measureText(next).width <= maxWidth) {
+      current = next;
+    } else {
+      lines.push(current);
+      current = words[i];
+    }
+  }
+  lines.push(current);
+  return lines;
+}
+
+function measureStatementBlock(ctx, statement, contentWidth) {
+  let height = 0;
+  const prepared = statement.lines.map((line, index) => {
+    ctx.font = line.font;
+    if (ctx.letterSpacing !== undefined) ctx.letterSpacing = line.letterSpacing || "0px";
+    const maxWidth =
+      line.maxWidth > 0 ? Math.min(line.maxWidth, contentWidth) : contentWidth;
+    const wrapped = wrapTextLines(ctx, line.text, maxWidth);
+    const blockHeight = wrapped.length * line.lineHeight;
+    if (index > 0) height += statement.gap;
+    height += blockHeight;
+    return { ...line, wrapped, maxWidth, blockHeight };
+  });
+  return { prepared, height };
+}
+
+function drawStatementCell(ctx, cell, cornerRadius) {
+  // Solid fill lives in the shader (#222229). Logo, copy, and badge stay in DOM
+  // above the canvas so they match Figma exactly (including bulge dim via CSS).
+  void ctx;
+  void cell;
+  void cornerRadius;
+}
+
 function drawStaticCell(ctx, cell, cornerRadius, cellSlots) {
   const { left: x, top: y, width: w, height: h } = cell;
   const useVideoTexture = cell.hasVideo && cellSlots && cellSlots[cell.index] >= 0;
 
   if (useVideoTexture) {
+    return;
+  }
+
+  if (cell.isStatement) {
+    drawStatementCell(ctx, cell, cornerRadius);
     return;
   }
 

@@ -83,8 +83,8 @@ body.is-home.is-home-enter .stage {
 }
 
 /* top band */
-.tile[data-id="quest-people"]    { grid-column: 1 / 4; grid-row: 1 / 5; }
-.tile[data-id="horizon-chat"]    { grid-column: 4 / 7; grid-row: 1 / 5; }
+.tile[data-id="intro"]           { grid-column: 1 / 4; grid-row: 1 / 5; }
+.tile[data-id="quest-people"]   { grid-column: 4 / 7; grid-row: 1 / 5; }
 /* bottom band — 8 rows, all columns end at row line 13 */
 .tile[data-id="portal-household"] { grid-column: 1 / 3; grid-row: 5 / 13; }
 .tile[data-id="portal-voice"]    { grid-column: 3 / 5; grid-row: 5 / 8; }
@@ -151,9 +151,36 @@ body.is-home.is-home-enter .stage {
   object-position: left top;
 }
 
-/* Social VR — inset vignette fallback only (WebGL shader when .grid--bulge-active) */
+/* Social VR — inset vignette fallback (WebGL owns this when .grid--bulge-active).
+   ::after sits above the video; inset box-shadow alone paints under media and vanishes. */
 .bento-bulge-page .grid:not(.grid--bulge-active) .tile[data-id="quest-people"] .tile__surface {
-  box-shadow: inset 0 0 90px 90px #222229;
+  border-color: transparent;
+}
+
+.bento-bulge-page .grid:not(.grid--bulge-active) .tile[data-id="quest-people"] .tile__surface::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 78% 72% at 50% 50%,
+    transparent 30%,
+    rgba(34, 34, 41, 0.55) 72%,
+    #222229 100%
+  );
+}
+
+@media (max-width: 600px) {
+  .bento-bulge-page .grid:not(.grid--bulge-active) .tile[data-id="quest-people"] .tile__surface::after {
+    background: radial-gradient(
+      ellipse 80% 76% at 50% 50%,
+      transparent 22%,
+      rgba(20, 20, 24, 0.72) 68%,
+      #141418 100%
+    );
+  }
 }
 
 .tile__veil {
@@ -170,6 +197,18 @@ body.is-home.is-home-enter .stage {
   );
   opacity: 0.18;
   transition: opacity var(--d-2) var(--e-out);
+}
+/* Top-label tiles — mirror veil from top-left (matches WebGL veilFromTop) */
+.tile[data-id="quest-people"] .tile__veil,
+.tile[data-id="horizon-mobile"] .tile__veil,
+.tile[data-id="portal-voice"] .tile__veil,
+.tile[data-id="portal-household"] .tile__veil {
+  background: linear-gradient(
+    165deg,
+    rgba(0, 0, 0, 0.72) 0%,
+    rgba(0, 0, 0, 0.34) 28%,
+    transparent 50%
+  );
 }
 .tile__label {
   position: absolute;
@@ -204,23 +243,394 @@ body.is-home.is-home-enter .stage {
   color: #fff;
 }
 
+/* Statement intro — Figma node 2666:3253 */
+.tile--statement {
+  cursor: default;
+  --statement-size: clamp(1.375rem, 1.67vw, 2rem);
+  /* Looking expands past the tile box — don't clip it */
+  overflow: visible;
+}
+.tile--statement .tile__surface {
+  background: #222229;
+  border-radius: 12px;
+}
+/* Keep expanded Looking above neighboring tiles */
+.tile--statement:has(.tile__looking.is-expanded),
+.tile--statement:has(.tile__looking:focus-within) {
+  z-index: 7;
+}
+.tile__statement {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  box-sizing: border-box;
+  display: grid;
+  align-items: start;
+  justify-items: start;
+  padding:
+    clamp(40px, 7.7%, 62px)
+    clamp(28px, 3.4%, 48px)
+    clamp(28px, 4%, 48px);
+  pointer-events: none;
+  overflow: visible;
+}
+/* Logo 94.8×30 vs type 32 in Figma — size to type, not tile % (was reading small) */
+.tile__statement-logo {
+  grid-area: 1 / 1;
+  display: block;
+  width: auto;
+  height: calc(var(--statement-size) * 30 / 32);
+  margin: 0;
+}
+/* Copy + meta + looking as one block, vertically centered in the tile */
+.tile__statement-body {
+  grid-area: 1 / 1;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+  overflow: visible;
+}
+.tile__statement-copy {
+  margin: 0;
+  max-width: min(731px, 100%);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-style: normal;
+  font-synthesis: none;
+  font-size: var(--statement-size);
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--ink);
+}
+.tile__statement-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.65rem;
+  margin-top: 12px;
+  pointer-events: auto;
+}
+.tile__statement-ex,
+.tile__statement-loc {
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  line-height: 1;
+}
+.tile__statement-ex {
+  color: rgba(255, 255, 255, 0.6);
+}
+.tile__statement-loc {
+  color: rgba(255, 255, 255, 0.4);
+}
+.tile__statement-sep {
+  color: rgba(255, 255, 255, 0.2);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  line-height: 1;
+}
+.tile__statement-social {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.tile__statement-social-link {
+  display: inline-flex;
+  line-height: 0;
+  opacity: 0.4;
+  transition: opacity 150ms ease-out;
+}
+.tile__statement-social-link img {
+  display: block;
+  width: 14px;
+  height: 14px;
+}
+@media (hover: hover) {
+  .tile__statement-social-link:hover {
+    opacity: 1;
+  }
+}
+.tile__looking-slot {
+  --looking-collapsed-h: 44px;
+  position: relative;
+  align-self: stretch;
+  width: 100%;
+  height: var(--looking-collapsed-h);
+  margin-top: 32px;
+  overflow: visible;
+  pointer-events: none;
+}
+.tile__looking {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 100%;
+  margin: 0;
+  padding: 10px 14px;
+  border: 2px solid #ccfde9;
+  border-radius: 12px;
+  color: #47ffb2;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  overflow: hidden;
+  pointer-events: auto;
+  cursor: pointer;
+  background: transparent;
+  /* fixed → auto height (with interpolate-size) tracks real content, unlike max-height */
+  height: var(--looking-collapsed-h);
+  interpolate-size: allow-keywords;
+  /* collapse: shared delay, then everything moves together */
+  transition:
+    border-color 0.1s ease-out 0.15s,
+    background-color 0.1s ease-out 0.15s,
+    height 0.1s ease-out 0.15s,
+    width 0.1s ease-out 0.15s;
+}
+.tile__looking-frame {
+  box-sizing: border-box;
+  width: 100%;
+}
+.tile__looking-copy {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  line-height: 20px;
+  white-space: nowrap;
+  /* drop wrapping after collapse motion finishes (delay + duration) */
+  transition: white-space 0s allow-discrete 0.25s;
+}
+.tile__looking-lead {
+  display: inline;
+  white-space: nowrap;
+  line-height: 20px;
+  vertical-align: baseline;
+}
+.tile__looking-eye {
+  display: inline-block;
+  width: 27px;
+  height: 15px;
+  margin-right: 12px;
+  vertical-align: -2px;
+  overflow: visible;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+.tile__looking-eye-gaze {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.tile__looking-label {
+  line-height: inherit;
+  font-size: 15px;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+.tile__looking-status,
+.tile__looking-detail,
+.tile__looking-resume {
+  display: none;
+  /* stay mounted through delay + height/width tween */
+  transition: display 0s allow-discrete 0.25s;
+}
+.tile__looking-status,
+.tile__looking-detail {
+  vertical-align: baseline;
+  line-height: inherit;
+  /* same trim as Looking so baselines match when extras appear */
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
+}
+.tile__looking-status {
+  color: #ccfde9;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.tile__looking-sep {
+  color: rgba(204, 253, 233, 0.4);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+.tile__looking-detail {
+  color: rgba(204, 253, 233, 0.6);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.tile__looking-resume {
+  align-items: center;
+  gap: 4px;
+  margin-left: 12px;
+  padding: 0 8px;
+  height: 20px;
+  box-sizing: border-box;
+  border-radius: 6px;
+  vertical-align: baseline;
+  white-space: nowrap;
+  color: #ccfde9;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 1px;
+  line-height: 20px;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: transparent;
+  pointer-events: none;
+  transition:
+    display 0s allow-discrete 0.25s,
+    background-color 0.1s ease;
+}
+.tile__looking-resume img {
+  display: block;
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+@keyframes looking-eye-blink {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  12%,
+  20% {
+    transform: scaleY(0.06);
+  }
+  28% {
+    transform: scaleY(1);
+  }
+  42%,
+  50% {
+    transform: scaleY(0.06);
+  }
+  58% {
+    transform: scaleY(1);
+  }
+}
+
+/* Open chrome — shared by CSS hover and mobile .is-expanded */
+.tile__looking.is-expanded {
+  width: 100%;
+  height: auto;
+  border-color: rgba(204, 253, 233, 0.2);
+  background: rgba(204, 253, 233, 0.09);
+  /* expand: everything 0.1s, no delay */
+  transition:
+    border-color 0.1s ease-out,
+    background-color 0.1s ease-out,
+    width 0.1s ease-out,
+    height 0.1s ease-out;
+}
+.tile__looking.is-expanded .tile__looking-copy {
+  white-space: normal;
+  transition: white-space 0s allow-discrete;
+}
+.tile__looking.is-expanded .tile__looking-status,
+.tile__looking.is-expanded .tile__looking-detail {
+  display: inline;
+  transition: display 0s allow-discrete;
+}
+.tile__looking.is-expanded .tile__looking-resume {
+  display: inline-flex;
+  pointer-events: auto;
+  transition:
+    display 0s allow-discrete,
+    background-color 0.1s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile--statement:has(.tile__looking:hover) {
+    z-index: 7;
+  }
+  .tile__looking:hover,
+  .tile__looking:focus-within {
+    width: 100%;
+    height: auto;
+    border-color: rgba(204, 253, 233, 0.2);
+    background: rgba(204, 253, 233, 0.09);
+    transition:
+      border-color 0.1s ease-out,
+      background-color 0.1s ease-out,
+      width 0.1s ease-out,
+      height 0.1s ease-out;
+  }
+  .tile__looking:hover .tile__looking-copy,
+  .tile__looking:focus-within .tile__looking-copy {
+    white-space: normal;
+    transition: white-space 0s allow-discrete;
+  }
+  .tile__looking:hover .tile__looking-status,
+  .tile__looking:focus-within .tile__looking-status,
+  .tile__looking:hover .tile__looking-detail,
+  .tile__looking:focus-within .tile__looking-detail {
+    display: inline;
+    transition: display 0s allow-discrete;
+  }
+  .tile__looking:hover .tile__looking-resume,
+  .tile__looking:focus-within .tile__looking-resume {
+    display: inline-flex;
+    pointer-events: auto;
+    transition:
+      display 0s allow-discrete,
+      background-color 0.1s ease;
+  }
+  .tile__looking:hover .tile__looking-resume:hover,
+  .tile__looking:focus-within .tile__looking-resume:hover,
+  .tile__looking.is-expanded .tile__looking-resume:hover {
+    background: rgba(204, 253, 233, 0.15);
+  }
+  .tile__looking:hover .tile__looking-eye,
+  .tile__looking:focus-within .tile__looking-eye,
+  .tile__looking.is-expanded .tile__looking-eye {
+    animation: looking-eye-blink 0.7s ease-in-out;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile__looking,
+  .tile__looking-resume {
+    transition: none !important;
+  }
+  .tile__looking:hover .tile__looking-eye,
+  .tile__looking:focus-within .tile__looking-eye,
+  .tile__looking.is-expanded .tile__looking-eye {
+    animation: none !important;
+  }
+}
+
 /* rack-focus dim + unified depth hover (Social VR blur de-blur) */
 @media (hover: hover) {
   /* blur/dim the whole tile as one layer — bleeds into gutters, not clipped per-surface */
-  .grid:hover .tile:not(:hover) {
+  .grid:hover .tile:not(:hover):not(.tile--statement) {
     opacity: 0.58;
     filter: blur(4px) saturate(0.78);
   }
-  .grid:hover .tile:not(:hover) .tile__surface {
+  .grid:hover .tile:not(:hover):not(.tile--statement) .tile__surface {
     overflow: visible;
     isolation: auto;
+  }
+  .grid:hover .tile--statement {
+    opacity: 1;
+    filter: none;
   }
   .tile:hover {
     z-index: 6;
     opacity: 1;
     filter: none;
   }
-  .tile:hover .tile__surface {
+  .tile:hover:not(.tile--statement) .tile__surface {
     overflow: hidden;
     transform: translate(var(--edge-x), var(--edge-y)) scale(1.045);
     border-radius: 16px;
@@ -410,10 +820,10 @@ body.is-home.is-detail-enter .detail-close {
     grid-template-rows: none;
     grid-auto-rows: clamp(58px, 9vw, 96px);
   }
-  .tile[data-id="quest-people"],
-  .tile[data-id="horizon-chat"] { grid-column: 1 / 5; grid-row: auto; }
+  .tile[data-id="intro"],
+  .tile[data-id="quest-people"] { grid-column: 1 / 5; grid-row: auto; }
+  .tile[data-id="intro"],
   .tile[data-id="quest-people"] { grid-row: span 4; }
-  .tile[data-id="horizon-chat"] { grid-row: span 4; }
   .tile[data-id="horizon-mobile"],
   .tile[data-id="portal-voice"],
   .tile[data-id="portal-household"],
@@ -435,6 +845,82 @@ body.is-home.is-detail-enter .detail-close {
     grid-row: auto;
     aspect-ratio: 16 / 10;
   }
+  .tile[data-id="intro"] {
+    aspect-ratio: auto;
+    height: auto;
+    min-height: clamp(360px, 96vw, 480px);
+  }
+  .tile--statement {
+    --statement-size: clamp(1.25rem, 5.2vw, 1.75rem);
+  }
+  .tile--statement .tile__statement {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    min-height: clamp(360px, 96vw, 480px);
+    padding: clamp(28px, 7vw, 40px) clamp(20px, 5vw, 28px);
+  }
+  .tile__statement-copy {
+    max-width: none;
+  }
+  .tile__statement-logo {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .tile__statement-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    gap: 0.55rem;
+  }
+  .tile__statement-sep {
+    display: none;
+  }
+  .tile__looking-slot {
+    --looking-size: 11px;
+    --looking-line: 15px;
+    --looking-pad-y: 8px;
+    --looking-pad-x: 11px;
+    --looking-collapsed-h: calc(var(--looking-line) + var(--looking-pad-y) * 2 + 4px);
+    margin-top: 28px;
+    height: var(--looking-collapsed-h);
+  }
+  .tile__looking {
+    height: var(--looking-collapsed-h);
+    padding: var(--looking-pad-y) var(--looking-pad-x);
+    font-size: var(--looking-size);
+    letter-spacing: 0.6px;
+    cursor: pointer;
+  }
+  .tile__looking-copy,
+  .tile__looking-lead {
+    line-height: var(--looking-line);
+  }
+  .tile__looking-label {
+    font-size: var(--looking-size);
+  }
+  .tile__looking-eye {
+    width: 22px;
+    height: 12px;
+    margin-right: 10px;
+    vertical-align: -1px;
+  }
+  .tile__looking-resume {
+    height: var(--looking-line);
+    line-height: var(--looking-line);
+    font-size: 10px;
+    letter-spacing: 0.6px;
+    gap: 3px;
+    margin-left: 8px;
+    padding: 0 6px;
+    /* inline-flex sits high against trimmed detail text — nudge to the line */
+    vertical-align: -3px;
+  }
+  .tile__looking-resume img {
+    width: 10px;
+    height: 10px;
+  }
   .tile[data-orient="portrait"] {
     grid-column: 1 / -1;
     aspect-ratio: 3 / 4;
@@ -455,6 +941,11 @@ body.is-home.is-detail-enter .detail-close {
   .tile__media video,
   .tile__media img,
   .tile__label { transition: none !important; }
+  .tile__looking:hover .tile__looking-eye,
+  .tile__looking:focus-within .tile__looking-eye,
+  .tile__looking.is-expanded .tile__looking-eye {
+    animation: none !important;
+  }
 }
 
 /* ---- 404 error page ---- */
