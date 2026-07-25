@@ -25,6 +25,7 @@
       node.setAttribute("playsinline", "");
       node.preload = "metadata";
       node.setAttribute("data-inview", "");
+      if (m.alt) node.setAttribute("aria-label", m.alt);
     } else {
       node = document.createElement("img");
       node.src = m.src;

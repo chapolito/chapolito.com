@@ -12,7 +12,7 @@ window.PROJECTS = [
   {
     id: "quest-people",
     title: "Social VR",
-    product: "Quest VR",
+    product: "Quest",
     era: "Meta",
     orientation: "landscape",
     hover: "depth",
@@ -60,6 +60,42 @@ window.PROJECTS = [
           ],
           body: [
             "This required coordinating across multiple teams to bring in their highest value features. The challenge was integrating complex systems without bloating the feature set.",
+          ],
+        },
+        {
+          title: "In-game Communication",
+          intro:
+            "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication across text chat, voice, and emotes, including the in-game menu experience. This work was completed for both VR and Mobile.",
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/home/World-Comms.tile.mp4",
+                  alt: "Horizon world chat on mobile",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/horizon/emotes-menu-vr.jpg",
+                  alt: "Emotes menu in Horizon VR",
+                  fit: "cover",
+                },
+                {
+                  type: "video",
+                  src: "/images/horizon/vr-concept-prototype.mp4",
+                  alt: "VR concept prototype for in-world communication",
+                  fit: "cover",
+                  label: "Concept prototype",
+                },
+              ],
+            },
           ],
         },
       ],
@@ -421,7 +457,12 @@ window.PROJECTS = [
         { k: "Platforms", v: "Android, iOS, fireOS, & Web" },
         { k: "Date", v: "2017–2018" },
       ],
-      hero: { type: "image", src: "/images/messenger-kids/hero-image.jpg", fit: "cover" },
+      hero: {
+        type: "image",
+        src: "/images/messenger-kids/hero-image.jpg",
+        alt: "Messenger Kids app on a tablet with playful UI",
+        fit: "cover",
+      },
       sections: [
         {
           kicker: "Moments",
@@ -472,7 +513,12 @@ window.PROJECTS = [
         { k: "Platforms", v: "Android & iOS" },
         { k: "Date", v: "2016" },
       ],
-      hero: { type: "video", src: "/images/life360/closing-the-loop.mp4", fit: "contain" },
+      hero: {
+        type: "video",
+        src: "/images/life360/closing-the-loop.mp4",
+        alt: "Life360 family messaging closing the loop on location check-ins",
+        fit: "contain",
+      },
       sections: [
         {
           kicker: "Messaging",
