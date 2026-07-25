@@ -29,13 +29,13 @@ if (!fs.existsSync(shellIndex)) {
 const SITE_ORIGIN = "https://www.chapolito.com";
 const HOME = {
   title: "Portfolio of Jesse O'Chapo",
-  description: "Chapolito.com is the portfolio of Product Designer Jesse O'Chapo.",
+  description: "Portfolio of Jesse O'Chapo, a product designer based in Santa Cruz, California.",
   url: `${SITE_ORIGIN}/`,
 };
 const ABOUT = {
   title: "About · Jesse O'Chapo",
   description:
-    "Jesse O'Chapo is a Principal Product Designer at Meta, based in Santa Cruz, CA. Previously Life360, Fanpics, and MTV.",
+    "Jesse O'Chapo is a product designer based in Santa Cruz, California. Previously at Meta, Life360, and MTV.",
   url: `${SITE_ORIGIN}/about/`,
 };
 

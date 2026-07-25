@@ -8,7 +8,7 @@ Rules for any agent working in this repo. This file is read on every task, so it
 
 These hold whether you are editing the site or designing in Figma.
 
-- **Owner / identity:** Jesse O'Chapo — Principal Product Designer, Santa Cruz, CA. This is a personal portfolio (`chapolito.com`).
+- **Owner / identity:** Jesse O'Chapo — Product Designer | Consumer AI · Social · Spatial. Based in Santa Cruz, CA. Previously at Meta. This is a personal portfolio (`chapolito.com`).
 - **Audience:** hiring managers, recruiters, and fellow designers. Optimize for clarity, craft, and credibility.
 - **Voice & tone:** confident, concise, human. No marketing fluff, no buzzwords, no emojis unless explicitly asked.
 - **Craft bar:** every change should look intentional and polished. Prefer fewer, higher-quality elements over busy layouts.
