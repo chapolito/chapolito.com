@@ -165,9 +165,10 @@ body.is-home.is-home-enter .stage {
   border-radius: inherit;
   pointer-events: none;
   background: radial-gradient(
-    ellipse 78% 72% at 50% 50%,
-    transparent 30%,
-    rgba(34, 34, 41, 0.55) 72%,
+    ellipse 72% 68% at 50% 50%,
+    transparent 22%,
+    rgba(34, 34, 41, 0.45) 58%,
+    rgba(34, 34, 41, 0.85) 82%,
     #222229 100%
   );
 }
@@ -256,6 +257,7 @@ body.is-home.is-home-enter .stage {
 }
 /* Keep expanded Looking above neighboring tiles */
 .tile--statement:has(.tile__looking.is-expanded),
+.tile--statement:has(.tile__looking.is-collapsing),
 .tile--statement:has(.tile__looking:focus-within) {
   z-index: 7;
 }
@@ -290,12 +292,13 @@ body.is-home.is-home-enter .stage {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  max-width: 100%;
+  /* 1728 artboard: tile ~858, pad 3.4% → ~800 content; 80% ≈ 640 for H1 + Looking */
+  max-width: 80%;
   overflow: visible;
 }
 .tile__statement-copy {
   margin: 0;
-  max-width: min(731px, 100%);
+  max-width: 100%;
   font-family: var(--font-display);
   font-weight: 700;
   font-style: normal;
@@ -363,6 +366,8 @@ body.is-home.is-home-enter .stage {
   margin-top: 32px;
   overflow: visible;
   pointer-events: none;
+  /* size container so the frame can lock to the final expanded width (cqw) */
+  container-type: inline-size;
 }
 .tile__looking {
   position: absolute;
@@ -370,7 +375,9 @@ body.is-home.is-home-enter .stage {
   left: 0;
   display: block;
   box-sizing: border-box;
-  width: max-content;
+  /* Collapsed hug width from JS (lead + pad/border). Frame is always the
+     open width and clipped, so keyword max-content would size to the slot. */
+  width: var(--looking-chip-w, max-content);
   max-width: 100%;
   margin: 0;
   padding: 10px 14px;
@@ -390,39 +397,50 @@ body.is-home.is-home-enter .stage {
   /* fixed → auto height (with interpolate-size) tracks real content, unlike max-height */
   height: var(--looking-collapsed-h);
   interpolate-size: allow-keywords;
-  /* collapse: shared delay, then everything moves together */
+  /* collapse: shared delay, then everything moves together (ends at 0.45s) */
   transition:
-    border-color 0.1s ease-out 0.15s,
-    background-color 0.1s ease-out 0.15s,
-    height 0.1s ease-out 0.15s,
-    width 0.1s ease-out 0.15s;
+    border-color 0.3s ease-out 0.15s,
+    background-color 0.3s ease-out 0.15s,
+    height 0.3s ease-out 0.15s,
+    width 0.3s ease-out 0.15s;
+}
+/* Applied while JS resolves the hug width so it lands without tweening
+   down from the open frame width (on load, fonts ready, and resize). */
+.tile__looking.is-measuring,
+.tile__looking.is-measuring .tile__looking-copy,
+.tile__looking.is-measuring .tile__looking-resume {
+  transition: none !important;
 }
 .tile__looking-frame {
   box-sizing: border-box;
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  /* Always the open content width. The chip is only a clipping mask —
+     inner layout never reflows on expand/collapse. */
+  width: calc(100cqw - var(--looking-pad-x, 14px) * 2 - 4px);
+  max-width: none;
 }
-.tile__looking-copy {
-  margin: 0;
+.tile__looking-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   width: 100%;
-  max-width: 100%;
-  display: block;
-  line-height: 20px;
-  white-space: nowrap;
-  /* drop wrapping after collapse motion finishes (delay + duration) */
-  transition: white-space 0s allow-discrete 0.25s;
+  min-height: 20px;
 }
 .tile__looking-lead {
-  display: inline;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
   white-space: nowrap;
   line-height: 20px;
-  vertical-align: baseline;
 }
 .tile__looking-eye {
-  display: inline-block;
+  display: block;
   width: 27px;
   height: 15px;
-  margin-right: 12px;
-  vertical-align: -2px;
+  flex-shrink: 0;
   overflow: visible;
   transform-origin: 50% 50%;
   will-change: transform;
@@ -432,52 +450,65 @@ body.is-home.is-home-enter .stage {
   transform-origin: center;
 }
 .tile__looking-label {
-  line-height: inherit;
+  line-height: 20px;
   font-size: 15px;
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
 }
-.tile__looking-status,
-.tile__looking-detail,
-.tile__looking-resume {
-  display: none;
-  /* stay mounted through delay + height/width tween */
-  transition: display 0s allow-discrete 0.25s;
-}
-.tile__looking-status,
-.tile__looking-detail {
-  vertical-align: baseline;
-  line-height: inherit;
-  /* same trim as Looking so baselines match when extras appear */
-  text-box-trim: trim-both;
-  text-box-edge: cap alphabetic;
+.tile__looking-copy {
+  display: block;
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  line-height: 20px;
+  letter-spacing: 1px;
+  text-transform: none;
+  /* Fades out first, then the chip closes. visibility follows the fade so the
+     closed chip can't show this line through its bottom padding (overflow
+     clips at the padding box) and so it stays out of the a11y tree. */
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s ease-out,
+    visibility 0s linear 0.15s;
 }
 .tile__looking-status {
   color: #ccfde9;
   font-weight: 600;
-  letter-spacing: 0;
+  font-size: 15px;
+  letter-spacing: 1px;
+  line-height: 20px;
   text-transform: none;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 .tile__looking-sep {
   color: rgba(204, 253, 233, 0.4);
   font-weight: 400;
-  letter-spacing: 0;
+  font-size: 15px;
+  letter-spacing: 1px;
+  line-height: 20px;
 }
 .tile__looking-detail {
   color: rgba(204, 253, 233, 0.6);
   font-weight: 400;
-  letter-spacing: 0;
+  font-size: 15px;
+  letter-spacing: 1px;
+  line-height: 20px;
   text-transform: none;
+  text-box-trim: trim-both;
+  text-box-edge: cap alphabetic;
 }
 .tile__looking-resume {
+  display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-left: 12px;
-  padding: 0 8px;
-  height: 20px;
+  margin-left: auto;
+  margin-top: -2px;
+  margin-bottom: -2px;
+  padding: 2px 8px;
   box-sizing: border-box;
   border-radius: 6px;
-  vertical-align: baseline;
   white-space: nowrap;
   color: #ccfde9;
   font-weight: 500;
@@ -487,9 +518,10 @@ body.is-home.is-home-enter .stage {
   text-transform: uppercase;
   text-decoration: none;
   background: transparent;
+  opacity: 0;
   pointer-events: none;
   transition:
-    display 0s allow-discrete 0.25s,
+    opacity 0.15s ease-out,
     background-color 0.1s ease;
 }
 .tile__looking-resume img {
@@ -520,76 +552,80 @@ body.is-home.is-home-enter .stage {
   }
 }
 
-/* Open chrome — shared by CSS hover and mobile .is-expanded */
+/* Open chrome — chip size/colors only; inner layout is already final */
 .tile__looking.is-expanded {
   width: 100%;
   height: auto;
-  border-color: rgba(204, 253, 233, 0.2);
-  background: rgba(204, 253, 233, 0.09);
-  /* expand: everything 0.1s, no delay */
+  border-color: rgba(204, 253, 233, 0.1);
+  background: rgba(0, 0, 0, 0.2);
   transition:
-    border-color 0.1s ease-out,
-    background-color 0.1s ease-out,
-    width 0.1s ease-out,
-    height 0.1s ease-out;
+    border-color 0.3s ease-out,
+    background-color 0.3s ease-out,
+    width 0.3s ease-out,
+    height 0.3s ease-out;
 }
+/* Content fades in once the box has most of its size */
 .tile__looking.is-expanded .tile__looking-copy {
-  white-space: normal;
-  transition: white-space 0s allow-discrete;
-}
-.tile__looking.is-expanded .tile__looking-status,
-.tile__looking.is-expanded .tile__looking-detail {
-  display: inline;
-  transition: display 0s allow-discrete;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.2s ease-out 0.12s,
+    visibility 0s;
 }
 .tile__looking.is-expanded .tile__looking-resume {
-  display: inline-flex;
+  opacity: 1;
   pointer-events: auto;
   transition:
-    display 0s allow-discrete,
+    opacity 0.2s ease-out 0.12s,
     background-color 0.1s ease;
+}
+.tile__looking.is-expanded .tile__looking-resume:active {
+  background: rgba(204, 253, 233, 0.3);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .tile--statement:has(.tile__looking:hover) {
+  .tile--statement:has(.tile__looking:hover),
+  .tile--statement:has(.tile__looking.is-collapsing) {
     z-index: 7;
   }
   .tile__looking:hover,
   .tile__looking:focus-within {
     width: 100%;
     height: auto;
-    border-color: rgba(204, 253, 233, 0.2);
-    background: rgba(204, 253, 233, 0.09);
+    border-color: rgba(204, 253, 233, 0.1);
+    background: rgba(0, 0, 0, 0.2);
     transition:
-      border-color 0.1s ease-out,
-      background-color 0.1s ease-out,
-      width 0.1s ease-out,
-      height 0.1s ease-out;
+      border-color 0.3s ease-out,
+      background-color 0.3s ease-out,
+      width 0.3s ease-out,
+      height 0.3s ease-out;
   }
   .tile__looking:hover .tile__looking-copy,
   .tile__looking:focus-within .tile__looking-copy {
-    white-space: normal;
-    transition: white-space 0s allow-discrete;
-  }
-  .tile__looking:hover .tile__looking-status,
-  .tile__looking:focus-within .tile__looking-status,
-  .tile__looking:hover .tile__looking-detail,
-  .tile__looking:focus-within .tile__looking-detail {
-    display: inline;
-    transition: display 0s allow-discrete;
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 0.2s ease-out 0.12s,
+      visibility 0s;
   }
   .tile__looking:hover .tile__looking-resume,
   .tile__looking:focus-within .tile__looking-resume {
-    display: inline-flex;
+    opacity: 1;
     pointer-events: auto;
     transition:
-      display 0s allow-discrete,
+      opacity 0.2s ease-out 0.12s,
       background-color 0.1s ease;
   }
   .tile__looking:hover .tile__looking-resume:hover,
   .tile__looking:focus-within .tile__looking-resume:hover,
-  .tile__looking.is-expanded .tile__looking-resume:hover {
+  .tile__looking.is-expanded .tile__looking-resume:hover,
+  .tile__looking.is-collapsing .tile__looking-resume:hover {
     background: rgba(204, 253, 233, 0.15);
+  }
+  .tile__looking:hover .tile__looking-resume:active,
+  .tile__looking:focus-within .tile__looking-resume:active,
+  .tile__looking.is-expanded .tile__looking-resume:active {
+    background: rgba(204, 253, 233, 0.3);
   }
   .tile__looking:hover .tile__looking-eye,
   .tile__looking:focus-within .tile__looking-eye,
@@ -600,6 +636,7 @@ body.is-home.is-home-enter .stage {
 
 @media (prefers-reduced-motion: reduce) {
   .tile__looking,
+  .tile__looking-copy,
   .tile__looking-resume {
     transition: none !important;
   }
@@ -814,25 +851,36 @@ body.is-home.is-detail-enter .detail-close {
 }
 
 /* ---- responsive ---- */
+/* Tablet / iPad — statement + 2×2 projects (bento-bulge.css owns live placement) */
 @media (max-width: 1080px) {
+  .tile__statement-body {
+    max-width: 100%;
+  }
+  .tile--statement {
+    --statement-size: clamp(1.25rem, 2.1vw, 1.75rem);
+  }
+  .tile__statement {
+    padding:
+      clamp(28px, 4.5%, 48px)
+      clamp(24px, 3.2%, 40px)
+      clamp(20px, 3%, 36px);
+  }
   .grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     grid-template-rows: none;
     grid-auto-rows: clamp(58px, 9vw, 96px);
   }
-  .tile[data-id="intro"],
-  .tile[data-id="quest-people"] { grid-column: 1 / 5; grid-row: auto; }
-  .tile[data-id="intro"],
-  .tile[data-id="quest-people"] { grid-row: span 4; }
-  .tile[data-id="horizon-mobile"],
-  .tile[data-id="portal-voice"],
-  .tile[data-id="portal-household"],
-  .tile[data-id="mk-play"],
-  .tile[data-id="life360-messaging"] {
-    grid-column: span 2;
-    grid-row: span 3;
+  .tile[data-id="intro"] {
+    grid-column: 1 / 7;
+    grid-row: span 4;
   }
-  .tile[data-id="portal-household"] { grid-row: span 5; }
+  .tile[data-id="quest-people"],
+  .tile[data-id="portal-household"],
+  .tile[data-id="portal-voice"],
+  .tile[data-id="horizon-mobile"] {
+    grid-column: span 3;
+    grid-row: span 4;
+  }
 }
 @media (max-width: 600px) {
   .grid {
@@ -869,13 +917,17 @@ body.is-home.is-detail-enter .detail-close {
     cursor: pointer;
   }
   .tile__statement-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    flex-wrap: nowrap;
-    gap: 0.55rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.55rem 0.65rem;
   }
-  .tile__statement-sep {
+  /* keep ex · loc on one line; drop the sep before social */
+  .tile__statement-sep:has(+ .tile__statement-social) {
     display: none;
+  }
+  .tile__statement-social {
+    flex-basis: 100%;
   }
   .tile__looking-slot {
     --looking-size: 11px;
@@ -893,29 +945,39 @@ body.is-home.is-detail-enter .detail-close {
     letter-spacing: 0.6px;
     cursor: pointer;
   }
+  .tile__looking-top {
+    /* desktop min-height:20px overflows the 15px mobile line box */
+    min-height: var(--looking-line);
+  }
   .tile__looking-copy,
-  .tile__looking-lead {
+  .tile__looking-lead,
+  .tile__looking-status,
+  .tile__looking-detail,
+  .tile__looking-sep {
     line-height: var(--looking-line);
   }
   .tile__looking-label {
     font-size: var(--looking-size);
+    line-height: var(--looking-line);
   }
   .tile__looking-eye {
     width: 22px;
     height: 12px;
-    margin-right: 10px;
-    vertical-align: -1px;
+  }
+  .tile__looking-lead {
+    gap: 10px;
+  }
+  .tile__looking-status,
+  .tile__looking-detail,
+  .tile__looking-sep {
+    font-size: var(--looking-size);
   }
   .tile__looking-resume {
-    height: var(--looking-line);
     line-height: var(--looking-line);
     font-size: 10px;
     letter-spacing: 0.6px;
     gap: 3px;
-    margin-left: 8px;
     padding: 0 6px;
-    /* inline-flex sits high against trimmed detail text — nudge to the line */
-    vertical-align: -3px;
   }
   .tile__looking-resume img {
     width: 10px;

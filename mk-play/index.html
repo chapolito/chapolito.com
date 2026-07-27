@@ -273,7 +273,7 @@
           var copy = document.createElement("p");
           copy.className = "tile__statement-copy";
           copy.textContent =
-            "Jesse is a designer who builds, ships, & steers. He is comfortable with the unknown.";
+            "Hi, I'm Jesse. A designer who builds, ships, & steers. I'm at ease with the unknown.";
           body.appendChild(copy);
 
           var meta = document.createElement("div");
@@ -291,7 +291,7 @@
 
           var loc = document.createElement("span");
           loc.className = "tile__statement-loc";
-          loc.textContent = "Santa Cruz, California";
+          loc.textContent = "Santa Cruz, CA";
           meta.appendChild(loc);
 
           var sepSocial = document.createElement("span");
@@ -319,32 +319,31 @@
           lookingSlot.className = "tile__looking-slot";
           looking.innerHTML =
             '<div class="tile__looking-frame">' +
-            '<div class="tile__looking-copy">' +
+            '<div class="tile__looking-top">' +
             '<span class="tile__looking-lead">' +
             '<svg class="tile__looking-eye" viewBox="0 0 27 15" width="27" height="15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
             '<path class="tile__looking-eye-sclera" d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 5.53863 7.07688 0.37037 13.4015 0.37037C19.726 0.37037 26.0146 5.72382 26.0146 7.40741Z" fill="#CCFDE9"/>' +
             '<g clip-path="url(#looking-eye-sclera-clip)">' +
             '<g class="tile__looking-eye-gaze">' +
             '<path class="tile__looking-eye-iris" d="M13.4694 12.6603C16.5546 12.6603 19.0556 10.3102 19.0556 7.41122C19.0556 4.51226 16.5546 2.16219 13.4694 2.16219C10.3842 2.16219 7.88321 4.51226 7.88321 7.41122C7.88321 10.3102 10.3842 12.6603 13.4694 12.6603Z" fill="#47FFB2"/>' +
-            '<path class="tile__looking-eye-pupil" d="M13.4022 9.26293C14.4911 9.26293 15.3738 8.43349 15.3738 7.41033C15.3738 6.38717 14.4911 5.55774 13.4022 5.55774C12.3134 5.55774 11.4307 6.38717 11.4307 7.41033C11.4307 8.43349 12.3134 9.26293 13.4022 9.26293Z" fill="#151B26"/>' +
+            '<path class="tile__looking-eye-pupil" d="M13.4022 9.26293C14.4911 9.26293 15.3738 8.43349 15.3738 7.41033C15.3738 6.38717 14.4911 5.55774 13.4022 5.55774C12.3134 5.55774 11.4307 6.38717 11.4307 7.41033C11.4307 8.43349 12.3134 9.26293 13.4022 9.26293Z" fill="#222229"/>' +
             "</g></g>" +
             '<defs><clipPath id="looking-eye-sclera-clip" clipPathUnits="userSpaceOnUse"><path d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 5.53863 7.07688 0.37037 13.4015 0.37037C19.726 0.37037 26.0146 5.72382 26.0146 7.40741Z"/></clipPath></defs>' +
             "</svg>" +
             '<span class="tile__looking-label">Looking</span>' +
-            "</span>" +
-            '<span class="tile__looking-status" aria-hidden="true">' +
-            '<span class="tile__looking-sep" aria-hidden="true"> · </span>' +
-            "Actively interviewing" +
-            "</span>" +
-            '<span class="tile__looking-detail" aria-hidden="true">' +
-            '<span class="tile__looking-sep" aria-hidden="true"> · </span>' +
-            "Principal or Staff Product Design role in consumer AI, social, messaging, hardware, or fintech. Remote or Bay Area." +
             "</span>" +
             '<a class="tile__looking-resume" href="/Jesse%20O%27Chapo%20-%20Resume.pdf" download="Jesse O\'Chapo - Resume.pdf" tabindex="-1" aria-hidden="true">' +
             '<img src="/images/home/looking-download.svg" alt="" width="12" height="12" />' +
             "Résumé" +
             "</a>" +
             "</div>" +
+            '<p class="tile__looking-copy">' +
+            '<span class="tile__looking-status" aria-hidden="true">Actively interviewing</span>' +
+            '<span class="tile__looking-sep" aria-hidden="true"> · </span>' +
+            '<span class="tile__looking-detail" aria-hidden="true">' +
+            "Principal or Staff Product Design role in Consumer AI, social, messaging, or fintech. Remote or Bay Area." +
+            "</span>" +
+            "</p>" +
             "</div>";
 
           var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -457,7 +456,30 @@
           looking.setAttribute("tabindex", "0");
           looking.setAttribute("aria-expanded", "false");
 
+          var lookingCollapseTimer = 0;
+          var LOOKING_COLLAPSE_MS = 450;
+
+          /* Keep the chip above neighbors while it shrinks (hover ends
+             immediately; layout widths stay put on their own). */
+          function holdLookingCollapseZ() {
+            looking.classList.add("is-collapsing");
+            window.clearTimeout(lookingCollapseTimer);
+            lookingCollapseTimer = window.setTimeout(function () {
+              looking.classList.remove("is-collapsing");
+            }, LOOKING_COLLAPSE_MS);
+          }
+
+          function clearLookingCollapseZ() {
+            window.clearTimeout(lookingCollapseTimer);
+            looking.classList.remove("is-collapsing");
+          }
+
           function setLookingExpanded(expanded) {
+            if (expanded) {
+              clearLookingCollapseZ();
+            } else if (looking.classList.contains("is-expanded")) {
+              holdLookingCollapseZ();
+            }
             looking.classList.toggle("is-expanded", expanded);
             setLookingAria(expanded);
           }
@@ -495,19 +517,22 @@
               true
             );
           } else if (fineHover.matches) {
-            // Expand is CSS :hover / :focus-within — only keep aria in sync
             looking.addEventListener("mouseenter", function () {
+              clearLookingCollapseZ();
               setLookingAria(true);
             });
             looking.addEventListener("mouseleave", function () {
               setLookingAria(false);
+              holdLookingCollapseZ();
             });
             looking.addEventListener("focusin", function () {
+              clearLookingCollapseZ();
               setLookingAria(true);
             });
             looking.addEventListener("focusout", function (e) {
               if (looking.contains(e.relatedTarget)) return;
               setLookingAria(false);
+              holdLookingCollapseZ();
             });
           } else {
             looking.addEventListener("click", onLookingToggle);
@@ -532,6 +557,33 @@
 
           tile.appendChild(statement);
           grid.appendChild(tile);
+
+          /* Collapsed chip width must be a px value measured from the lead.
+             The frame is always full-open width (clipped), so max-content on
+             the chip would resolve to the slot and never hug. */
+          function measureLookingChip() {
+            if (looking.classList.contains("is-expanded")) return;
+            if (looking.matches(":hover") || looking.matches(":focus-within")) return;
+            var lead = looking.querySelector(".tile__looking-lead");
+            if (!lead) return;
+            var cs = window.getComputedStyle(looking);
+            var padX =
+              (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0);
+            var borderX =
+              (parseFloat(cs.borderLeftWidth) || 0) +
+              (parseFloat(cs.borderRightWidth) || 0);
+            var w = Math.ceil(lead.getBoundingClientRect().width + padX + borderX);
+            if (looking.style.getPropertyValue("--looking-chip-w") === w + "px") return;
+            looking.classList.add("is-measuring");
+            looking.style.setProperty("--looking-chip-w", w + "px");
+            void looking.offsetWidth;
+            looking.classList.remove("is-measuring");
+          }
+          measureLookingChip();
+          if (document.fonts && document.fonts.ready) {
+            document.fonts.ready.then(measureLookingChip);
+          }
+          window.addEventListener("resize", measureLookingChip);
         }
 
         appendIntroTile();
