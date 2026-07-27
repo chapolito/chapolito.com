@@ -196,16 +196,18 @@ vec3 applyCellBorder(vec3 color, float edgeDistPx, float strength) {
 vec3 applyInsetShadow(vec3 color, vec2 local, vec4 rect) {
   // Edge vignette scaled to cell size: strong enough on mobile tiles without
   // collapsing to a peephole, capped on large desktop cells.
+  // cornerR must stay well below insetReach — equal values inflate SDF
+  // distances and wipe out the falloff.
   vec2 cellPx = max(rect.zw * uPlaneSize, vec2(1.0));
   float minSide = min(cellPx.x, cellPx.y);
-  float insetReach = clamp(minSide * 0.28, 52.0, 120.0);
-  float cornerR = max(insetReach, uCornerRadius);
+  float insetReach = clamp(minSide * 0.32, 64.0, 140.0);
+  float cornerR = clamp(insetReach * 0.35, 24.0, 48.0);
   vec2 p = (local - 0.5) * cellPx;
   vec2 halfSize = cellPx * 0.5;
   float edgeDist = max(-sdRoundedBox(p, halfSize, cornerR), 0.0);
   // On small tiles, hold the dark longer (higher opacity mid-ring).
   float smallBoost = 1.0 - smoothstep(260.0, 520.0, minSide);
-  float vignette = pow(smoothstep(0.0, insetReach, edgeDist), mix(1.0, 1.55, smallBoost));
+  float vignette = pow(smoothstep(0.0, insetReach, edgeDist), mix(0.85, 1.35, smallBoost));
   vec3 shadow = mix(
     vec3(0.133333, 0.133333, 0.160784), // #222229 desktop
     vec3(0.08, 0.08, 0.10),             // denser on mobile
@@ -271,20 +273,22 @@ void main() {
       alpha *= cellShapeAlpha(cellDist);
     }
 
+    float borderStrength = 1.0 - uPressExtraDim;
+    // Skip hairline on inset-vignette tiles — against solid edge fill it reads as a sharp glow.
+    if (borderStrength > 0.001 && uCellInsetShadow[idx] < 0.5) {
+      color = applyCellBorder(color, edgeDistPx, borderStrength);
+    }
+    // Inset first, then legibility veil — so the diagonal label gradient still
+    // reads on inset tiles (veil-then-inset was flattening it to a solid plate).
+    if (uCellInsetShadow[idx] > 0.5) {
+      color = applyInsetShadow(color, local, rect);
+    }
     // Skip legibility veil on statement tiles — no label over video.
     float veilStrength =
       vBulgeAmount > 0.001 && uCellSolidFill[idx] < 0.5
         ? uCellDimAmount[idx]
         : 0.0;
     color = applyLegibilityVeil(color, local, veilStrength, uCellVeilFromTop[idx]);
-    float borderStrength = 1.0 - uPressExtraDim;
-    // Skip hairline on inset-vignette tiles — against solid edge fill it reads as a sharp glow.
-    if (borderStrength > 0.001 && uCellInsetShadow[idx] < 0.5) {
-      color = applyCellBorder(color, edgeDistPx, borderStrength);
-    }
-    if (uCellInsetShadow[idx] > 0.5) {
-      color = applyInsetShadow(color, local, rect);
-    }
   }
 
   float bulge = vBulgeAmount;

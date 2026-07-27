@@ -45,6 +45,7 @@ Case study content is rendered into `.reader` from `javascripts/projects.js` —
 | `600px` | Mobile single-column bento |
 | `768px` | Tablet / about inline layout |
 | `900px` | Detail split stack |
+| `1080px` | Tablet bento — statement + 2×2 projects |
 | `1200px` | Desktop artboard insets |
 
 When editing, match surrounding units in the file you are changing.
