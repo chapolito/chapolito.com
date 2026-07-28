@@ -332,7 +332,7 @@ window.PROJECTS = [
       layout: "story",
       storyColumn: "992",
       lede:
-        "Household mode let parents restrict the contacts and apps anyone in the home could use on a shared Portal. The primary use case was for parents to set limits for kids — controlling who could be contacted and which apps were available on a device the whole family shared.",
+        "Household mode let parents set limits for kids on a shared Portal — controlling who could be contacted and which apps were available.",
       meta: [
         { k: "Project", brand: "meta", v: "Portal" },
         { k: "Role", v: "Product Designer" },
@@ -342,7 +342,7 @@ window.PROJECTS = [
       sections: [
         {
           intro:
-            "Household mode let parents restrict the contacts and apps anyone in the home could use on a shared Portal. The primary use case was for parents to set limits for kids — controlling who could be contacted and which apps were available on a device the whole family shared.",
+            "Household mode let parents set limits for kids on a shared Portal — controlling who could be contacted and which apps were available.",
           mediaRows: [
             {
               layout: "full",
