@@ -69,7 +69,7 @@ function clearDomLayers(layout) {
   });
 }
 
-function syncLabelOpacity(layout, field) {
+function syncLabelOpacity(layout, field, params) {
   layout.cells.forEach((cell) => {
     const dim = field.cellDimAmounts[cell.index] ?? 0;
     // Cut the low-opacity tail so blurred text doesn't linger as a smear.
@@ -85,10 +85,21 @@ function syncLabelOpacity(layout, field) {
     }
 
     if (cell.isStatement) {
-      // Intro copy stays fully readable — don't rack-focus dim with neighbor tiles.
+      // Match shader dimFactor so logo/copy track neighbor-tile video dim.
+      let statementOpacity = 1;
+      if (field.active) {
+        const dimFloor = params?.dimOpacity ?? 0.65;
+        statementOpacity = dimFloor + (1 - dimFloor) * dim;
+        if (field.pressExtraDim > 0.001 && dim < 0.5) {
+          const pressFloor = params?.pressDimOpacity ?? 0.35;
+          statementOpacity =
+            statementOpacity + (pressFloor - statementOpacity) * field.pressExtraDim;
+        }
+      }
       const prevStatement = cell.el.style.getPropertyValue("--bento-statement-opacity");
-      if (prevStatement !== "1") {
-        cell.el.style.setProperty("--bento-statement-opacity", "1");
+      const nextStatement = String(statementOpacity);
+      if (prevStatement !== nextStatement) {
+        cell.el.style.setProperty("--bento-statement-opacity", nextStatement);
       }
     }
   });
@@ -478,7 +489,7 @@ export function initBentoBulge(options = {}) {
     lastTime = now;
 
     updateBulgeField(field, params, dt, { overlayOpen });
-    syncLabelOpacity(layout, field);
+    syncLabelOpacity(layout, field, params);
 
     const continuous = wantsContinuousRender();
     if (wasContinuous && !continuous) needsRender = true;
@@ -552,7 +563,7 @@ export function initBentoBulge(options = {}) {
       snapCellDims(field);
       field.targetOverlayDim = overlayDimAmount();
       snapOverlayDim(field);
-      syncLabelOpacity(layout, field);
+      syncLabelOpacity(layout, field, params);
       surface.updateFromField(field, params);
       syncVideoPlayback(null);
       markDirty();
@@ -780,7 +791,7 @@ export function initBentoBulge(options = {}) {
   };
 
   surface.updateFromField(field, params);
-  syncLabelOpacity(layout, field);
+  syncLabelOpacity(layout, field, params);
   surface.updateVideoSlots(initialVideoState);
   syncVideoMedia();
   finishBootRender();

@@ -650,17 +650,18 @@ body.is-home.is-home-enter .stage {
 
 /* rack-focus dim + unified depth hover (Social VR blur de-blur) */
 @media (hover: hover) {
-  /* blur/dim the whole tile as one layer — bleeds into gutters, not clipped per-surface */
-  .grid:hover .tile:not(:hover):not(.tile--statement) {
+  /* Dim all idle tiles; blur project media only — statement stays sharp (opacity dim via CSS / WebGL) */
+  .grid:hover .tile:not(:hover) {
     opacity: 0.58;
+  }
+  .grid:hover .tile:not(:hover):not(.tile--statement) {
     filter: blur(4px) saturate(0.78);
   }
   .grid:hover .tile:not(:hover):not(.tile--statement) .tile__surface {
     overflow: visible;
     isolation: auto;
   }
-  .grid:hover .tile--statement {
-    opacity: 1;
+  .grid:hover .tile--statement:not(:hover) {
     filter: none;
   }
   .tile:hover {

@@ -201,9 +201,11 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
     pointer-events: none;
   }
 
-  /* WebGL owns solid fill; keep statement DOM (logo/type/badge) visible above canvas */
+  /* WebGL owns solid fill; keep statement DOM (logo/type/badge) visible above canvas.
+   * Opacity tracks --bento-statement-opacity from syncLabelOpacity (video dim parity). */
   .bento-bulge-page .grid.grid--bulge-active .tile__statement {
     opacity: var(--bento-statement-opacity, 1);
+    transition: none;
   }
 
   /* Keep videos decoding — opacity only, not visibility:hidden */
