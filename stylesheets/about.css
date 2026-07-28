@@ -572,7 +572,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     width: 100%;
-    max-width: var(--about-copy-max);
+    max-width: none;
     aspect-ratio: auto;
     margin-top: 12px;
   }
