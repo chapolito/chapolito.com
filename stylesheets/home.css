@@ -246,7 +246,7 @@ body.is-home.is-home-enter .stage {
 
 /* Statement intro — Figma node 2666:3253 */
 .tile--statement {
-  cursor: default;
+  cursor: pointer;
   --statement-size: clamp(1.375rem, 1.67vw, 2rem);
   /* Looking expands past the tile box — don't clip it */
   overflow: visible;
@@ -911,10 +911,6 @@ body.is-home.is-detail-enter .detail-close {
   }
   .tile__statement-copy {
     max-width: none;
-  }
-  .tile__statement-logo {
-    pointer-events: auto;
-    cursor: pointer;
   }
   .tile__statement-meta {
     flex-direction: row;

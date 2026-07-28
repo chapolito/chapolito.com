@@ -162,9 +162,20 @@ export function initBentoBulgeOverlays(options = {}) {
     }
   }
 
-  function startTilePress(tile, id) {
+  function isStatementPassthroughTarget(target) {
+    if (!target || !target.closest) return false;
+    return Boolean(
+      target.closest(".tile__looking") || target.closest(".tile__statement-social-link")
+    );
+  }
+
+  function isStatementTile(tile) {
+    return Boolean(tile && (tile.classList.contains("tile--statement") || tile.dataset.id === "intro"));
+  }
+
+  function startTilePress(tile, id, options = {}) {
     if (isOverlayActive() || reduceMotion) return;
-    activePress = { tile, id };
+    activePress = { tile, id, about: options.about === true };
     tile.classList.add("is-pressed");
     window.BentoBulge?.setTilePress?.(tile, true);
   }
@@ -289,17 +300,6 @@ export function initBentoBulgeOverlays(options = {}) {
     doc.appendChild(tpl.content.cloneNode(true));
   }
 
-  function focusAboutEntry() {
-    const title = doc.querySelector(".about__hero-title");
-    if (title) {
-      title.setAttribute("tabindex", "-1");
-      title.focus({ preventScroll: true });
-      return;
-    }
-    panel.setAttribute("tabindex", "-1");
-    panel.focus({ preventScroll: true });
-  }
-
   function focusProjectClose() {
     if (coarsePointer) return;
     closeBtn.focus({ preventScroll: true });
@@ -326,19 +326,12 @@ export function initBentoBulgeOverlays(options = {}) {
       doc.classList.add("is-revealed", "is-instant");
       document.body.classList.add("is-detail-open", "is-detail-enter");
       onOpen(instant);
-      if (!instant) {
-        if (isAbout) focusAboutEntry();
-        else focusProjectClose();
-      }
       return;
     }
 
     doc.classList.add("is-revealed");
     startOpenTransition();
-    if (!instant) {
-      if (isAbout) focusAboutEntry();
-      else focusProjectClose();
-    }
+    if (!instant && !isAbout) focusProjectClose();
   }
 
   function open(id, skipPush, tile, instant, afterDockExit) {
@@ -416,7 +409,6 @@ export function initBentoBulgeOverlays(options = {}) {
       else if (!isAboutLocation()) history.replaceState({ about: true }, "", aboutUrl());
       setPageMeta(PAGE_META.about);
       setActiveNav("about");
-      if (!instant) focusAboutEntry();
       return;
     }
 
@@ -485,6 +477,11 @@ export function initBentoBulgeOverlays(options = {}) {
       // Coarse pointer: open on release — startOpenTransition() before click
       // disables grid pointer-events and suppresses the synthetic click on touch.
       if (coarsePointer) {
+        if (press.about) {
+          if (isStatementPassthroughTarget(e.target)) return;
+          openAbout(false);
+          return;
+        }
         open(press.id, false, press.tile);
         return;
       }
@@ -500,7 +497,23 @@ export function initBentoBulgeOverlays(options = {}) {
     // Touch taps are handled in onPointerUp; keep click for mouse + reduced-motion touch.
     if (coarsePointer && !reduceMotion) return;
     const tile = e.target.closest && e.target.closest(".tile");
-    if (!tile || !grid.contains(tile) || tile.dataset.static === "true") return;
+    if (!tile || !grid.contains(tile)) return;
+
+    if (isStatementTile(tile)) {
+      if (isStatementPassthroughTarget(e.target)) return;
+      e.preventDefault();
+      activePress = null;
+      if (
+        !document.body.classList.contains("is-detail-opening") &&
+        !document.body.classList.contains("is-detail-open")
+      ) {
+        startOpenTransition();
+      }
+      openAbout(false);
+      return;
+    }
+
+    if (tile.dataset.static === "true") return;
     const id = tile.dataset.id;
     if (!id) return;
     e.preventDefault();
@@ -574,7 +587,21 @@ export function initBentoBulgeOverlays(options = {}) {
 
   grid.querySelectorAll(".tile").forEach((tile) => {
     const id = tile.dataset.id;
-    if (!id || tile.dataset.static === "true") return;
+    if (!id) return;
+
+    if (isStatementTile(tile)) {
+      tile.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0 || isOverlayActive()) return;
+        if (isStatementPassthroughTarget(e.target)) return;
+        startTilePress(tile, id, { about: true });
+      });
+      tile.addEventListener("pointercancel", () => {
+        if (activePress && activePress.tile === tile) cancelTilePress();
+      });
+      return;
+    }
+
+    if (tile.dataset.static === "true") return;
 
     tile.addEventListener("pointerdown", (e) => {
       if (e.button !== 0 || isOverlayActive()) return;

@@ -250,7 +250,7 @@
           tile.className = "tile tile--statement";
           tile.dataset.id = "intro";
           tile.dataset.static = "true";
-          tile.setAttribute("aria-label", "Introduction");
+          tile.setAttribute("aria-label", "About Jesse O'Chapo");
 
           var surface = document.createElement("div");
           surface.className = "tile__surface";
@@ -497,21 +497,11 @@
               e.preventDefault();
               setLookingExpanded(!looking.classList.contains("is-expanded"));
             });
-            logo.addEventListener("click", onLookingToggle);
-            logo.setAttribute("role", "button");
-            logo.setAttribute("tabindex", "0");
-            logo.setAttribute("aria-label", "Expand currently looking");
-            logo.addEventListener("keydown", function (e) {
-              if (e.key !== "Enter" && e.key !== " ") return;
-              e.preventDefault();
-              setLookingExpanded(!looking.classList.contains("is-expanded"));
-            });
             document.addEventListener(
               "pointerdown",
               function (e) {
                 if (!looking.classList.contains("is-expanded")) return;
                 if (looking.contains(e.target)) return;
-                if (e.target === logo || (logo.contains && logo.contains(e.target))) return;
                 setLookingExpanded(false);
               },
               true
