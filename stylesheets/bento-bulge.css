@@ -235,6 +235,18 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
     transition: opacity var(--tx-out) ease-in;
   }
 
+  /*
+   * Statement is live DOM above the canvas — don't CSS-fade its tile opacity.
+   * That delayed 0.35→1 ramp lagged WebGL uOverlayDim and read as a second
+   * brighten after the shared grid blur cleared. Blur alone backgrounds it.
+   */
+  body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge-active .tile[data-id="intro"],
+  body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .tile[data-id="intro"],
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge-active .tile[data-id="intro"] {
+    opacity: 1 !important;
+    transition: none;
+  }
+
   body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge-active,
   body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active,
   body.is-detail-opening.bento-bulge-page.is-home .grid.grid--bulge,
@@ -263,6 +275,11 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
     opacity: 1 !important;
     transition: opacity var(--tx-in) ease-out var(--tx-delay);
   }
+
+  body.is-detail-closing.bento-bulge-page.is-home .grid.grid--bulge-active .tile[data-id="intro"] {
+    opacity: 1 !important;
+    transition: none;
+  }
 }
 
 .bento-bulge-page .tile__label {
@@ -281,7 +298,7 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
     filter var(--d-2, 180ms) var(--e-out, ease);
 }
 
-/* Top labels — Social VR + bottom row (WebGL bulge reads toward tile edge) */
+/* Top labels — project tiles (WebGL bulge reads toward tile edge) */
 .bento-bulge-page .grid .tile[data-id="quest-people"] .tile__label,
 .bento-bulge-page .grid .tile[data-id="horizon-mobile"] .tile__label,
 .bento-bulge-page .grid .tile[data-id="portal-voice"] .tile__label,
