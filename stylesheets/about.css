@@ -125,6 +125,10 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
   border-radius: 50%;
   overflow: hidden;
   box-shadow: var(--about-photo-shadow);
+  transform-origin: center center;
+  transition: transform var(--d-1) var(--e-out);
+  container-type: inline-size;
+  container-name: about-portrait;
 }
 
 .about__portrait img {
@@ -169,11 +173,76 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
   object-fit: cover;
 }
 
+/* Hover captions — bottom-right on rect frames; circular arc on portrait */
+.about__caption {
+  position: absolute;
+  z-index: 2;
+  right: clamp(14px, 2vw, 22px);
+  bottom: clamp(8px, 1.1vw, 12px);
+  margin: 0;
+  max-width: calc(100% - 1.5rem);
+  font-family: var(--font-mono);
+  font-size: clamp(0.625rem, 0.7vw, 0.75rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  color: #fff;
+  text-align: right;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(3px);
+  transition:
+    opacity 180ms var(--e-out),
+    transform 180ms var(--e-out);
+}
+
+.about__caption--circular {
+  inset: 0;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  overflow: visible;
+  text-align: start;
+  transform: none;
+}
+
+.about__caption--circular text {
+  fill: #fff;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  /* Counter viewBox scaling so size matches square captions across portrait sizes */
+  font-size: calc(clamp(0.625rem, 0.7vw, 0.75rem) * 100px / 100cqw);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .about__photo.about__photo-frame:hover .about__caption,
+  .about__portrait:hover .about__caption {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .about__portrait:hover .about__caption--circular {
+    transform: none;
+  }
+
+  .about__photo.about__photo-frame:hover,
+  .about__portrait:hover {
+    transform: scale(1.05);
+  }
+}
+
 .about__photo {
   position: absolute;
   z-index: 1;
   margin: 0;
   aspect-ratio: 1;
+  transform-origin: center center;
+  transition: transform var(--d-1) var(--e-out);
 }
 
 .about__photo--wide {
@@ -198,18 +267,27 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
   left: calc(679 / var(--about-artboard) * 100%);
   top: calc((440 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
+  z-index: 2;
 }
 
 .about__photo--polaroid {
   left: calc(888 / var(--about-artboard) * 100%);
   top: calc((459 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
+  z-index: 1;
 }
 
 .about__photo--scalloped {
   left: calc(1201 / var(--about-artboard) * 100%);
   top: calc((517 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
+}
+
+/* Right corner is covered by the coffee photo — keep caption clear on the left */
+.about__photo--scalloped .about__caption {
+  right: auto;
+  left: clamp(14px, 2vw, 22px);
+  text-align: left;
 }
 
 .about__photo--coffee {
@@ -620,5 +698,16 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 @media (prefers-reduced-motion: reduce) {
   .about__moments {
     scroll-behavior: auto;
+  }
+
+  .about__portrait,
+  .about__photo,
+  .about__caption {
+    transition: none;
+  }
+
+  .about__photo.about__photo-frame:hover,
+  .about__portrait:hover {
+    transform: none;
   }
 }
