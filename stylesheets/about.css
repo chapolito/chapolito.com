@@ -114,6 +114,8 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__portrait {
+  /* Average sample from jesse-ochapo-portrait.jpg — shows while img loads */
+  --about-photo-fill: #868e92;
   position: absolute;
   z-index: 2;
   left: calc(960 / var(--about-artboard) * 100%);
@@ -250,6 +252,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__photo--surf {
+  --about-photo-fill: #7d99ac; /* surfing.jpg */
   left: calc(88 / var(--about-artboard) * 100%);
   top: calc((424 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
@@ -257,6 +260,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__photo--wide {
+  --about-photo-fill: #b29779; /* wood-handle.jpg */
   left: calc(250 / var(--about-artboard) * 100%);
   top: calc((509 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(480 / var(--about-artboard) * 100%);
@@ -264,6 +268,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__photo--manta {
+  --about-photo-fill: #2e6fb7; /* diving-with-manta-rays.jpg */
   left: calc(679 / var(--about-artboard) * 100%);
   top: calc((440 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
@@ -271,6 +276,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__photo--polaroid {
+  --about-photo-fill: #9f958e; /* jesse-and-caito.jpg */
   left: calc(888 / var(--about-artboard) * 100%);
   top: calc((459 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
@@ -278,6 +284,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__photo--scalloped {
+  --about-photo-fill: #a18369; /* scalloped-wood.jpg */
   left: calc(1201 / var(--about-artboard) * 100%);
   top: calc((517 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
@@ -291,6 +298,7 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 }
 
 .about__photo--coffee {
+  --about-photo-fill: #b17751; /* coffee-table-wave.jpg */
   left: calc(1410 / var(--about-artboard) * 100%);
   top: calc((612 - var(--about-hero-collage-top)) / var(--about-hero-collage-height) * 100%);
   width: calc(234 / var(--about-artboard) * 100%);
@@ -378,6 +386,13 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
 .about__moment:nth-child(3) { margin-top: clamp(40px, 4.63vw, 80px); }
 .about__moment:nth-child(4) { margin-top: clamp(20px, 2.31vw, 40px); }
 .about__moment:nth-child(5) { margin-top: 0; }
+
+/* Career art — average samples so frames paint before images load */
+.about__moment:nth-child(1) .about__moment-art { --about-photo-fill: #172230; } /* starcraft.jpg */
+.about__moment:nth-child(2) .about__moment-art { --about-photo-fill: #533421; } /* mtv.jpg */
+.about__moment:nth-child(3) .about__moment-art { --about-photo-fill: #051c38; } /* meta.jpg */
+.about__moment:nth-child(4) .about__moment-art { --about-photo-fill: #484561; } /* oculus-vr.jpg */
+.about__moment:nth-child(5) .about__moment-art { --about-photo-fill: #1d1820; } /* whats-next.jpg */
 
 .about__moment-art {
   margin: 0 0 16px;
