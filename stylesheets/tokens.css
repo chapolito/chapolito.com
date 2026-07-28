@@ -34,8 +34,8 @@
   --grad: linear-gradient(96deg, var(--pp) 0%, var(--pk) 46%, var(--po) 100%);
   --grad-soft: linear-gradient(180deg, #efe2ff 0%, #f7c9bd 130%);
 
-  /* solid accent for small UI (soft purple, not cyan) */
-  --accent: #c9a9ff;
+  /* solid accent for small UI (focus rings, links) */
+  --accent: #4c75ff;
 
   /* ambient glow colors (loop-orb hues, used very subtly) */
   --glow-violet: rgba(139, 95, 255, 0.18);
