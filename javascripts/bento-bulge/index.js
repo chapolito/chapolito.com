@@ -16,6 +16,7 @@ import { initParams } from "./dialkit.js";
 import { createCustomCursor } from "./cursor.js";
 import { getEffectiveDpr } from "./dpr.js";
 import { createPerfMonitor, isPerfEnabled, noopPerf } from "./perf.js";
+import { promoteGridVideos, promoteHomeVideos } from "./videos.js";
 
 let instance = null;
 let whenReadyResolve = null;
@@ -107,31 +108,9 @@ function syncLabelOpacity(layout, field, params) {
 
 function bootDomGridVideos(bento, cellOpts, params) {
   if (!params.enableVideos) return;
-  const layout = measureCells(bento, 1, cellOpts);
-  promoteGridVideos(layout, params.pauseIdleVideos);
-}
-
-function promoteGridVideos(layout, pauseIdleVideos = false) {
-  const cells = layout.cells
-    .filter((cell) => cell.hasVideo && cell.video)
-    .sort((a, b) => b.width * b.height - a.width * a.height);
-
-  const immediate = 3;
-  const staggerMs = 100;
-
-  cells.forEach((cell, index) => {
-    const video = cell.video;
-    video.preload = "auto";
-    if (pauseIdleVideos) return;
-
-    const start = () => {
-      video.play().catch(() => {});
-    };
-    if (index < immediate) {
-      start();
-    } else {
-      window.setTimeout(start, (index - immediate) * staggerMs + 500);
-    }
+  promoteHomeVideos(bento, {
+    ...cellOpts,
+    pauseIdleVideos: params.pauseIdleVideos
   });
 }
 

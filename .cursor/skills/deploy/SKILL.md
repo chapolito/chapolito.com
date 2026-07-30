@@ -36,10 +36,11 @@ The deploy script automatically:
 
 1. Regenerates `/{project-id}/` and `/about/` deep-link copies (`generate:home-routes`)
 2. Vendors Three.js min builds (`vendor:three`)
-3. Syncs **assets** with `Cache-Control: public, max-age=86400` (stable filenames — do not use immutable/long TTL)
-4. Syncs **HTML** with `Cache-Control: no-cache` (fixes stale shell after LinkedIn/external link clicks)
-5. **Prod only:** updates CloudFront legacy redirect function and invalidates `/*`
-6. Runs `curl` smoke checks
+3. Bundles the bento-bulge WebGL graph into `javascripts/bento-bulge.bundle.js` (`build:bento`)
+4. Syncs **assets** with `Cache-Control: public, max-age=86400` (stable filenames — do not use immutable/long TTL)
+5. Syncs **HTML** with `Cache-Control: no-cache` (fixes stale shell after LinkedIn/external link clicks)
+6. **Prod only:** updates CloudFront legacy redirect function and invalidates `/*`
+7. Runs `curl` smoke checks
 
 Prod sync preserves `.well-known/pki-validation/` (SSL domain validation).
 

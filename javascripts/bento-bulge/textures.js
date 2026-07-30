@@ -1,4 +1,4 @@
-import * as THREE from "/javascripts/vendor/three.module.min.js";
+import * as THREE from "../vendor/three.module.min.js";
 import { MAX_CELLS, MAX_VIDEO_SLOTS } from "./shaders.js";
 
 const emptyTexture = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
@@ -20,10 +20,8 @@ function roundedRectPath(ctx, x, y, w, h, r) {
 }
 
 function drawPlaceholder(ctx, x, y, w, h, cornerRadius) {
-  const gradient = ctx.createLinearGradient(x, y, x, y + h);
-  gradient.addColorStop(0, "#303030");
-  gradient.addColorStop(1, "#242424");
-  ctx.fillStyle = gradient;
+  // Match statement tile surface (#222229) while video frames arrive.
+  ctx.fillStyle = "#222229";
   roundedRectPath(ctx, x, y, w, h, cornerRadius);
   ctx.fill();
 }

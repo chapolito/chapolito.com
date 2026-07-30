@@ -8,3 +8,5 @@ node_modules/
 .cursor/*
 !.cursor/rules/
 !.cursor/skills/
+javascripts/bento-bulge.bundle.js
+javascripts/bento-bulge.bundle.js.map

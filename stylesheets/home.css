@@ -123,7 +123,7 @@ body.is-home.is-home-enter .stage {
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: var(--bg);
+  background: #222229;
 }
 .tile__media video,
 .tile__media img {
@@ -392,7 +392,7 @@ body.is-home.is-home-enter .stage {
   opacity: 0.55;
   transition: opacity 150ms ease-out;
 }
-.tile__statement-social-link img {
+.tile__statement-social-link svg {
   display: block;
   width: 14px;
   height: 14px;
@@ -424,7 +424,7 @@ body.is-home.is-home-enter .stage {
   .tile__statement-social {
     gap: 12px;
   }
-  .tile__statement-social-link img {
+  .tile__statement-social-link svg {
     width: 20px;
     height: 20px;
   }

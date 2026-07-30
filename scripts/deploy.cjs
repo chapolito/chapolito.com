@@ -30,7 +30,6 @@ const SYNC_EXCLUDES = [
   "package-lock.json",
   "package.json",
   "AGENTS.md",
-  "interaction-lab/*",
   "about-v1/*",
   "about-v3/*",
   "stylesheets/about-variants.css",
@@ -80,7 +79,6 @@ const HTML_SKIP_DIRS = new Set([
   "node_modules",
   "scripts",
   ".cursor",
-  "interaction-lab",
   "about-v1",
   "about-v3",
 ]);
@@ -195,8 +193,9 @@ function main() {
   if (!dryRun) {
     run("node", ["scripts/generate-home-routes.cjs"]);
     run("npm", ["run", "vendor:three"]);
+    run("npm", ["run", "build:bento"]);
   } else {
-    console.log("\n→ (skipping generate:home-routes and vendor:three in dry run)");
+    console.log("\n→ (skipping generate:home-routes, vendor:three, and build:bento in dry run)");
   }
 
   console.log(`\nSyncing assets (cache-control: ${config.cacheControl.assets}) ...`);

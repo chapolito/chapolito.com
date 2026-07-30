@@ -1,4 +1,4 @@
-import * as THREE from "/javascripts/vendor/three.module.min.js";
+import * as THREE from "../vendor/three.module.min.js";
 import { vertexShader, fragmentShader, MAX_CELLS, MAX_VIDEO_SLOTS } from "./shaders.js";
 import { getEffectiveDpr, shouldUseAntialias } from "./dpr.js";
 

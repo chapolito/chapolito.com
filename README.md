@@ -60,7 +60,7 @@ npm run deploy:staging
 npm run deploy:prod
 ```
 
-The deploy script (`scripts/deploy.cjs`) regenerates deep-link routes, vendors Three.js, syncs with correct `Cache-Control` headers (HTML: `no-cache`, assets: 1-day TTL), and on production updates CloudFront legacy redirects and invalidates the CDN cache.
+The deploy script (`scripts/deploy.cjs`) regenerates deep-link routes, vendors Three.js, bundles the bento-bulge WebGL graph (`build:bento`), syncs with correct `Cache-Control` headers (HTML: `no-cache`, assets: 1-day TTL), and on production updates CloudFront legacy redirects and invalidates the CDN cache.
 
 Config: `scripts/deploy.config.json`. Optional machine-specific AWS profile: `scripts/deploy.config.local.json` (gitignored), e.g. `{ "awsProfile": "chapolito" }`.
 

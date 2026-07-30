@@ -7,7 +7,9 @@
     "apply:s3-redirects": "node scripts/apply-s3-website-config.cjs",
     "apply:cloudfront-redirects": "node scripts/apply-cloudfront-redirects.cjs",
     "vendor:three": "cp node_modules/three/build/three.core.min.js node_modules/three/build/three.module.min.js javascripts/vendor/",
-    "start": "node scripts/generate-home-routes.cjs && npm run vendor:three && node scripts/serve.cjs",
+    "build:bento": "node scripts/build-bento.cjs",
+    "sample:tile-colors": "node scripts/sample-tile-poster-colors.cjs",
+    "start": "node scripts/generate-home-routes.cjs && npm run vendor:three && npm run build:bento && node scripts/serve.cjs",
     "serve": "npm run start",
     "minify:images": "bash scripts/minify-assets.sh --images-only",
     "minify:videos": "bash scripts/minify-assets.sh --videos-only",
@@ -17,6 +19,7 @@
     "deploy:prod": "node scripts/deploy.cjs prod"
   },
   "dependencies": {
+    "esbuild": "^0.25.12",
     "three": "^0.184.0"
   }
 }

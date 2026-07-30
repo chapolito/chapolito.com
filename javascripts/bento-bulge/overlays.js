@@ -6,6 +6,78 @@ const TX_DELAY = 150;
 const DOCK_EXIT_MS = 340;
 const READER_TITLE_ID = "reader-overlay-title";
 
+/** Overlay-only sheets — kept off the home critical path. */
+const OVERLAY_STYLE_HREFS = {
+  detail: "/stylesheets/detail-view.css",
+  project: "/stylesheets/project.css",
+  about: "/stylesheets/about.css"
+};
+
+const overlayStyleLoads = new Map();
+
+function loadOverlayStylesheet(href) {
+  const pending = overlayStyleLoads.get(href);
+  if (pending) return pending;
+
+  const promise = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`link[data-overlay-style="${href}"]`);
+    if (existing) {
+      if (existing.sheet || existing.dataset.loaded === "true") {
+        resolve();
+        return;
+      }
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener(
+        "error",
+        () => reject(new Error(`Failed to load ${href}`)),
+        { once: true }
+      );
+      return;
+    }
+
+    const link = document.createElement("link");
+    link.rel = "stylesheet";
+    link.href = href;
+    link.dataset.overlayStyle = href;
+    link.addEventListener(
+      "load",
+      () => {
+        link.dataset.loaded = "true";
+        resolve();
+      },
+      { once: true }
+    );
+    link.addEventListener(
+      "error",
+      () => reject(new Error(`Failed to load ${href}`)),
+      { once: true }
+    );
+    document.head.appendChild(link);
+  });
+
+  overlayStyleLoads.set(href, promise);
+  return promise;
+}
+
+function ensureOverlayStyles({ about = false } = {}) {
+  const hrefs = [OVERLAY_STYLE_HREFS.detail, OVERLAY_STYLE_HREFS.project];
+  if (about) hrefs.push(OVERLAY_STYLE_HREFS.about);
+  return Promise.all(hrefs.map(loadOverlayStylesheet)).catch((err) => {
+    console.warn("[bento-bulge] overlay stylesheet load failed", err);
+  });
+}
+
+function warmOverlayStyles() {
+  const run = () => {
+    ensureOverlayStyles({ about: true });
+  };
+  if (typeof window.requestIdleCallback === "function") {
+    window.requestIdleCallback(run, { timeout: 2500 });
+  } else {
+    window.setTimeout(run, 1200);
+  }
+}
+
 export function initBentoBulgeOverlays(options = {}) {
   const grid = document.querySelector(options.grid || "#grid");
   const reader = document.getElementById("reader");
@@ -84,6 +156,7 @@ export function initBentoBulgeOverlays(options = {}) {
         document.body.classList.remove("is-home-pending");
         document.body.classList.add("is-home-enter");
         window.setTimeout(markHomeReady, TX_IN + TX_DELAY);
+        warmOverlayStyles();
       });
     };
     if (options.whenBulgeReady) {
@@ -467,10 +540,19 @@ export function initBentoBulgeOverlays(options = {}) {
     const p = window.getProject(id);
     if (!p || isClosing) return;
 
+    ensureOverlayStyles().then(() => {
+      openAfterStyles(id, skipPush, tile, instant, afterDockExit);
+    });
+  }
+
+  function openAfterStyles(id, skipPush, tile, instant, afterDockExit) {
+    const p = window.getProject(id);
+    if (!p || isClosing) return;
+
     if (!instant && !afterDockExit && document.body.classList.contains("is-home") && !isOverlayOpen()) {
       startOpenTransition();
       runHomeDockExit(() => {
-        open(id, skipPush, tile, instant, true);
+        openAfterStyles(id, skipPush, tile, instant, true);
       });
       return;
     }
@@ -505,6 +587,14 @@ export function initBentoBulgeOverlays(options = {}) {
   }
 
   function openAbout(skipPush, instant, afterDockExit) {
+    if ((aboutOpen && !openId) || isClosing) return;
+
+    ensureOverlayStyles({ about: true }).then(() => {
+      openAboutAfterStyles(skipPush, instant, afterDockExit);
+    });
+  }
+
+  function openAboutAfterStyles(skipPush, instant, afterDockExit) {
     if ((aboutOpen && !openId) || isClosing) return;
 
     if (openId) {
@@ -545,7 +635,7 @@ export function initBentoBulgeOverlays(options = {}) {
     if (!instant && !afterDockExit && document.body.classList.contains("is-home") && !isOverlayOpen()) {
       startOpenTransition();
       runHomeDockExit(() => {
-        openAbout(skipPush, instant, true);
+        openAboutAfterStyles(skipPush, instant, true);
       });
       return;
     }
