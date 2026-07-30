@@ -108,7 +108,7 @@ body.is-home.is-home-enter .stage {
   inset: 0;
   border-radius: 8px;
   overflow: hidden;
-  background: var(--bg);
+  background: #222229;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   isolation: isolate;
   will-change: transform;
@@ -132,6 +132,24 @@ body.is-home.is-home-enter .stage {
   object-fit: cover;
   will-change: transform;
   transition: transform var(--d-3) var(--e-out);
+}
+/* Play under the fade — opacity ramps while the loop is already running. */
+.tile__media video {
+  opacity: 0;
+  transition:
+    opacity 400ms var(--e-out),
+    transform var(--d-3) var(--e-out);
+}
+.tile__media video.is-frame-ready {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile__media video {
+    transition: transform var(--d-3) var(--e-out);
+  }
+  .tile__media video.is-frame-ready {
+    opacity: 1;
+  }
 }
 .tile[data-fit="contain"] .tile__media {
   display: grid;

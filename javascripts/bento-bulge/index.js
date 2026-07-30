@@ -271,8 +271,11 @@ export function initBentoBulge(options = {}) {
     requestAnimationFrame(tick);
   }
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
   function wantsContinuousRender() {
     if (!readyFired) return true;
+    if (surface.hasVideoFading?.()) return true;
     if (overlayOpen) {
       return (
         isFieldMorphing(field) ||
@@ -469,6 +472,9 @@ export function initBentoBulge(options = {}) {
 
     updateBulgeField(field, params, dt, { overlayOpen });
     syncLabelOpacity(layout, field, params);
+    if (surface.tickVideoFades?.(dt, reduceMotion)) {
+      needsRender = true;
+    }
 
     const continuous = wantsContinuousRender();
     if (wasContinuous && !continuous) needsRender = true;
@@ -493,7 +499,8 @@ export function initBentoBulge(options = {}) {
     lastDrawAt = now;
     needsRender = false;
 
-    if (continuous) {
+    // Slots may start a fade during drawFrame — keep ticking until they settle.
+    if (continuous || surface.hasVideoFading?.()) {
       stopVideoLoop();
       scheduleFrame();
     } else {

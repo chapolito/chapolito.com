@@ -71,6 +71,7 @@ uniform int uCellCount;
 uniform vec4 uCellRects[25];
 uniform float uCornerRadius;
 uniform float uCellVideoSlot[25];
+uniform float uCellVideoFade[25];
 uniform int uVideoSlotCount;
 uniform vec2 uVideoSize[8];
 uniform float uVideoFitContain[8];
@@ -242,17 +243,26 @@ void main() {
         vec2(uCellCoverAnchorX[idx], uCellCoverAnchorY[idx])
       );
     }
+    // Live loop under the fade — mix from tile fill while playback is already going.
+    vec3 solid = vec3(0.133333, 0.133333, 0.160784); // #222229
+    float fade = clamp(uCellVideoFade[idx], 0.0, 1.0);
     if (uVideoFitContain[slot] > 0.5) {
       bool inMedia = mediaUV.x >= 0.0 && mediaUV.x <= 1.0 && mediaUV.y >= 0.0 && mediaUV.y <= 1.0;
       color = inMedia
-        ? sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0))
+        ? mix(solid, sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0)), fade)
         : containBackground(local);
     } else {
-      color = sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0));
+      color = mix(solid, sampleVideoSlot(slot, clamp(mediaUV, 0.0, 1.0)), fade);
     }
     alpha = 1.0;
   } else if (idx >= 0 && uCellSolidFill[idx] > 0.5) {
     // Statement tiles — solid fill in-shader; atlas carries type only.
+    vec3 solid = vec3(0.133333, 0.133333, 0.160784); // #222229
+    vec4 atlasSample = texture2D(uAtlas, uv);
+    color = mix(solid, atlasSample.rgb, atlasSample.a);
+    alpha = 1.0;
+  } else if (idx >= 0) {
+    // Project tiles waiting on video — keep statement fill under atlas/placeholder.
     vec3 solid = vec3(0.133333, 0.133333, 0.160784); // #222229
     vec4 atlasSample = texture2D(uAtlas, uv);
     color = mix(solid, atlasSample.rgb, atlasSample.a);
@@ -269,7 +279,7 @@ void main() {
     float cellDist = cellRoundedDist(uv, rect);
     float edgeDistPx = distToEdgePx(cellDist);
 
-    if (uCellVideoSlot[idx] >= 0.0 || uCellSolidFill[idx] > 0.5) {
+    if (uCellVideoSlot[idx] >= 0.0 || uCellSolidFill[idx] > 0.5 || alpha > 0.0) {
       alpha *= cellShapeAlpha(cellDist);
     }
 

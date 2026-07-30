@@ -7,6 +7,23 @@ export function ensureVideoSrc(video) {
   if (!dataSrc) return;
   if (video.getAttribute("src") === dataSrc) return;
   video.src = dataSrc;
+  watchVideoFrameReady(video);
+}
+
+function watchVideoFrameReady(video) {
+  if (!video || video.dataset.frameReadyWatch === "true") return;
+  video.dataset.frameReadyWatch = "true";
+
+  const mark = () => {
+    video.classList.add("is-frame-ready");
+  };
+
+  if (video.readyState >= 2 && video.videoWidth > 0) {
+    mark();
+    return;
+  }
+
+  video.addEventListener("loadeddata", mark, { once: true });
 }
 
 /**
@@ -31,6 +48,7 @@ export function promoteGridVideos(layout, pauseIdleVideos = false) {
       ensureVideoSrc(video);
       video.preload = "auto";
       if (pauseIdleVideos) return;
+      // Start playback immediately; CSS/WebGL fade in while the loop runs.
       video.play().catch(() => {});
     };
 

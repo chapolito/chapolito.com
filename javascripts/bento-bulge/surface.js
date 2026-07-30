@@ -59,6 +59,9 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
 
   const cellVideoSlot = new Float32Array(MAX_CELLS);
   cellVideoSlot.fill(-1);
+  const cellVideoFade = new Float32Array(MAX_CELLS);
+  const prevCellVideoSlot = new Float32Array(MAX_CELLS);
+  prevCellVideoSlot.fill(-1);
   const videoSizes = Array.from({ length: MAX_VIDEO_SLOTS }, () => new THREE.Vector2(1, 1));
   const videoFitContain = new Float32Array(MAX_VIDEO_SLOTS);
   const videoFitFill = new Float32Array(MAX_VIDEO_SLOTS);
@@ -66,6 +69,9 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   for (let i = 0; i < MAX_VIDEO_SLOTS; i++) {
     videoUniforms[`uVideo${i}`] = { value: emptyTexture };
   }
+
+  const VIDEO_FADE_SEC = 0.4;
+  let videoFading = false;
 
   const cellUniforms = createCellUniforms(layout.cells);
 
@@ -83,6 +89,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uCellSolidFill: { value: cellUniforms.solidFill },
     uCornerRadius: { value: params.cornerRadius || 8 },
     uCellVideoSlot: { value: cellVideoSlot },
+    uCellVideoFade: { value: cellVideoFade },
     uVideoSlotCount: { value: 0 },
     uVideoSize: { value: videoSizes },
     uVideoFitContain: { value: videoFitContain },
@@ -213,7 +220,22 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   function updateVideoSlots(videoState) {
     const { slots, cellSlots } = videoState;
     uniforms.uVideoSlotCount.value = slots.length;
-    uniforms.uCellVideoSlot.value = cellSlots;
+
+    for (let i = 0; i < MAX_CELLS; i++) {
+      const next = cellSlots[i] ?? -1;
+      const prev = prevCellVideoSlot[i];
+      cellVideoSlot[i] = next;
+      if (next >= 0 && prev < 0) {
+        // New live slot — fade up while the loop is already playing.
+        cellVideoFade[i] = 0;
+        videoFading = true;
+      } else if (next < 0) {
+        cellVideoFade[i] = 0;
+      }
+      prevCellVideoSlot[i] = next;
+    }
+    uniforms.uCellVideoSlot.value = cellVideoSlot;
+    uniforms.uCellVideoFade.value = cellVideoFade;
 
     for (let i = 0; i < MAX_VIDEO_SLOTS; i++) {
       const slot = slots[i];
@@ -233,6 +255,31 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uniforms.uVideoSize.value = videoSizes;
     uniforms.uVideoFitContain.value = videoFitContain;
     uniforms.uVideoFitFill.value = videoFitFill;
+  }
+
+  function tickVideoFades(dt, instant = false) {
+    if (!videoFading && !instant) return false;
+
+    let stillFading = false;
+    const step = instant ? 1 : dt / VIDEO_FADE_SEC;
+
+    for (let i = 0; i < MAX_CELLS; i++) {
+      if (cellVideoSlot[i] < 0) {
+        cellVideoFade[i] = 0;
+        continue;
+      }
+      if (cellVideoFade[i] >= 1) continue;
+      cellVideoFade[i] = Math.min(1, cellVideoFade[i] + step);
+      if (cellVideoFade[i] < 1) stillFading = true;
+    }
+
+    videoFading = stillFading;
+    uniforms.uCellVideoFade.value = cellVideoFade;
+    return stillFading;
+  }
+
+  function hasVideoFading() {
+    return videoFading;
   }
 
   function render() {
@@ -256,6 +303,8 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     resize,
     updateFromField,
     updateVideoSlots,
+    tickVideoFades,
+    hasVideoFading,
     render,
     dispose
   };
