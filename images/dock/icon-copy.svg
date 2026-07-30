@@ -1,0 +1,34 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!--
+      Punch out the front sheet + padding so the back stroke never
+      touches it — uniform gap, hard cuts where the mask clips.
+    -->
+    <mask id="dock-copy-gap" maskUnits="userSpaceOnUse">
+      <rect width="24" height="24" fill="white" />
+      <rect x="3.5" y="6.5" width="12" height="16" rx="3.75" fill="black" />
+    </mask>
+  </defs>
+  <!-- Front — portrait 9×13 -->
+  <rect
+    x="5"
+    y="8"
+    width="9"
+    height="13"
+    rx="2.25"
+    stroke="white"
+    stroke-width="1.75"
+  />
+  <!-- Back — same 9×13, offset equally (+4, −4) -->
+  <rect
+    x="9"
+    y="4"
+    width="9"
+    height="13"
+    rx="2.25"
+    stroke="white"
+    stroke-width="1.75"
+    stroke-linecap="butt"
+    mask="url(#dock-copy-gap)"
+  />
+</svg>

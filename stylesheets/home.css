@@ -248,7 +248,8 @@ body.is-home.is-home-enter .stage {
 /* Statement intro — Figma node 2666:3253 */
 .tile--statement {
   cursor: pointer;
-  --statement-size: clamp(1.375rem, 1.67vw, 2rem);
+  --statement-size: clamp(1.8rem, 2.708vw, 2.925rem);
+  --statement-logo-size: clamp(1.375rem, 1.67vw, 2rem);
   /* Looking expands past the tile box — don't clip it */
   overflow: visible;
 }
@@ -282,7 +283,7 @@ body.is-home.is-home-enter .stage {
   grid-area: 1 / 1;
   display: block;
   width: auto;
-  height: calc(var(--statement-size) * 30 / 32);
+  height: calc(var(--statement-logo-size) * 30 / 32);
   margin: 0;
 }
 /* Copy + meta + looking as one block, vertically centered in the tile */
@@ -293,9 +294,33 @@ body.is-home.is-home-enter .stage {
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
-  /* 1728 artboard: tile ~858, pad 3.4% → ~800 content; 80% ≈ 640 for H1 + Looking */
-  max-width: 80%;
+  max-width: 88%;
   overflow: visible;
+}
+.tile__statement-mut {
+  color: rgba(255, 255, 255, 0.5);
+}
+/* Accent highlight chips on builds / ships / steers */
+.tile__statement-mark {
+  --statement-mark-trim: 0.22em;
+  display: inline;
+  position: relative;
+  isolation: isolate;
+  padding: 0.04em 0.1em;
+  color: #fff;
+  background: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.tile__statement-mark::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: var(--statement-mark-trim);
+  bottom: 0;
+  background: var(--accent);
 }
 .tile__statement-copy {
   margin: 0;
@@ -305,17 +330,21 @@ body.is-home.is-home-enter .stage {
   font-style: normal;
   font-synthesis: none;
   font-size: var(--statement-size);
-  line-height: 1.25;
+  line-height: 1.2;
   letter-spacing: 0;
   color: var(--ink);
 }
 .tile__statement-meta {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
-  gap: 0.55rem 0.65rem;
+  align-self: stretch;
+  width: 100%;
+  column-gap: 0.65rem;
+  row-gap: 12px;
   margin-top: 12px;
   pointer-events: auto;
+  overflow: visible;
 }
 .tile__statement-ex,
 .tile__statement-loc {
@@ -323,6 +352,7 @@ body.is-home.is-home-enter .stage {
   font-weight: 500;
   font-size: clamp(0.75rem, 0.85vw, 0.875rem);
   line-height: 1;
+  flex-shrink: 0;
 }
 .tile__statement-ex {
   color: rgba(255, 255, 255, 0.6);
@@ -336,16 +366,30 @@ body.is-home.is-home-enter .stage {
   font-weight: 400;
   font-size: clamp(0.75rem, 0.85vw, 0.875rem);
   line-height: 1;
+  flex-shrink: 0;
+}
+/* Stacked only when JS detects the row won't fit */
+.tile__statement-meta.is-stacked {
+  flex-wrap: wrap;
+}
+.tile__statement-meta.is-stacked .tile__statement-sep--social {
+  display: none;
+}
+.tile__statement-meta.is-stacked .tile__statement-social {
+  flex-basis: 100%;
 }
 .tile__statement-social {
   display: inline-flex;
   align-items: center;
   gap: 0.85rem;
+  flex-shrink: 0;
+  overflow: visible;
 }
 .tile__statement-social-link {
   display: inline-flex;
+  flex-shrink: 0;
   line-height: 0;
-  opacity: 0.4;
+  opacity: 0.55;
   transition: opacity 150ms ease-out;
 }
 .tile__statement-social-link img {
@@ -358,8 +402,192 @@ body.is-home.is-home-enter .stage {
     opacity: 1;
   }
 }
+
+/* Desktop columns — constrained copy + stacked meta (option 2) */
+@media (min-width: 1081px) {
+  .tile__statement-body {
+    max-width: min(100%, calc(var(--statement-size) * 8.05));
+  }
+  .tile__statement-copy {
+    line-height: 1.15;
+  }
+  .tile__statement-meta {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: flex-start;
+    row-gap: 10px;
+    margin-top: 20px;
+  }
+  .tile__statement-sep {
+    display: none;
+  }
+  .tile__statement-social {
+    gap: 12px;
+  }
+  .tile__statement-social-link img {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+/* Email reveal-pill — option A: icon rest, expand right, swipe to Copied */
+.tile__mailpill {
+  --mail-collapsed: 14px;
+  --mail-line: 17px; /* room for mono descenders (j, g, y) */
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  box-sizing: border-box;
+  width: var(--mail-collapsed);
+  /* Grow past the ~80% statement body on hover — don't clamp to parent */
+  max-width: none;
+  height: var(--mail-line);
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  line-height: var(--mail-line);
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.55;
+  transition:
+    width 320ms var(--e-out),
+    opacity 150ms ease-out,
+    gap 320ms var(--e-out);
+}
+.tile__mailpill-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+}
+.tile__mailpill-mail,
+.tile__mailpill-copy,
+.tile__mailpill-check {
+  grid-area: 1 / 1;
+  display: block;
+  width: 14px;
+  height: 14px;
+  transition:
+    opacity 180ms var(--e-out),
+    transform 180ms var(--e-out),
+    filter 180ms var(--e-out);
+}
+.tile__mailpill-copy,
+.tile__mailpill-check {
+  opacity: 0;
+  transform: scale(0.7);
+  filter: blur(3px);
+}
+.tile__mailpill-text {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  height: var(--mail-line);
+  opacity: 0;
+  transition: opacity 160ms var(--e-out);
+}
+.tile__mailpill-addr,
+.tile__mailpill-done {
+  display: block;
+  white-space: nowrap;
+  line-height: var(--mail-line);
+  transition:
+    transform 280ms var(--e-out),
+    opacity 220ms ease-out;
+}
+.tile__mailpill-addr {
+  position: relative;
+  color: #fff;
+}
+.tile__mailpill-done {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #47ffb2;
+  pointer-events: none;
+  /* Micro-slide + fade — avoids hard clipping from a full off-stage wipe */
+  opacity: 0;
+  transform: translateX(-8px);
+}
+.tile__mailpill.is-copied .tile__mailpill-addr {
+  transform: translateX(8px);
+  opacity: 0;
+}
+.tile__mailpill.is-copied .tile__mailpill-done {
+  transform: translateX(0);
+  opacity: 1;
+}
+.tile__mailpill.is-copied {
+  width: var(--mail-w, 180px);
+  gap: 8px;
+  opacity: 1;
+}
+.tile__mailpill.is-copied .tile__mailpill-text {
+  opacity: 1;
+  transition-delay: 40ms;
+}
+@media (hover: hover) {
+  .tile__mailpill:hover,
+  .tile__mailpill:focus-visible {
+    width: var(--mail-w, 180px);
+    gap: 8px;
+    opacity: 1;
+  }
+  .tile__mailpill:hover .tile__mailpill-text,
+  .tile__mailpill:focus-visible .tile__mailpill-text {
+    opacity: 1;
+    transition-delay: 60ms;
+  }
+  .tile__mailpill:hover:not(.is-copied) .tile__mailpill-addr,
+  .tile__mailpill:focus-visible:not(.is-copied) .tile__mailpill-addr {
+    opacity: 1;
+  }
+  /* Hint the click action while the address is revealed */
+  .tile__mailpill:hover .tile__mailpill-mail,
+  .tile__mailpill:focus-visible .tile__mailpill-mail {
+    opacity: 0;
+    transform: scale(0.7);
+    filter: blur(3px);
+  }
+  .tile__mailpill:hover .tile__mailpill-copy,
+  .tile__mailpill:focus-visible .tile__mailpill-copy {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+}
+.tile__mailpill.is-copied .tile__mailpill-mail,
+.tile__mailpill.is-copied .tile__mailpill-copy {
+  opacity: 0;
+  transform: scale(0.7);
+  filter: blur(3px);
+}
+.tile__mailpill.is-copied .tile__mailpill-check {
+  opacity: 1;
+  transform: scale(1);
+  filter: blur(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile__mailpill,
+  .tile__mailpill-text,
+  .tile__mailpill-addr,
+  .tile__mailpill-done,
+  .tile__mailpill-mail,
+  .tile__mailpill-copy,
+  .tile__mailpill-check {
+    transition: none !important;
+  }
+}
 .tile__looking-slot {
-  --looking-collapsed-h: 44px;
+  --looking-collapsed-h: 40px;
   position: relative;
   align-self: stretch;
   width: 100%;
@@ -376,15 +604,15 @@ body.is-home.is-home-enter .stage {
   left: 0;
   display: block;
   box-sizing: border-box;
-  /* Collapsed hug width from JS (lead + pad/border). Frame is always the
+  /* Collapsed hug width from JS (lead + pad). Frame is always the
      open width and clipped, so keyword max-content would size to the slot. */
   width: var(--looking-chip-w, max-content);
   max-width: 100%;
   margin: 0;
   padding: 10px 14px;
-  border: 2px solid #ccfde9;
+  border: none;
   border-radius: 12px;
-  color: #47ffb2;
+  color: #ccfde9;
   font-family: var(--font-mono);
   font-weight: 600;
   font-size: 15px;
@@ -394,13 +622,12 @@ body.is-home.is-home-enter .stage {
   overflow: hidden;
   pointer-events: auto;
   cursor: pointer;
-  background: transparent;
+  background: rgba(71, 255, 178, 0.2);
   /* fixed → auto height (with interpolate-size) tracks real content, unlike max-height */
   height: var(--looking-collapsed-h);
   interpolate-size: allow-keywords;
   /* collapse: shared delay, then everything moves together (ends at 0.45s) */
   transition:
-    border-color 0.3s ease-out 0.15s,
     background-color 0.3s ease-out 0.15s,
     height 0.3s ease-out 0.15s,
     width 0.3s ease-out 0.15s;
@@ -420,7 +647,7 @@ body.is-home.is-home-enter .stage {
   gap: 5px;
   /* Always the open content width. The chip is only a clipping mask —
      inner layout never reflows on expand/collapse. */
-  width: calc(100cqw - var(--looking-pad-x, 14px) * 2 - 4px);
+  width: calc(100cqw - var(--looking-pad-x, 14px) * 2);
   max-width: none;
 }
 .tile__looking-top {
@@ -445,10 +672,18 @@ body.is-home.is-home-enter .stage {
   overflow: visible;
   transform-origin: 50% 50%;
   will-change: transform;
+  transition:
+    transform 220ms var(--e-out),
+    opacity 220ms var(--e-out);
 }
 .tile__looking-eye-gaze {
   transform-box: fill-box;
   transform-origin: center;
+}
+.tile__looking-eye-pupil {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: transform 220ms var(--e-out);
 }
 .tile__looking-label {
   line-height: 20px;
@@ -461,8 +696,9 @@ body.is-home.is-home-enter .stage {
   margin: 0;
   width: 100%;
   max-width: 100%;
-  line-height: 20px;
-  letter-spacing: 1px;
+  font-size: clamp(0.75rem, 0.85vw, 0.875rem);
+  line-height: 1.35;
+  letter-spacing: 0.02em;
   text-transform: none;
   /* Fades out first, then the chip closes. visibility follows the fade so the
      closed chip can't show this line through its bottom padding (overflow
@@ -476,9 +712,9 @@ body.is-home.is-home-enter .stage {
 .tile__looking-status {
   color: #ccfde9;
   font-weight: 600;
-  font-size: 15px;
-  letter-spacing: 1px;
-  line-height: 20px;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
   text-transform: none;
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
@@ -486,16 +722,16 @@ body.is-home.is-home-enter .stage {
 .tile__looking-sep {
   color: rgba(204, 253, 233, 0.4);
   font-weight: 400;
-  font-size: 15px;
-  letter-spacing: 1px;
-  line-height: 20px;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
 }
 .tile__looking-detail {
   color: rgba(204, 253, 233, 0.6);
   font-weight: 400;
-  font-size: 15px;
-  letter-spacing: 1px;
-  line-height: 20px;
+  font-size: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
   text-transform: none;
   text-box-trim: trim-both;
   text-box-edge: cap alphabetic;
@@ -532,35 +768,72 @@ body.is-home.is-home-enter .stage {
   flex-shrink: 0;
 }
 
-@keyframes looking-eye-blink {
-  0%,
+/* Sleep nod-off — lid sequence is WAAPI; Z’s need to escape the chip clip */
+.tile__looking.is-asleep {
+  overflow: visible;
+}
+.tile__looking.is-asleep .tile__looking-eye-lid {
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .tile__looking.is-asleep .tile__looking-eye-lid {
+    ry: 0.43;
+  }
+  .tile__looking.is-asleep .tile__looking-eye-gaze {
+    opacity: 0;
+  }
+  .tile__looking.is-asleep .tile__looking-eye {
+    opacity: 0.6;
+  }
+}
+@keyframes looking-z-float {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.8);
+  }
+  30% {
+    opacity: 0.8;
+  }
   100% {
-    transform: scaleY(1);
+    opacity: 0;
+    transform: translate(9px, -18px) scale(1.2);
   }
-  12%,
-  20% {
-    transform: scaleY(0.06);
-  }
-  28% {
-    transform: scaleY(1);
-  }
-  42%,
-  50% {
-    transform: scaleY(0.06);
-  }
-  58% {
-    transform: scaleY(1);
-  }
+}
+.tile__looking-z {
+  position: absolute;
+  left: 30px;
+  top: 6px;
+  z-index: 2;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 10px;
+  color: rgba(204, 253, 233, 0.8);
+  text-transform: lowercase;
+  pointer-events: none;
+  opacity: 0;
+  animation: looking-z-float 2.6s ease-in-out infinite;
+}
+.tile__looking-z--2 {
+  left: 38px;
+  top: 2px;
+  font-size: 8px;
+  animation-delay: 1.3s;
+}
+
+/* Résumé excitement — dilate + lean toward the button */
+.tile__looking.is-excited .tile__looking-eye-pupil {
+  transform: scale(1.45);
+}
+.tile__looking.is-excited .tile__looking-eye {
+  transform: scale(1.1);
 }
 
 /* Open chrome — chip size/colors only; inner layout is already final */
 .tile__looking.is-expanded {
   width: 100%;
   height: auto;
-  border-color: rgba(204, 253, 233, 0.1);
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(71, 255, 178, 0.07);
   transition:
-    border-color 0.3s ease-out,
     background-color 0.3s ease-out,
     width 0.3s ease-out,
     height 0.3s ease-out;
@@ -593,10 +866,8 @@ body.is-home.is-home-enter .stage {
   .tile__looking:focus-within {
     width: 100%;
     height: auto;
-    border-color: rgba(204, 253, 233, 0.1);
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(71, 255, 178, 0.07);
     transition:
-      border-color 0.3s ease-out,
       background-color 0.3s ease-out,
       width 0.3s ease-out,
       height 0.3s ease-out;
@@ -628,11 +899,6 @@ body.is-home.is-home-enter .stage {
   .tile__looking.is-expanded .tile__looking-resume:active {
     background: rgba(204, 253, 233, 0.3);
   }
-  .tile__looking:hover .tile__looking-eye,
-  .tile__looking:focus-within .tile__looking-eye,
-  .tile__looking.is-expanded .tile__looking-eye {
-    animation: looking-eye-blink 0.7s ease-in-out;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -640,11 +906,6 @@ body.is-home.is-home-enter .stage {
   .tile__looking-copy,
   .tile__looking-resume {
     transition: none !important;
-  }
-  .tile__looking:hover .tile__looking-eye,
-  .tile__looking:focus-within .tile__looking-eye,
-  .tile__looking.is-expanded .tile__looking-eye {
-    animation: none !important;
   }
 }
 
@@ -853,35 +1114,16 @@ body.is-home.is-detail-enter .detail-close {
 }
 
 /* ---- responsive ---- */
-/* Tablet / iPad — statement + 2×2 projects (bento-bulge.css owns live placement) */
-@media (max-width: 1080px) {
-  .tile__statement-body {
-    max-width: 100%;
-  }
+/* Tablet / iPad — statement + 2×2 (bento-bulge.css owns live placement) */
+@media (max-width: 1080px) and (min-width: 601px) {
   .tile--statement {
-    --statement-size: clamp(1.25rem, 2.1vw, 1.75rem);
+    --statement-size: clamp(1.6rem, 3.2vw, 2.4rem);
   }
   .tile__statement {
     padding:
       clamp(28px, 4.5%, 48px)
       clamp(24px, 3.2%, 40px)
       clamp(20px, 3%, 36px);
-  }
-  .grid {
-    grid-template-columns: repeat(6, 1fr);
-    grid-template-rows: none;
-    grid-auto-rows: clamp(58px, 9vw, 96px);
-  }
-  .tile[data-id="intro"] {
-    grid-column: 1 / 7;
-    grid-row: span 4;
-  }
-  .tile[data-id="quest-people"],
-  .tile[data-id="portal-household"],
-  .tile[data-id="portal-voice"],
-  .tile[data-id="horizon-mobile"] {
-    grid-column: span 3;
-    grid-row: span 4;
   }
 }
 @media (max-width: 600px) {
@@ -901,7 +1143,7 @@ body.is-home.is-detail-enter .detail-close {
     min-height: clamp(360px, 96vw, 480px);
   }
   .tile--statement {
-    --statement-size: clamp(1.25rem, 5.2vw, 1.75rem);
+    --statement-size: clamp(1.6rem, 7vw, 2.25rem);
   }
   .tile--statement .tile__statement {
     position: relative;
@@ -914,25 +1156,12 @@ body.is-home.is-detail-enter .detail-close {
   .tile__statement-copy {
     max-width: none;
   }
-  .tile__statement-meta {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.55rem 0.65rem;
-  }
-  /* keep ex · loc on one line; drop the sep before social */
-  .tile__statement-sep:has(+ .tile__statement-social) {
-    display: none;
-  }
-  .tile__statement-social {
-    flex-basis: 100%;
-  }
   .tile__looking-slot {
     --looking-size: 11px;
     --looking-line: 15px;
     --looking-pad-y: 8px;
     --looking-pad-x: 11px;
-    --looking-collapsed-h: calc(var(--looking-line) + var(--looking-pad-y) * 2 + 4px);
+    --looking-collapsed-h: calc(var(--looking-line) + var(--looking-pad-y) * 2);
     margin-top: 28px;
     height: var(--looking-collapsed-h);
   }
@@ -947,12 +1176,9 @@ body.is-home.is-detail-enter .detail-close {
     /* desktop min-height:20px overflows the 15px mobile line box */
     min-height: var(--looking-line);
   }
-  .tile__looking-copy,
-  .tile__looking-lead,
-  .tile__looking-status,
-  .tile__looking-detail,
-  .tile__looking-sep {
+  .tile__looking-lead {
     line-height: var(--looking-line);
+    gap: 10px;
   }
   .tile__looking-label {
     font-size: var(--looking-size);
@@ -961,14 +1187,6 @@ body.is-home.is-detail-enter .detail-close {
   .tile__looking-eye {
     width: 22px;
     height: 12px;
-  }
-  .tile__looking-lead {
-    gap: 10px;
-  }
-  .tile__looking-status,
-  .tile__looking-detail,
-  .tile__looking-sep {
-    font-size: var(--looking-size);
   }
   .tile__looking-resume {
     line-height: var(--looking-line);

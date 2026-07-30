@@ -30,6 +30,10 @@ const SYNC_EXCLUDES = [
   "package-lock.json",
   "package.json",
   "AGENTS.md",
+  "interaction-lab/*",
+  "about-v1/*",
+  "about-v3/*",
+  "stylesheets/about-variants.css",
   "**/.DS_Store",
 ];
 
@@ -71,7 +75,15 @@ function excludeArgs(extra = []) {
   return [...SYNC_EXCLUDES, ...extra].flatMap((pattern) => ["--exclude", pattern]);
 }
 
-const HTML_SKIP_DIRS = new Set([".git", "node_modules", "scripts", ".cursor"]);
+const HTML_SKIP_DIRS = new Set([
+  ".git",
+  "node_modules",
+  "scripts",
+  ".cursor",
+  "interaction-lab",
+  "about-v1",
+  "about-v3",
+]);
 
 function collectHtmlFiles(dir, files = [], rel = "") {
   for (const name of fs.readdirSync(dir)) {

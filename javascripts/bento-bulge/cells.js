@@ -53,7 +53,9 @@ export function measureCells(container, dpr, options = {}) {
   const containerRect = container.getBoundingClientRect();
   const width = Math.max(containerRect.width, 1);
   const height = Math.max(containerRect.height, 1);
-  const elements = [...container.querySelectorAll(cellSelector)].slice(0, MAX_CELLS);
+  const elements = [...container.querySelectorAll(cellSelector)]
+    .filter((el) => getComputedStyle(el).display !== "none")
+    .slice(0, MAX_CELLS);
 
   let baselineArea = null;
   const cells = elements.map((el, index) => {

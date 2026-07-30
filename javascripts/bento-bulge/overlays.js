@@ -120,10 +120,135 @@ export function initBentoBulgeOverlays(options = {}) {
     return "/about/";
   }
 
+  /* ---- Dock sliding ink ---- */
+  const dockNav = document.querySelector(".dock__nav");
+  const dockInk = dockNav?.querySelector(".dock__ink");
+  let dockInkReady = false;
+  let dockInkHover = null;
+
+  function dockInkTarget() {
+    if (!dockNav) return null;
+    if (dockInkHover && dockNav.contains(dockInkHover)) return dockInkHover;
+    return dockNav.querySelector(".dock__link.is-active") || dockNav.querySelector(".dock__link");
+  }
+
+  function moveDockInk(el = dockInkTarget(), { instant = false } = {}) {
+    if (!dockInk || !dockNav || !el) return;
+    const nr = dockNav.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    if (!nr.width || !r.width) return;
+    const next = {
+      width: `${r.width * 0.8}px`,
+      transform: `translateX(${r.left - nr.left + r.width * 0.1}px)`,
+    };
+    if (instant || !dockInkReady) {
+      const prev = dockInk.style.transition;
+      dockInk.style.transition = "none";
+      dockInk.style.width = next.width;
+      dockInk.style.transform = next.transform;
+      void dockInk.offsetWidth;
+      dockInk.style.transition = prev;
+    } else {
+      dockInk.style.width = next.width;
+      dockInk.style.transform = next.transform;
+    }
+    if (!dockInkReady) {
+      dockInkReady = true;
+      dockInk.classList.add("is-ready");
+    }
+  }
+
+  function initDockInk() {
+    if (!dockNav || !dockInk) return;
+    const links = [...dockNav.querySelectorAll(".dock__link[data-view]")];
+    links.forEach((link) => {
+      link.addEventListener("mouseenter", () => {
+        dockInkHover = link;
+        moveDockInk(link);
+      });
+      link.addEventListener("focus", () => {
+        dockInkHover = link;
+        moveDockInk(link);
+      });
+    });
+    dockNav.addEventListener("mouseleave", () => {
+      dockInkHover = null;
+      moveDockInk();
+    });
+    dockNav.addEventListener("focusout", (e) => {
+      if (dockNav.contains(e.relatedTarget)) return;
+      dockInkHover = null;
+      moveDockInk();
+    });
+    window.addEventListener("resize", () => moveDockInk(undefined, { instant: true }));
+    // Land after enter animations finish so widths are final
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => moveDockInk(undefined, { instant: true }));
+    });
+    window.setTimeout(() => moveDockInk(undefined, { instant: true }), 700);
+  }
+
+  /* ---- Reader scroll progress (content-flexible) ---- */
+  const RING_LEN = 2 * Math.PI * 30; // r=30 in the close-button SVG
+  const ringPath = closeBtn.querySelector(".detail-close__ring-path");
+  let progressRaf = 0;
+  let progressObserver = null;
+
+  function readingProgress() {
+    const max = panel.scrollHeight - panel.clientHeight;
+    if (max <= 1) return 1; // short pages read as complete
+    return Math.max(0, Math.min(1, panel.scrollTop / max));
+  }
+
+  function updateReadingProgress() {
+    progressRaf = 0;
+    if (!ringPath) return;
+    const p = readingProgress();
+    ringPath.style.strokeDashoffset = String(RING_LEN * (1 - p));
+    // Hide until scroll starts — round linecaps leave a visible dot at 0%
+    closeBtn.classList.toggle("is-reading", p > 0.001);
+    closeBtn.classList.toggle("is-read-done", p >= 0.995);
+  }
+
+  function scheduleReadingProgress() {
+    if (progressRaf) return;
+    progressRaf = requestAnimationFrame(updateReadingProgress);
+  }
+
+  function resetReadingProgress() {
+    if (!ringPath) return;
+    ringPath.style.strokeDashoffset = String(RING_LEN);
+    closeBtn.classList.remove("is-reading", "is-read-done");
+  }
+
+  function bindReadingProgress() {
+    resetReadingProgress();
+    scheduleReadingProgress();
+    if (progressObserver) progressObserver.disconnect();
+    if (typeof ResizeObserver !== "undefined") {
+      progressObserver = new ResizeObserver(() => scheduleReadingProgress());
+      progressObserver.observe(panel);
+      if (doc) progressObserver.observe(doc);
+    }
+  }
+
+  function unbindReadingProgress() {
+    if (progressObserver) {
+      progressObserver.disconnect();
+      progressObserver = null;
+    }
+    if (progressRaf) {
+      cancelAnimationFrame(progressRaf);
+      progressRaf = 0;
+    }
+    resetReadingProgress();
+  }
+
   function setActiveNav(name) {
     document.querySelectorAll(".dock__nav .dock__link[data-view]").forEach((link) => {
       link.classList.toggle("is-active", link.dataset.view === name);
     });
+    moveDockInk();
   }
 
   function runHomeDockExit(then) {
@@ -165,7 +290,9 @@ export function initBentoBulgeOverlays(options = {}) {
   function isStatementPassthroughTarget(target) {
     if (!target || !target.closest) return false;
     return Boolean(
-      target.closest(".tile__looking") || target.closest(".tile__statement-social-link")
+      target.closest(".tile__looking") ||
+        target.closest(".tile__statement-social-link") ||
+        target.closest(".tile__mailpill")
     );
   }
 
@@ -221,6 +348,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
   function teardownReader() {
     clearOpenPhaseTimer();
+    unbindReadingProgress();
     if (idFromLocation() || isAboutLocation()) {
       history.replaceState({ home: true }, "", homeUrl());
     }
@@ -321,6 +449,7 @@ export function initBentoBulgeOverlays(options = {}) {
     document.body.style.overflow = "hidden";
     panel.classList.add("is-morphed");
     panel.scrollTop = 0;
+    bindReadingProgress();
 
     if (instant) {
       doc.classList.add("is-revealed", "is-instant");
@@ -397,6 +526,7 @@ export function initBentoBulgeOverlays(options = {}) {
       document.body.style.overflow = "hidden";
       panel.classList.add("is-morphed");
       panel.scrollTop = 0;
+      bindReadingProgress();
       doc.classList.remove("detail-split", "is-instant");
       doc.classList.add("is-revealed");
       document.body.classList.remove("is-detail-opening", "is-detail-closing");
@@ -630,6 +760,9 @@ export function initBentoBulgeOverlays(options = {}) {
     link.addEventListener("click", onNavClick);
   });
 
+  panel.addEventListener("scroll", scheduleReadingProgress, { passive: true });
+  initDockInk();
+
   function bootFromLocation() {
     const legacyId = new URLSearchParams(location.search).get("id");
     if (legacyId && window.getProject(legacyId) && !idFromLocation()) {
@@ -664,6 +797,7 @@ export function initBentoBulgeOverlays(options = {}) {
     dispose() {
       if (disposed) return;
       disposed = true;
+      unbindReadingProgress();
       document.removeEventListener("pointerup", onPointerUp);
       grid.removeEventListener("click", onGridClick);
       scrim.removeEventListener("click", onScrimClick);
@@ -671,6 +805,7 @@ export function initBentoBulgeOverlays(options = {}) {
       document.removeEventListener("keydown", onKeydown);
       window.removeEventListener("popstate", onPopstate);
       window.removeEventListener("hashchange", onHashChange);
+      panel.removeEventListener("scroll", scheduleReadingProgress);
       navLinks.forEach((link) => {
         link.removeEventListener("click", onNavClick);
       });

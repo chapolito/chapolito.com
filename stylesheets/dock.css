@@ -74,6 +74,7 @@
   pointer-events: auto;
 }
 .dock__nav {
+  position: relative;
   display: flex;
   align-items: baseline;
   gap: 1.75rem;
@@ -90,22 +91,34 @@
   padding-bottom: 10px;
   transition: color 150ms ease-out;
 }
-.dock__link::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 10%;
-  width: 80%;
-  height: 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.38);
-  opacity: 0;
-  transition: opacity 300ms ease-out, transform 300ms ease-out;
-}
 .dock__link.is-active { color: rgba(255, 255, 255, 0.88); }
-.dock__link.is-active::after { opacity: 1; }
 @media (hover: hover) {
   .dock__link:hover { color: rgba(255, 255, 255, 0.88); }
-  .dock__link:hover::after { opacity: 1; transform: translateY(-4px); }
+}
+
+/* Sliding ink — one underline that travels between links */
+.dock__ink {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  width: 0;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, width;
+  transition:
+    transform 260ms var(--e-out),
+    width 260ms var(--e-out),
+    opacity 150ms ease-out;
+}
+.dock__ink.is-ready {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dock__ink {
+    transition: none;
+  }
 }
 
 /* dock nav stagger — home + detail */

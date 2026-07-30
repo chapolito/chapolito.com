@@ -14,7 +14,7 @@ export function createCustomCursor() {
   document.body.appendChild(el);
   document.body.classList.add("bento-bulge-has-cursor");
 
-  const linkCursorSelector = ".dock a, .tile__statement-social-link, .tile__looking";
+  const linkCursorSelector = ".dock a, .tile__statement-social-link, .tile__mailpill, .tile__looking";
 
   function isLinkCursorTarget(event) {
     return Boolean(event.target.closest(linkCursorSelector));

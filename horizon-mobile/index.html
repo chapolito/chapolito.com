@@ -226,6 +226,7 @@
         <nav class="dock__nav" aria-label="Site navigation">
           <a class="dock__link is-active" href="#" data-view="portfolio">Portfolio</a>
           <a class="dock__link" href="/about/" data-view="about">About</a>
+          <span class="dock__ink" aria-hidden="true"></span>
         </nav>
       </div>
     </aside>
@@ -239,6 +240,28 @@
             <rect x="-1.42" y="-14.3" width="2.84" height="28.6" rx="1.42" />
             <rect x="-14.3" y="-1.42" width="28.6" height="2.84" rx="1.42" />
           </g>
+        </svg>
+        <svg class="detail-close__ring" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true" focusable="false">
+          <defs>
+            <linearGradient id="detail-close-ring-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#d6b6f0" />
+              <stop offset="0.5" stop-color="#f3c2ce" />
+              <stop offset="1" stop-color="#ffc59e" />
+            </linearGradient>
+          </defs>
+          <circle
+            class="detail-close__ring-path"
+            cx="32"
+            cy="32"
+            r="30"
+            fill="none"
+            stroke="url(#detail-close-ring-grad)"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-dasharray="188.496"
+            stroke-dashoffset="188.496"
+            transform="rotate(-90 32 32)"
+          />
         </svg>
       </button>
       <div class="reader__panel" id="panel">
@@ -292,15 +315,23 @@
 
           var copy = document.createElement("p");
           copy.className = "tile__statement-copy";
-          copy.textContent =
-            "Hi, I'm Jesse. A designer who builds, ships, & steers. I'm at ease with the unknown.";
+          copy.innerHTML =
+            "Jesse O'Chapo " +
+            '<span class="tile__statement-mut">is a designer who </span>' +
+            '<mark class="tile__statement-mark">builds</mark>' +
+            '<span class="tile__statement-mut">,</span> ' +
+            '<mark class="tile__statement-mark">ships</mark>' +
+            '<span class="tile__statement-mut">, &amp;</span> ' +
+            '<mark class="tile__statement-mark">steers</mark>' +
+            '<span class="tile__statement-mut">.</span>';
           body.appendChild(copy);
 
           var meta = document.createElement("div");
           meta.className = "tile__statement-meta";
+
           var ex = document.createElement("span");
           ex.className = "tile__statement-ex";
-          ex.textContent = "x Meta, Life360, & MTV";
+          ex.textContent = "Ex-Meta, Life360, & MTV";
           meta.appendChild(ex);
 
           var sepLoc = document.createElement("span");
@@ -315,22 +346,106 @@
           meta.appendChild(loc);
 
           var sepSocial = document.createElement("span");
-          sepSocial.className = "tile__statement-sep";
+          sepSocial.className = "tile__statement-sep tile__statement-sep--social";
           sepSocial.setAttribute("aria-hidden", "true");
           sepSocial.textContent = "·";
           meta.appendChild(sepSocial);
 
-          var social = document.createElement("span");
+          var social = document.createElement("div");
           social.className = "tile__statement-social";
           social.innerHTML =
-            '<a class="tile__statement-social-link" href="mailto:jesse@chapolito.com" aria-label="Email Jesse O\'Chapo">' +
-            '<img src="/images/dock/icon-email.svg" alt="" width="14" height="14" /></a>' +
             '<a class="tile__statement-social-link" href="https://www.linkedin.com/in/chapolito" aria-label="LinkedIn profile" rel="noopener noreferrer" target="_blank">' +
             '<img src="/images/dock/icon-linkedin.svg" alt="" width="14" height="14" /></a>' +
             '<a class="tile__statement-social-link" href="https://github.com/chapolito" aria-label="GitHub profile" rel="noopener noreferrer" target="_blank">' +
-            '<img src="/images/dock/icon-github.svg" alt="" width="14" height="14" /></a>';
+            '<img src="/images/dock/icon-github.svg" alt="" width="14" height="14" /></a>' +
+            '<button class="tile__mailpill" type="button" aria-label="Copy email address" data-mailpill>' +
+            '<span class="tile__mailpill-icon">' +
+            '<img class="tile__mailpill-mail" src="/images/dock/icon-email.svg" alt="" width="14" height="14" />' +
+            '<img class="tile__mailpill-copy" src="/images/dock/icon-copy.svg" alt="" width="14" height="14" />' +
+            '<svg class="tile__mailpill-check" viewBox="0 0 14 14" width="14" height="14" aria-hidden="true" focusable="false">' +
+            '<path d="M2.5 7.5 6 11l5.5-7.5" fill="none" stroke="#47ffb2" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />' +
+            "</svg>" +
+            "</span>" +
+            '<span class="tile__mailpill-text">' +
+            '<span class="tile__mailpill-addr">jesse@chapolito.com</span>' +
+            '<span class="tile__mailpill-done" aria-hidden="true">Copied</span>' +
+            "</span>" +
+            "</button>";
           meta.appendChild(social);
           body.appendChild(meta);
+
+          (function initMailPill(metaEl, socialEl) {
+            var EMAIL = "jesse@chapolito.com";
+            var btn = socialEl.querySelector("[data-mailpill]");
+            if (!btn) return;
+            var text = btn.querySelector(".tile__mailpill-text");
+
+            function measureMail() {
+              if (!text) return 180;
+              var prevW = btn.style.width;
+              var prevT = btn.style.transition;
+              var prevOp = text.style.opacity;
+              btn.style.transition = "none";
+              btn.style.width = "auto";
+              text.style.opacity = "1";
+              var w = Math.ceil(14 + 8 + text.getBoundingClientRect().width);
+              btn.style.width = prevW;
+              text.style.opacity = prevOp;
+              void btn.offsetWidth;
+              btn.style.transition = prevT;
+              btn.style.setProperty("--mail-w", w + "px");
+              return w;
+            }
+
+            /* Stack social only when icons at rest don't fit in the ~80% content
+               box (statement body). Expanded email may extend past that box on hover. */
+            function updateMetaLayout() {
+              measureMail();
+              var styles = window.getComputedStyle(metaEl);
+              var colGap = parseFloat(styles.columnGap) || 0;
+              var socialGap = parseFloat(window.getComputedStyle(socialEl).gap) || 0;
+              /* Use loc-sep width for both dots — social sep may be display:none when stacked */
+              var sepW = sepLoc.getBoundingClientRect().width;
+              var mailAtRest = 14;
+              var need =
+                ex.getBoundingClientRect().width +
+                colGap +
+                sepW +
+                colGap +
+                loc.getBoundingClientRect().width +
+                colGap +
+                sepW +
+                colGap +
+                14 +
+                socialGap +
+                14 +
+                socialGap +
+                mailAtRest;
+              /* Body is the ~80% content box — don't use meta.clientWidth (it used to
+                 shrink-wrap under align-items:flex-start and always look "too narrow"). */
+              var avail = (metaEl.parentElement && metaEl.parentElement.clientWidth) || metaEl.clientWidth;
+              metaEl.classList.toggle("is-stacked", need > avail + 0.5);
+            }
+
+            updateMetaLayout();
+            var timer = 0;
+            btn.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(EMAIL).catch(function () {});
+              }
+              btn.classList.add("is-copied");
+              window.clearTimeout(timer);
+              timer = window.setTimeout(function () {
+                btn.classList.remove("is-copied");
+              }, 1500);
+            });
+            if (document.fonts && document.fonts.ready) {
+              document.fonts.ready.then(updateMetaLayout);
+            }
+            window.addEventListener("resize", updateMetaLayout);
+          })(meta, social);
 
           var looking = document.createElement("div");
           looking.className = "tile__looking";
@@ -342,14 +457,16 @@
             '<div class="tile__looking-top">' +
             '<span class="tile__looking-lead">' +
             '<svg class="tile__looking-eye" viewBox="0 0 27 15" width="27" height="15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
+            '<defs><clipPath id="looking-eye-lid-clip" clipPathUnits="userSpaceOnUse">' +
+            /* Ellipse ry shrinks shut — iris/pupil stay circular and get clipped (not stretched). */
+            '<ellipse class="tile__looking-eye-lid" cx="13.4015" cy="7.40741" rx="13.2" ry="7.2"/>' +
+            "</clipPath></defs>" +
+            '<g clip-path="url(#looking-eye-lid-clip)">' +
             '<path class="tile__looking-eye-sclera" d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 5.53863 7.07688 0.37037 13.4015 0.37037C19.726 0.37037 26.0146 5.72382 26.0146 7.40741Z" fill="#CCFDE9"/>' +
-            '<g clip-path="url(#looking-eye-sclera-clip)">' +
             '<g class="tile__looking-eye-gaze">' +
             '<path class="tile__looking-eye-iris" d="M13.4694 12.6603C16.5546 12.6603 19.0556 10.3102 19.0556 7.41122C19.0556 4.51226 16.5546 2.16219 13.4694 2.16219C10.3842 2.16219 7.88321 4.51226 7.88321 7.41122C7.88321 10.3102 10.3842 12.6603 13.4694 12.6603Z" fill="#47FFB2"/>' +
             '<path class="tile__looking-eye-pupil" d="M13.4022 9.26293C14.4911 9.26293 15.3738 8.43349 15.3738 7.41033C15.3738 6.38717 14.4911 5.55774 13.4022 5.55774C12.3134 5.55774 11.4307 6.38717 11.4307 7.41033C11.4307 8.43349 12.3134 9.26293 13.4022 9.26293Z" fill="#222229"/>' +
-            "</g></g>" +
-            '<defs><clipPath id="looking-eye-sclera-clip" clipPathUnits="userSpaceOnUse"><path d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 5.53863 7.07688 0.37037 13.4015 0.37037C19.726 0.37037 26.0146 5.72382 26.0146 7.40741Z"/></clipPath></defs>' +
-            "</svg>" +
+            "</g></g></svg>" +
             '<span class="tile__looking-label">Looking</span>' +
             "</span>" +
             '<a class="tile__looking-resume" href="/Jesse%20O%27Chapo%20-%20Resume.pdf" download="Jesse O\'Chapo - Resume.pdf" tabindex="-1" aria-hidden="true">' +
@@ -361,7 +478,7 @@
             '<span class="tile__looking-status" aria-hidden="true">Actively interviewing</span>' +
             '<span class="tile__looking-sep" aria-hidden="true"> · </span>' +
             '<span class="tile__looking-detail" aria-hidden="true">' +
-            "Principal or Staff Product Design role in Consumer AI, social, messaging, or fintech. Remote or Bay Area." +
+            "Principal or Staff Product Design role in consumer AI, social, messaging, or fintech." +
             "</span>" +
             "</p>" +
             "</div>";
@@ -377,12 +494,15 @@
           var resumeEl = looking.querySelector(".tile__looking-resume");
           var detailEl = looking.querySelector(".tile__looking-detail");
           var eyeEl = looking.querySelector(".tile__looking-eye");
+          var lidEl = looking.querySelector(".tile__looking-eye-lid");
           var gazeEl = looking.querySelector(".tile__looking-eye-gaze");
           var gazeX = 0;
           var gazeY = 0;
           var gazeTargetX = 0;
           var gazeTargetY = 0;
           var gazeRaf = 0;
+          var gazeDamp = 0.16;
+          var gazeLocked = false;
           var GAZE_MAX_X = 3.35;
           var GAZE_MAX_Y = 1.85;
           var GAZE_CX = 13.435;
@@ -416,8 +536,8 @@
           }
 
           function tickLookingGaze() {
-            gazeX += (gazeTargetX - gazeX) * 0.16;
-            gazeY += (gazeTargetY - gazeY) * 0.16;
+            gazeX += (gazeTargetX - gazeX) * gazeDamp;
+            gazeY += (gazeTargetY - gazeY) * gazeDamp;
             applyLookingGaze();
             if (
               Math.abs(gazeTargetX - gazeX) > 0.02 ||
@@ -432,8 +552,26 @@
             }
           }
 
+          function kickLookingGaze() {
+            if (!gazeRaf) gazeRaf = window.requestAnimationFrame(tickLookingGaze);
+          }
+
+          function setLookingGazeTarget(nx, ny, damp) {
+            if (damp != null) gazeDamp = damp;
+            gazeTargetX = nx;
+            gazeTargetY = ny;
+            kickLookingGaze();
+          }
+
+          function clampGaze(v, lo, hi) {
+            return Math.max(lo, Math.min(hi, v));
+          }
+
           function onLookingGazeMove(e) {
-            if (reduceMotion.matches || !fineHover.matches || !gazeEl) return;
+            if (gazeLocked || lookingExcited || reduceMotion.matches || !fineHover.matches || !gazeEl) {
+              return;
+            }
+            gazeDamp = 0.16;
             var rect = eyeEl.getBoundingClientRect();
             if (!rect.width || !rect.height) return;
             var cx = rect.left + rect.width / 2;
@@ -445,18 +583,372 @@
             var reachY = Math.max(tileRect.height * 0.55, rect.height * 4);
             gazeTargetX = Math.max(-GAZE_MAX_X, Math.min(GAZE_MAX_X, (dx / reachX) * GAZE_MAX_X));
             gazeTargetY = Math.max(-GAZE_MAX_Y, Math.min(GAZE_MAX_Y, (dy / reachY) * GAZE_MAX_Y));
-            if (!gazeRaf) gazeRaf = window.requestAnimationFrame(tickLookingGaze);
+            kickLookingGaze();
           }
 
           function resetLookingGaze() {
+            if (gazeLocked || lookingExcited) return;
+            gazeDamp = 0.16;
             gazeTargetX = 0;
             gazeTargetY = 0;
-            if (!gazeRaf) gazeRaf = window.requestAnimationFrame(tickLookingGaze);
+            kickLookingGaze();
+          }
+
+          /* Ambient blinks + sleep (option C) while over the statement tile */
+          var statementHovering = false;
+          var lookingInteracted = false;
+          var lookingAsleep = false;
+          var lookingExcited = false;
+          var blinkTimer = 0;
+          var blinkFollowTimer = 0;
+          var blinkAnims = [];
+          var sleepIdleTimer = 0;
+          var sleepZTimer = 0;
+          var sleepNodTimers = [];
+          var sleepAnims = [];
+          var sleepZs = [];
+          var LOOKING_IDLE_MS = 5500;
+          var NOD_JOLT_MS = 380;
+          var NOD_HOLD_MS = 480;
+          var NOD_DROOP_MS = 3900;
+          var NOD_SINK_MS = 2700;
+          var NOD_MS = NOD_DROOP_MS + NOD_JOLT_MS + NOD_HOLD_MS + NOD_SINK_MS;
+          var NOD_DROOP_END = NOD_DROOP_MS / NOD_MS;
+          var NOD_HOLD_END = (NOD_DROOP_MS + NOD_JOLT_MS + NOD_HOLD_MS) / NOD_MS;
+
+          function cancelAnimList(list) {
+            list.forEach(function (a) {
+              a.cancel();
+            });
+            list.length = 0;
+          }
+
+          /* Lid ry shrinks shut — clips unscaled iris/pupil; gaze/eye opacity for shut state. */
+          var LID_RY_OPEN = 7.2;
+
+          function animateLookingLid(frames, options, store) {
+            if (!lidEl || !gazeEl || !eyeEl) return null;
+            cancelAnimList(store);
+            var lidFrames = frames.map(function (f) {
+              return {
+                ry: LID_RY_OPEN * f.sy,
+                offset: f.offset,
+                easing: f.easing,
+              };
+            });
+            var gazeFrames = frames.map(function (f) {
+              return {
+                opacity: f.gazeOp != null ? f.gazeOp : f.sy <= 0.1 ? 0 : 1,
+                offset: f.offset,
+                easing: f.easing,
+              };
+            });
+            var eyeFrames = frames.map(function (f) {
+              return {
+                opacity: f.eyeOp != null ? f.eyeOp : 1,
+                offset: f.offset,
+                easing: f.easing,
+              };
+            });
+            store.push(
+              lidEl.animate(lidFrames, options),
+              gazeEl.animate(gazeFrames, options),
+              eyeEl.animate(eyeFrames, options)
+            );
+            return store[0];
+          }
+
+          function cancelAmbientBlink() {
+            window.clearTimeout(blinkTimer);
+            window.clearTimeout(blinkFollowTimer);
+            blinkTimer = 0;
+            blinkFollowTimer = 0;
+            cancelAnimList(blinkAnims);
+          }
+
+          function blinkLookingEye() {
+            if (
+              reduceMotion.matches ||
+              !lidEl ||
+              !statementHovering ||
+              lookingAsleep ||
+              lookingExcited
+            ) {
+              return;
+            }
+            animateLookingLid(
+              [
+                { sy: 1, gazeOp: 1, eyeOp: 1, offset: 0 },
+                {
+                  sy: 0.06,
+                  gazeOp: 0,
+                  eyeOp: 1,
+                  offset: 0.45,
+                  easing: "cubic-bezier(0.55, 0.05, 0.9, 0.2)",
+                },
+                {
+                  sy: 1,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: 1,
+                  easing: "cubic-bezier(0.2, 0.85, 0.3, 1)",
+                },
+              ],
+              { duration: 130 + Math.random() * 50 },
+              blinkAnims
+            );
+          }
+
+          function scheduleAmbientBlink() {
+            window.clearTimeout(blinkTimer);
+            if (
+              !statementHovering ||
+              lookingAsleep ||
+              lookingExcited ||
+              reduceMotion.matches ||
+              !fineHover.matches
+            ) {
+              return;
+            }
+            var delay = 2400 + Math.random() * 4800;
+            blinkTimer = window.setTimeout(function () {
+              if (!statementHovering || lookingAsleep || lookingExcited) return;
+              blinkLookingEye();
+              if (Math.random() < 0.2) {
+                blinkFollowTimer = window.setTimeout(function () {
+                  if (statementHovering && !lookingAsleep && !lookingExcited) {
+                    blinkLookingEye();
+                  }
+                }, 150 + Math.random() * 140);
+              }
+              scheduleAmbientBlink();
+            }, delay);
+          }
+
+          function clearSleepNodTimers() {
+            sleepNodTimers.forEach(window.clearTimeout);
+            sleepNodTimers = [];
+          }
+
+          function clearSleepZs() {
+            window.clearTimeout(sleepZTimer);
+            sleepZTimer = 0;
+            sleepZs.forEach(function (z) {
+              z.remove();
+            });
+            sleepZs = [];
+          }
+
+          function cancelSleepAnim() {
+            clearSleepNodTimers();
+            cancelAnimList(sleepAnims);
+          }
+
+          function spawnSleepZs() {
+            sleepZs = ["z", "z"].map(function (t, i) {
+              var s = document.createElement("span");
+              s.className = "tile__looking-z" + (i ? " tile__looking-z--2" : "");
+              s.textContent = t;
+              looking.appendChild(s);
+              return s;
+            });
+          }
+
+          function lookingSleep() {
+            if (lookingAsleep || !lookingInteracted || !statementHovering || lookingExcited) {
+              return;
+            }
+            if (document.visibilityState !== "visible") return;
+            lookingAsleep = true;
+            looking.classList.add("is-asleep");
+            cancelAmbientBlink();
+            clearSleepZs();
+            cancelSleepAnim();
+
+            if (reduceMotion.matches) {
+              spawnSleepZs();
+              return;
+            }
+
+            var look = { x: gazeX, y: gazeY };
+            gazeLocked = true;
+            setLookingGazeTarget(
+              clampGaze(look.x * 0.85 + (look.x >= 0 ? 0.2 : -0.2), -GAZE_MAX_X, GAZE_MAX_X),
+              clampGaze(look.y + 0.35, -GAZE_MAX_Y, GAZE_MAX_Y * 0.45),
+              0.025
+            );
+
+            animateLookingLid(
+              [
+                {
+                  sy: 1,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: 0,
+                  easing: "cubic-bezier(0.55, 0.05, 0.9, 0.15)",
+                },
+                {
+                  sy: 0.48,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: NOD_DROOP_END,
+                  easing: "cubic-bezier(0.15, 0.9, 0.3, 1)",
+                },
+                {
+                  sy: 0.92,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: (NOD_DROOP_MS + NOD_JOLT_MS) / NOD_MS,
+                  easing: "linear",
+                },
+                {
+                  sy: 0.92,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: NOD_HOLD_END,
+                  easing: "cubic-bezier(0.55, 0.05, 0.9, 0.15)",
+                },
+                { sy: 0.06, gazeOp: 0, eyeOp: 0.6, offset: 0.94 },
+                { sy: 0.06, gazeOp: 0, eyeOp: 0.6, offset: 1 },
+              ],
+              { duration: NOD_MS, fill: "forwards" },
+              sleepAnims
+            );
+
+            sleepNodTimers.push(
+              window.setTimeout(function () {
+                if (!lookingAsleep) return;
+                setLookingGazeTarget(look.x, look.y, 0.32);
+              }, Math.round(NOD_MS * NOD_DROOP_END))
+            );
+
+            sleepNodTimers.push(
+              window.setTimeout(function () {
+                if (!lookingAsleep) return;
+                setLookingGazeTarget(
+                  clampGaze(look.x * 0.8, -GAZE_MAX_X, GAZE_MAX_X),
+                  clampGaze(look.y + 0.45, -GAZE_MAX_Y, GAZE_MAX_Y * 0.4),
+                  0.022
+                );
+              }, Math.round(NOD_MS * NOD_HOLD_END))
+            );
+
+            sleepZTimer = window.setTimeout(function () {
+              if (lookingAsleep) spawnSleepZs();
+            }, Math.round(NOD_MS * 0.9));
+          }
+
+          function lookingWake(opts) {
+            var startle = !opts || opts.startle !== false;
+            window.clearTimeout(sleepIdleTimer);
+            sleepIdleTimer = 0;
+            if (!lookingAsleep) return;
+            lookingAsleep = false;
+            cancelSleepAnim();
+            looking.classList.remove("is-asleep");
+            clearSleepZs();
+            gazeLocked = false;
+            gazeDamp = 0.16;
+            if (!lookingExcited) {
+              resetLookingGaze();
+            }
+            if (startle && !reduceMotion.matches && lidEl) {
+              window.setTimeout(function () {
+                animateLookingLid(
+                  [
+                    { sy: 1, gazeOp: 1, eyeOp: 1, offset: 0 },
+                    { sy: 0.06, gazeOp: 0, eyeOp: 1, offset: 0.45 },
+                    { sy: 1, gazeOp: 1, eyeOp: 1, offset: 1 },
+                  ],
+                  { duration: 260, easing: "ease-in-out" },
+                  blinkAnims
+                );
+              }, 200);
+            }
+            if (statementHovering && !lookingExcited) {
+              scheduleAmbientBlink();
+            }
+          }
+
+          function armLookingIdle() {
+            window.clearTimeout(sleepIdleTimer);
+            if (
+              reduceMotion.matches ||
+              !lookingInteracted ||
+              !statementHovering ||
+              lookingExcited ||
+              !fineHover.matches
+            ) {
+              return;
+            }
+            if (document.visibilityState !== "visible") return;
+            sleepIdleTimer = window.setTimeout(lookingSleep, LOOKING_IDLE_MS);
+          }
+
+          function onLookingActivity() {
+            if (!statementHovering) return;
+            lookingInteracted = true;
+            lookingWake({ startle: lookingAsleep });
+            armLookingIdle();
           }
 
           if (gazeEl && fineHover.matches) {
-            tile.addEventListener("pointermove", onLookingGazeMove, { passive: true });
-            tile.addEventListener("pointerleave", resetLookingGaze);
+            tile.addEventListener(
+              "pointermove",
+              function (e) {
+                onLookingGazeMove(e);
+                onLookingActivity();
+              },
+              { passive: true }
+            );
+            tile.addEventListener("pointerdown", onLookingActivity, { passive: true });
+            tile.addEventListener("pointerleave", function () {
+              statementHovering = false;
+              lookingWake({ startle: false });
+              cancelAmbientBlink();
+              resetLookingGaze();
+            });
+            tile.addEventListener("pointerenter", function () {
+              statementHovering = true;
+              lookingInteracted = true;
+              armLookingIdle();
+              if (!reduceMotion.matches) {
+                blinkTimer = window.setTimeout(
+                  scheduleAmbientBlink,
+                  900 + Math.random() * 1400
+                );
+              }
+            });
+          }
+
+          document.addEventListener("visibilitychange", function () {
+            if (document.visibilityState !== "visible") {
+              lookingWake({ startle: false });
+            } else if (statementHovering) {
+              armLookingIdle();
+            }
+          });
+
+          if (resumeEl && fineHover.matches) {
+            resumeEl.addEventListener("mouseenter", function () {
+              lookingExcited = true;
+              lookingWake({ startle: false });
+              cancelAmbientBlink();
+              looking.classList.add("is-excited");
+              if (!reduceMotion.matches) {
+                setLookingGazeTarget(GAZE_MAX_X, -0.6, 0.16);
+              }
+            });
+            resumeEl.addEventListener("mouseleave", function () {
+              lookingExcited = false;
+              looking.classList.remove("is-excited");
+              gazeDamp = 0.16;
+              resetLookingGaze();
+              if (statementHovering) {
+                armLookingIdle();
+                scheduleAmbientBlink();
+              }
+            });
           }
 
           function setLookingAria(expanded) {

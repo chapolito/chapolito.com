@@ -519,15 +519,16 @@ body.is-detail-closing .about-page.about-overlay .about__hero-intro {
   left: auto;
   z-index: 140;
   display: block;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
+  margin: -4px;
   padding: 0;
   border: none;
   border-radius: 50%;
   background: transparent;
   box-shadow: none;
   cursor: pointer;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
   opacity: 0;
   transform: translate(8px, -8px);
@@ -553,7 +554,7 @@ body.is-detail-closing .about-page.about-overlay .about__hero-intro {
 
 .detail-close__glass {
   position: absolute;
-  inset: 0;
+  inset: 4px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(8px);
@@ -568,13 +569,38 @@ body.is-detail-closing .about-page.about-overlay .about__hero-intro {
   display: block;
   width: 56px;
   height: 56px;
+  margin: 4px;
   flex-shrink: 0;
+  transition: transform 450ms var(--e-out);
 }
 
 .detail-close__icon g {
   fill: #fff;
   opacity: 0.6;
   transition: opacity var(--d-1) var(--e-out);
+}
+
+.detail-close__ring {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0;
+  transition:
+    opacity 180ms var(--e-out),
+    filter 500ms var(--e-out);
+}
+
+.detail-close.is-reading .detail-close__ring {
+  opacity: 1;
+}
+
+.detail-close__ring-path {
+  transition: stroke-dashoffset 80ms linear;
+}
+
+.detail-close.is-read-done .detail-close__ring {
+  filter: drop-shadow(0 0 6px rgba(243, 194, 206, 0.65));
 }
 
 body.is-detail-enter .detail-close,
@@ -609,9 +635,19 @@ body.is-detail-enter .detail-close,
     transform: translate(0, -2px);
   }
 
+  .detail-close:hover .detail-close__icon,
+  .detail-close:focus-visible .detail-close__icon {
+    transform: rotate(90deg);
+  }
+
   .detail-close:hover:active,
   .detail-close:focus-visible:active {
     transform: scale(0.94);
+  }
+
+  .detail-close:hover:active .detail-close__icon,
+  .detail-close:focus-visible:active .detail-close__icon {
+    transform: rotate(90deg) scale(0.98);
   }
 }
 @keyframes detail-close-in {
@@ -630,6 +666,18 @@ body.is-detail-closing .detail-close {
   pointer-events: none;
   transform: translate(8px, -8px);
   transition: opacity 220ms ease-in, transform 220ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .detail-close__icon,
+  .detail-close__ring,
+  .detail-close__ring-path {
+    transition: none !important;
+  }
+  .detail-close:hover .detail-close__icon,
+  .detail-close:focus-visible .detail-close__icon {
+    transform: none;
+  }
 }
 
 /* ---- story layout (editorial project pages) ---- */
