@@ -25,6 +25,14 @@
     <link rel="stylesheet" href="/stylesheets/dock.css" />
     <link rel="stylesheet" href="/stylesheets/home.css" />
     <link rel="stylesheet" href="/stylesheets/bento-bulge.css" />
+    <link rel="modulepreload" href="/javascripts/bento-bulge.bundle.js" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "/javascripts/vendor/three.module.min.js"
+        }
+      }
+    </script>
   </head>
   <body class="u-grain is-home is-home-pending bento-bulge-page">
     <div class="home-bg" aria-hidden="true"></div>
@@ -1177,56 +1185,57 @@
 
       let bulge = null;
 
-      function bootOverlays() {
-        initBentoBulgeOverlays({
-          onOpen(instant) {
-            bulge?.setOverlayOpen?.(true, { instant });
-          },
-          onClose() {
-            bulge?.setOverlayOpen?.(false);
-          }
-        });
-      }
+      const bulgeOpts = {
+        bento: "#grid",
+        projects: "#portfolio",
+        cellSelector: ".tile",
+        hoverClass: "is-bulge-hovered",
+        cornerRadius: 8
+      };
 
-      function loadBulge() {
-        const opts = {
-          bento: "#grid",
-          projects: "#portfolio",
-          cellSelector: ".tile",
-          hoverClass: "is-bulge-hovered",
-          cornerRadius: 8
-        };
-
-        function afterBulgeReady(api) {
-          bulge = api;
-          const overlayOpen =
-            document.body.classList.contains("is-detail-open") ||
-            document.body.classList.contains("is-detail-opening");
-          if (overlayOpen) {
-            bulge?.setOverlayOpen?.(true, { instant: true });
-          }
+      function afterBulgeReady(api) {
+        bulge = api;
+        const overlayOpen =
+          document.body.classList.contains("is-detail-open") ||
+          document.body.classList.contains("is-detail-opening");
+        if (overlayOpen) {
+          bulge?.setOverlayOpen?.(true, { instant: true });
         }
-
-        import("/javascripts/bento-bulge.bundle.js")
-          .then((mod) => afterBulgeReady(mod.initBentoBulge(opts)))
-          .catch((err) => {
-            console.warn("[bento-bulge] bundle load failed, falling back to modules", err);
-            return import("/javascripts/bento-bulge/index.js").then((mod) =>
-              afterBulgeReady(mod.initBentoBulge(opts))
-            );
-          });
       }
 
-      bootOverlays();
+      // Start Three/WebGL immediately (not on idle) so we never flash CSS hover → WebGL.
+      const whenBulgeReady = (async () => {
+        let mod;
+        try {
+          mod = await import("/javascripts/bento-bulge.bundle.js");
+        } catch (err) {
+          console.warn("[bento-bulge] bundle load failed, falling back to modules", err);
+          mod = await import("/javascripts/bento-bulge/index.js");
+        }
+        // May return null while measuring layout; getBulgeWhenReady resolves after handoff.
+        mod.initBentoBulge(bulgeOpts);
+        const api = await Promise.race([
+          mod.getBulgeWhenReady(),
+          new Promise((resolve) => window.setTimeout(() => resolve(null), 2800))
+        ]);
+        afterBulgeReady(api);
+      })().catch((err) => {
+        console.warn("[bento-bulge] boot failed", err);
+      });
+
+      initBentoBulgeOverlays({
+        whenBulgeReady,
+        onOpen(instant) {
+          bulge?.setOverlayOpen?.(true, { instant });
+        },
+        onClose() {
+          bulge?.setOverlayOpen?.(false);
+        }
+      });
 
       requestAnimationFrame(function () {
         requestAnimationFrame(function () {
           promoteHomeVideos(document.querySelector("#grid"));
-          if (typeof window.requestIdleCallback === "function") {
-            window.requestIdleCallback(loadBulge, { timeout: 900 });
-          } else {
-            window.setTimeout(loadBulge, 120);
-          }
         });
       });
     </script>

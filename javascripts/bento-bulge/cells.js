@@ -50,20 +50,22 @@ export function measureCells(container, dpr, options = {}) {
   const imgSelector = options.imgSelector || ".tile__media img";
   const videoSelector = options.videoSelector || ".tile__media video";
 
+  // Use layout box sizes (ignore CSS transforms like overlay scale(0.95)).
+  // getBoundingClientRect during overlay close baked the scaled size into WebGL
+  // and left black gutters between tiles once the grid returned to scale(1).
+  const width = Math.max(container.clientWidth, 1);
+  const height = Math.max(container.clientHeight, 1);
   const containerRect = container.getBoundingClientRect();
-  const width = Math.max(containerRect.width, 1);
-  const height = Math.max(containerRect.height, 1);
   const elements = [...container.querySelectorAll(cellSelector)]
     .filter((el) => getComputedStyle(el).display !== "none")
     .slice(0, MAX_CELLS);
 
   let baselineArea = null;
   const cells = elements.map((el, index) => {
-    const rect = el.getBoundingClientRect();
-    const left = snap(rect.left - containerRect.left + INSET_PX, dpr);
-    const top = snap(rect.top - containerRect.top + INSET_PX, dpr);
-    const cellWidth = snap(rect.width - INSET_PX * 2, dpr);
-    const cellHeight = snap(rect.height - INSET_PX * 2, dpr);
+    const left = snap(el.offsetLeft + INSET_PX, dpr);
+    const top = snap(el.offsetTop + INSET_PX, dpr);
+    const cellWidth = snap(el.offsetWidth - INSET_PX * 2, dpr);
+    const cellHeight = snap(el.offsetHeight - INSET_PX * 2, dpr);
     const area = cellWidth * cellHeight;
 
     if (baselineArea === null && cellWidth > 0 && cellHeight > 0) {
@@ -122,23 +124,31 @@ export function measureCells(container, dpr, options = {}) {
   };
 }
 
-export function cellAtPoint(cells, containerRect, x, y) {
+export function cellAtPoint(cells, containerRect, x, y, container) {
   let nearest = null;
   let nearestDist = Infinity;
 
+  // Cell left/top are layout (unscaled) coords. Map the pointer out of any CSS transform.
+  const layoutW = container?.clientWidth || containerRect.width || 1;
+  const layoutH = container?.clientHeight || containerRect.height || 1;
+  const scaleX = containerRect.width / layoutW;
+  const scaleY = containerRect.height / layoutH;
+  const localX = (x - containerRect.left) / (scaleX || 1);
+  const localY = (y - containerRect.top) / (scaleY || 1);
+
   for (let i = 0; i < cells.length; i++) {
     const cell = cells[i];
-    const left = containerRect.left + cell.left;
-    const top = containerRect.top + cell.top;
+    const left = cell.left;
+    const top = cell.top;
     const right = left + cell.width;
     const bottom = top + cell.height;
 
-    if (x >= left && x <= right && y >= top && y <= bottom) {
+    if (localX >= left && localX <= right && localY >= top && localY <= bottom) {
       return cell;
     }
 
-    const dx = Math.max(left - x, 0, x - right);
-    const dy = Math.max(top - y, 0, y - bottom);
+    const dx = Math.max(left - localX, 0, localX - right);
+    const dy = Math.max(top - localY, 0, localY - bottom);
     const dist = dx * dx + dy * dy;
     if (dist < nearestDist) {
       nearestDist = dist;

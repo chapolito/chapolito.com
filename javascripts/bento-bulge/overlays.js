@@ -664,11 +664,16 @@ export function initBentoBulgeOverlays(options = {}) {
     isClosing = true;
     clearOpenPhaseTimer();
     openTransitionStartedAt = 0;
-    onClose();
 
+    // Apply unscaled close styles before bulge remeasure (avoids baking scale(0.95)
+    // into WebGL cell rects — that left black gutters between tiles).
     doc.classList.remove("is-revealed");
     document.body.classList.remove("is-detail-enter", "is-detail-open", "is-detail-opening");
     document.body.classList.add("is-detail-closing", "is-home-enter");
+    void grid.offsetWidth;
+
+    onClose();
+
     grid.querySelectorAll(".tile.is-pressed").forEach((t) => {
       t.classList.remove("is-pressed");
     });
@@ -681,7 +686,6 @@ export function initBentoBulgeOverlays(options = {}) {
 
     reader.classList.add("is-exiting");
     closeBtn.setAttribute("aria-hidden", "true");
-    void grid.offsetWidth;
     window.setTimeout(() => {
       teardownReader();
     }, TX_DELAY + TX_IN + 80);

@@ -1,4 +1,16 @@
-import * as THREE from "../vendor/three.module.min.js";
+import {
+  WebGLRenderer,
+  Scene,
+  PlaneGeometry,
+  ShaderMaterial,
+  Mesh,
+  PerspectiveCamera,
+  OrthographicCamera,
+  Vector2,
+  Vector4,
+  SRGBColorSpace,
+  NoToneMapping
+} from "three";
 import { vertexShader, fragmentShader, MAX_CELLS, MAX_VIDEO_SLOTS } from "./shaders.js";
 import { getEffectiveDpr, shouldUseAntialias } from "./dpr.js";
 
@@ -12,14 +24,14 @@ function createCellUniforms(cells) {
   for (let i = 0; i < MAX_CELLS; i++) {
     const cell = cells[i];
     if (cell) {
-      rects.push(new THREE.Vector4(cell.normX, cell.normY, cell.normW, cell.normH));
+      rects.push(new Vector4(cell.normX, cell.normY, cell.normW, cell.normH));
       veilFromTop[i] = cell.veilFromTop ? 1 : 0;
       coverAnchorX[i] = cell.coverAnchorX ?? 0.5;
       coverAnchorY[i] = cell.coverAnchorY ?? 0.5;
       insetShadow[i] = cell.insetShadow ? 1 : 0;
       solidFill[i] = cell.isStatement ? 1 : 0;
     } else {
-      rects.push(new THREE.Vector4(0, 0, 0, 0));
+      rects.push(new Vector4(0, 0, 0, 0));
       veilFromTop[i] = 0;
       coverAnchorX[i] = 0.5;
       coverAnchorY[i] = 0.5;
@@ -40,7 +52,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   canvas.setAttribute("aria-hidden", "true");
   bento.appendChild(canvas);
 
-  const renderer = new THREE.WebGLRenderer({
+  const renderer = new WebGLRenderer({
     canvas,
     alpha: true,
     antialias: shouldUseAntialias(dpr),
@@ -50,19 +62,19 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
   renderer.setPixelRatio(dpr);
   renderer.setSize(width, height, false);
   renderer.setClearColor(0x000000, 0);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.NoToneMapping;
+  renderer.outputColorSpace = SRGBColorSpace;
+  renderer.toneMapping = NoToneMapping;
 
-  const scene = new THREE.Scene();
+  const scene = new Scene();
   const subdivisions = params.subdivisions;
-  const geometry = new THREE.PlaneGeometry(width, height, subdivisions, subdivisions);
+  const geometry = new PlaneGeometry(width, height, subdivisions, subdivisions);
 
   const cellVideoSlot = new Float32Array(MAX_CELLS);
   cellVideoSlot.fill(-1);
   const cellVideoFade = new Float32Array(MAX_CELLS);
   const prevCellVideoSlot = new Float32Array(MAX_CELLS);
   prevCellVideoSlot.fill(-1);
-  const videoSizes = Array.from({ length: MAX_VIDEO_SLOTS }, () => new THREE.Vector2(1, 1));
+  const videoSizes = Array.from({ length: MAX_VIDEO_SLOTS }, () => new Vector2(1, 1));
   const videoFitContain = new Float32Array(MAX_VIDEO_SLOTS);
   const videoFitFill = new Float32Array(MAX_VIDEO_SLOTS);
   const videoUniforms = {};
@@ -79,7 +91,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uAtlas: { value: atlasTexture },
     uBulgeAmount: { value: 0 },
     uMaxDisplacement: { value: width * params.maxDisplacementRatio },
-    uPlaneSize: { value: new THREE.Vector2(width, height) },
+    uPlaneSize: { value: new Vector2(width, height) },
     uCellCount: { value: layout.cells.length },
     uCellRects: { value: cellUniforms.rects },
     uCellVeilFromTop: { value: cellUniforms.veilFromTop },
@@ -95,8 +107,8 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uVideoFitContain: { value: videoFitContain },
     uVideoFitFill: { value: videoFitFill },
     ...videoUniforms,
-    uProjectCenter: { value: new THREE.Vector2(0.5, 0.5) },
-    uProjectRadius: { value: new THREE.Vector2(0.1, 0.1) },
+    uProjectCenter: { value: new Vector2(0.5, 0.5) },
+    uProjectRadius: { value: new Vector2(0.1, 0.1) },
     uProjectStrength: { value: 0 },
     uProjectWeight: { value: params.projectWeight },
     uProjectSpread: { value: params.projectSpread },
@@ -113,7 +125,7 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     uSubdivisions: { value: subdivisions }
   };
 
-  const material = new THREE.ShaderMaterial({
+  const material = new ShaderMaterial({
     uniforms,
     vertexShader,
     fragmentShader,
@@ -125,17 +137,17 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     renderer.debug.checkShaderErrors = true;
   }
 
-  const mesh = new THREE.Mesh(geometry, material);
+  const mesh = new Mesh(geometry, material);
   mesh.position.set(width * 0.5, height * 0.5, 0);
   scene.add(mesh);
 
   let camera;
   if (params.enablePerspective) {
-    camera = new THREE.PerspectiveCamera(28, width / height, 1, 3000);
+    camera = new PerspectiveCamera(28, width / height, 1, 3000);
     camera.position.set(width * 0.5, height * 0.5, width * 1.1);
     camera.lookAt(width * 0.5, height * 0.5, 0);
   } else {
-    camera = new THREE.OrthographicCamera(0, width, height, 0, -500, 500);
+    camera = new OrthographicCamera(0, width, height, 0, -500, 500);
     camera.position.z = 10;
   }
 
@@ -165,20 +177,20 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     currentHeight = h;
     renderer.setSize(w, h, false);
     mesh.geometry.dispose();
-    const next = new THREE.PlaneGeometry(w, h, params.subdivisions, params.subdivisions);
+    const next = new PlaneGeometry(w, h, params.subdivisions, params.subdivisions);
     mesh.geometry = next;
     mesh.position.set(w * 0.5, h * 0.5, 0);
     uniforms.uSubdivisions.value = params.subdivisions;
     uniforms.uPlaneSize.value.set(w, h);
     uniforms.uMaxDisplacement.value = w * params.maxDisplacementRatio;
     uniforms.uCellCount.value = newLayout.cells.length;
-    const cellUniforms = createCellUniforms(newLayout.cells);
-    uniforms.uCellRects.value = cellUniforms.rects;
-    uniforms.uCellVeilFromTop.value = cellUniforms.veilFromTop;
-    uniforms.uCellCoverAnchorX.value = cellUniforms.coverAnchorX;
-    uniforms.uCellCoverAnchorY.value = cellUniforms.coverAnchorY;
-    uniforms.uCellInsetShadow.value = cellUniforms.insetShadow;
-    uniforms.uCellSolidFill.value = cellUniforms.solidFill;
+    const nextCellUniforms = createCellUniforms(newLayout.cells);
+    uniforms.uCellRects.value = nextCellUniforms.rects;
+    uniforms.uCellVeilFromTop.value = nextCellUniforms.veilFromTop;
+    uniforms.uCellCoverAnchorX.value = nextCellUniforms.coverAnchorX;
+    uniforms.uCellCoverAnchorY.value = nextCellUniforms.coverAnchorY;
+    uniforms.uCellInsetShadow.value = nextCellUniforms.insetShadow;
+    uniforms.uCellSolidFill.value = nextCellUniforms.solidFill;
     if (camera.isPerspectiveCamera) {
       camera.aspect = w / h;
       camera.position.set(w * 0.5, h * 0.5, w * 1.1);
@@ -188,12 +200,12 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
     } else {
       camera.right = w;
       camera.top = h;
-      camera.bottom = 0;
       camera.updateProjectionMatrix();
     }
   }
 
   function updateFromField(field, params) {
+    const layout = { width: currentWidth, height: currentHeight };
     uniforms.uBulgeAmount.value = field.bulgeAmount;
     uniforms.uProjectCenter.value.set(field.projectCenter.x, field.projectCenter.y);
     uniforms.uProjectRadius.value.set(field.projectRadius.x, field.projectRadius.y);
@@ -226,10 +238,9 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
       const prev = prevCellVideoSlot[i];
       cellVideoSlot[i] = next;
       if (next >= 0 && prev < 0) {
-        // New live slot — fade up while the loop is already playing.
         cellVideoFade[i] = 0;
         videoFading = true;
-      } else if (next < 0) {
+      } else if (next < 0 && prev >= 0) {
         cellVideoFade[i] = 0;
       }
       prevCellVideoSlot[i] = next;
@@ -269,6 +280,18 @@ export function createSurface(bento, layout, params, atlasTexture, emptyTexture)
         continue;
       }
       if (cellVideoFade[i] >= 1) continue;
+
+      // Hold on solid fill until the slot texture has uploaded — empty/black GPU
+      // samples would otherwise fade #222229 → black before content arrives.
+      if (!instant) {
+        const slot = cellVideoSlot[i];
+        const tex = slot >= 0 ? uniforms[`uVideo${slot}`]?.value : null;
+        if (!tex || tex === emptyTexture || tex.userData?.frameUploaded !== true) {
+          stillFading = true;
+          continue;
+        }
+      }
+
       cellVideoFade[i] = Math.min(1, cellVideoFade[i] + step);
       if (cellVideoFade[i] < 1) stillFading = true;
     }

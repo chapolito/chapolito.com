@@ -1,8 +1,9 @@
-#!/usr/bin/env node
 /**
  * Bundle the bento-bulge WebGL graph (incl. Three) into one ESM file so
  * deploy/start don't pay the multi-module discovery waterfall.
+ * Named imports from "three" let esbuild tree-shake unused Three code.
  */
+const fs = require("node:fs");
 const path = require("node:path");
 const esbuild = require("esbuild");
 
@@ -19,10 +20,16 @@ esbuild
     minify: true,
     target: ["es2020"],
     logLevel: "info",
-    legalComments: "none"
+    legalComments: "none",
+    treeShaking: true,
+    // Prefer ESM entry so unused Three exports can be dropped.
+    mainFields: ["module", "browser", "main"],
+    conditions: ["import", "module", "browser", "default"]
   })
   .then(() => {
-    console.log(`built ${path.relative(ROOT, outfile)}`);
+    const bytes = fs.statSync(outfile).size;
+    const kb = (bytes / 1024).toFixed(1);
+    console.log(`built ${path.relative(ROOT, outfile)} (${kb} KB)`);
   })
   .catch((err) => {
     console.error(err);

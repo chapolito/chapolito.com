@@ -184,7 +184,8 @@
   z-index: 5;
   background: transparent;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  /* No appear transition — fading the canvas in after DOM tiles hide flashes the page bg. */
+  transition: none;
 }
 
 body.is-home.is-detail-opening.bento-bulge-page .grid .experimental-bento__surface,
@@ -264,6 +265,7 @@ body.is-detail-open.bento-bulge-page.is-home .grid.grid--bulge-active .experimen
   .bento-bulge-page .grid.grid--bulge-active .tile .tile__media video {
     opacity: 0.001;
     visibility: visible;
+    transition: none;
   }
 
   .bento-bulge-page .grid.grid--bulge-active .tile:hover .tile__media,

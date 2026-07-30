@@ -16,7 +16,7 @@ import { initParams } from "./dialkit.js";
 import { createCustomCursor } from "./cursor.js";
 import { getEffectiveDpr } from "./dpr.js";
 import { createPerfMonitor, isPerfEnabled, noopPerf } from "./perf.js";
-import { promoteGridVideos, promoteHomeVideos } from "./videos.js";
+import { promoteGridVideos, promoteHomeVideos, whenVideoFramePainted } from "./videos.js";
 
 let instance = null;
 let whenReadyResolve = null;
@@ -368,8 +368,10 @@ export function initBentoBulge(options = {}) {
   function performHandoff() {
     if (handoffDone) return;
     handoffDone = true;
-    bento.classList.add("grid--bulge-active");
+    // Canvas must be opaque before DOM surfaces hide, or the page bg flashes through.
     surface.canvas.classList.add("is-bulge-surface-ready");
+    void surface.canvas.offsetWidth;
+    bento.classList.add("grid--bulge-active");
     syncVideoMedia();
   }
 
@@ -563,9 +565,23 @@ export function initBentoBulge(options = {}) {
     clearHoverBulge();
     field.targetOverlayDim = 1;
     if (instant) snapOverlayDim(field);
-    remeasure();
+
+    const refreshLayout = () => {
+      if (overlayOpen) return;
+      remeasure();
+      scheduleSyncVideoMedia();
+      markDirty({ force: true });
+      scheduleFrame();
+    };
+
+    // Remeasure once close styles have applied (unscaled), and again after
+    // teardown restores body overflow / scrollbar width.
+    requestAnimationFrame(() => {
+      requestAnimationFrame(refreshLayout);
+    });
+    window.setTimeout(refreshLayout, 650);
+
     surface.updateFromField(field, params);
-    scheduleSyncVideoMedia();
     markDirty();
     scheduleFrame();
   }
@@ -595,7 +611,7 @@ export function initBentoBulge(options = {}) {
       event.clientY <= containerRect.bottom;
 
     pointerInside = inside;
-    const hit = cellAtPoint(layout.cells, containerRect, event.clientX, event.clientY);
+    const hit = cellAtPoint(layout.cells, containerRect, event.clientX, event.clientY, bento);
 
     if (!inside || !hit) {
       if (activeCellData !== null) {
@@ -681,15 +697,17 @@ export function initBentoBulge(options = {}) {
     if (!cell.video) return;
 
     const onVideoReady = () => {
-      if (cell.video.dataset.bentoBulgeMediaReady === "true") return;
-      if (!isVideoReady(cell.video)) return;
-      cell.video.dataset.bentoBulgeMediaReady = "true";
-      textureManager.markVideoSlotsDirty();
-      scheduleSyncVideoMedia();
+      whenVideoFramePainted(cell.video).then(() => {
+        if (cell.video.dataset.bentoBulgeMediaReady === "true") return;
+        cell.video.dataset.bentoBulgeMediaReady = "true";
+        textureManager.markVideoSlotsDirty();
+        scheduleSyncVideoMedia();
+      });
     };
     cell.video.addEventListener("loadeddata", onVideoReady, { once: true });
     cell.video.addEventListener("canplay", onVideoReady, { once: true });
-    if (isVideoReady(cell.video)) onVideoReady();
+    cell.video.addEventListener("playing", onVideoReady, { once: true });
+    if (isVideoReady(cell.video) || cell.video.readyState >= 2) onVideoReady();
   });
 
   document.addEventListener("pointermove", onPointerMoveWrapped, { passive: true });

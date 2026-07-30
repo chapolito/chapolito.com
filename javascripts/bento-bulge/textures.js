@@ -1,7 +1,15 @@
-import * as THREE from "../vendor/three.module.min.js";
+import {
+  DataTexture,
+  VideoTexture,
+  CanvasTexture,
+  SRGBColorSpace,
+  LinearFilter,
+  RGBAFormat
+} from "three";
 import { MAX_CELLS, MAX_VIDEO_SLOTS } from "./shaders.js";
+import { hasPaintedVideoFrame } from "./videos.js";
 
-const emptyTexture = new THREE.DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
+const emptyTexture = new DataTexture(new Uint8Array([0, 0, 0, 0]), 1, 1);
 emptyTexture.needsUpdate = true;
 
 function roundedRectPath(ctx, x, y, w, h, r) {
@@ -78,6 +86,8 @@ function drawImageCover(ctx, img, x, y, w, h, mediaFit, cornerRadius, anchorX = 
 
 function drawVideoCover(ctx, video, x, y, w, h, mediaFit, cornerRadius, anchorX = 0.5, anchorY = 0.5) {
   if (!video.videoWidth || !video.videoHeight) return false;
+  // Never bake an unpainted / black first frame into the atlas — keep #222229 instead.
+  if (!hasPaintedVideoFrame(video)) return false;
   if (video.readyState < 2 && video.dataset.bentoBulgeBound !== "true") return false;
   roundedRectPath(ctx, x, y, w, h, cornerRadius);
   ctx.save();
@@ -153,6 +163,9 @@ function drawStaticCell(ctx, cell, cornerRadius, cellSlots) {
   const useVideoTexture = cell.hasVideo && cellSlots && cellSlots[cell.index] >= 0;
 
   if (useVideoTexture) {
+    // Keep statement fill in the atlas under live video so slot/atlas
+    // timing mismatches never flash a transparent hole.
+    drawPlaceholder(ctx, x, y, w, h, cornerRadius);
     return;
   }
 
@@ -204,22 +217,26 @@ function isVideoReady(video) {
   if (!video || !video.videoWidth || !video.videoHeight) return false;
   // Keep bound videos slotted through loop seeks (readyState can dip briefly).
   if (video.dataset.bentoBulgeBound === "true") return true;
-  return video.readyState >= 2;
+  // Wait for a painted frame — readyState alone often yields a black first frame.
+  return hasPaintedVideoFrame(video) && video.readyState >= 2;
 }
 
 export { isVideoReady };
 
 export function createVideoTexture(video) {
-  const tex = new THREE.VideoTexture(video);
-  tex.colorSpace = THREE.SRGBColorSpace;
+  const tex = new VideoTexture(video);
+  tex.colorSpace = SRGBColorSpace;
   tex.flipY = false;
-  tex.minFilter = THREE.LinearFilter;
-  tex.magFilter = THREE.LinearFilter;
+  tex.minFilter = LinearFilter;
+  tex.magFilter = LinearFilter;
   tex.generateMipmaps = false;
+  // Fade stays on #222229 until the GPU has a real uploaded frame.
+  tex.userData.frameUploaded = false;
 
   let lastTime = -1;
-  const baseUpdate = THREE.VideoTexture.prototype.update;
+  const baseUpdate = VideoTexture.prototype.update;
   tex.update = function () {
+    if (!hasPaintedVideoFrame(video)) return;
     if (video.readyState < video.HAVE_CURRENT_DATA) return;
     if (video.seeking) return;
 
@@ -229,7 +246,19 @@ export function createVideoTexture(video) {
     lastTime = t;
 
     baseUpdate.call(this);
+    this.userData.frameUploaded = true;
   };
+
+  // Prime with the already-painted frame so the first fade sample isn't empty/black.
+  if (hasPaintedVideoFrame(video) && video.readyState >= video.HAVE_CURRENT_DATA) {
+    try {
+      baseUpdate.call(tex);
+      lastTime = video.currentTime;
+      tex.userData.frameUploaded = true;
+    } catch {
+      /* ignore */
+    }
+  }
 
   return tex;
 }
@@ -243,13 +272,13 @@ export function createTextureManager(cornerRadius = 8) {
   if (!ctx) {
     throw new Error("[bento-bulge] 2D canvas context unavailable");
   }
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.format = THREE.RGBAFormat;
+  const texture = new CanvasTexture(canvas);
+  texture.colorSpace = SRGBColorSpace;
+  texture.format = RGBAFormat;
   texture.premultiplyAlpha = false;
   texture.flipY = false;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
+  texture.minFilter = LinearFilter;
+  texture.magFilter = LinearFilter;
 
   const videoTextures = new Map();
   const frameUnwatchers = [];
@@ -400,7 +429,9 @@ export function createTextureManager(cornerRadius = 8) {
       lastVideoState = state;
       videoSlotsDirty = false;
       if (changed) {
-        scheduleRebuild(layout, dpr, state.cellSlots);
+        // Rebuild before the next draw — deferred rAF left a frame where
+        // slot uniforms and atlas contents disagreed (tile flicker).
+        rebuildStaticNow(layout, dpr, state.cellSlots);
         rebindVideoFrameWatchers(layout.cells);
       }
       return state;
