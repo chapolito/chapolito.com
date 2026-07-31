@@ -71,7 +71,8 @@
   height: 125px;
   padding: 0 clamp(16px, 2.6vw, 46px) 24px;
   box-sizing: border-box;
-  pointer-events: auto;
+  /* Pass through empty dock area so the LOOKING eye can keep tracking the cursor */
+  pointer-events: none;
 }
 .dock__nav {
   position: relative;
@@ -79,6 +80,7 @@
   align-items: baseline;
   gap: 1.75rem;
   flex-shrink: 0;
+  pointer-events: auto;
 }
 .dock__link {
   position: relative;
