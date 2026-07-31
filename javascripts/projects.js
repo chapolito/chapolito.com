@@ -24,7 +24,7 @@ window.PROJECTS = [
       lede:
         "Quests are the best-selling VR devices ever. My focus was helping people communicate and play together in VR. As part of a broader redesign of the VR OS in 2024, we created the Navigator: a single menu accessible from anywhere for apps, social, and settings. I developed the initial direction for the You and People tabs before handing off to senior designers to bring the experience across the finish line.",
       meta: [
-        { k: "Project", brand: "meta", v: "Quest VR" },
+        { k: "Project", brand: "meta", v: "Quest" },
         { k: "Role", v: "Product Designer" },
         { k: "Platforms", v: "VR OS" },
         { k: "Date", v: "2024–2025" },
