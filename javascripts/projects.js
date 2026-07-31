@@ -181,9 +181,9 @@ window.PROJECTS = [
       layout: "story",
       storyColumn: "992",
       lede:
-        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta.",
+        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming profiles and networks would work across Meta. I led a cross-org design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction.",
       intro:
-        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta.",
+        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming profiles and networks would work across Meta. I led a cross-org design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction.",
       meta: [
         { k: "Project", brand: "meta", v: "Horizon" },
         { k: "Role", v: "Design lead, guiding 5 designers" },
@@ -199,7 +199,7 @@ window.PROJECTS = [
       footnote: {
         lead: "This work is scheduled to ship in Summer 2026.",
         body:
-          "I can share the full case study during a portfolio review, including how we defined a shared gaming profile across Meta, aligned teams around a unified vision, and designed the foundations for profiles across Facebook and Instagram.",
+          "I can share the full case study during a portfolio review, including how we defined a shared gaming profile across Meta, aligned directors and VPs across four orgs, and designed the foundations for gaming profiles across Facebook and Instagram.",
       },
     },
   },
@@ -392,7 +392,7 @@ window.PROJECTS = [
         {
           title: "Meta Accounts",
           intro:
-            "Alongside household mode, I worked as part of a cross-Meta effort to launch the UI of Meta Accounts and was responsible for the Portal experience. Linking a Meta account and Facebook profile meant people could use one account to manage household mode.",
+            "Alongside Household Mode, I redesigned Portal's account and login flows for the Meta Accounts launch. I partnered with the central team to evaluate platform requirements, and successfully advocated to reduce scope to better serve Portal's audience. Linking a Meta account and Facebook profile meant people could use one account to manage Household Mode.",
           mediaRows: [
             {
               layout: "full",
