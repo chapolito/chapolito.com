@@ -596,7 +596,14 @@
           }
 
           function onLookingGazeMove(e) {
-            if (gazeLocked || lookingExcited || reduceMotion.matches || !fineHover.matches || !gazeEl) {
+            if (
+              gazeLocked ||
+              lookingExcited ||
+              lookingSquinting ||
+              reduceMotion.matches ||
+              !fineHover.matches ||
+              !gazeEl
+            ) {
               return;
             }
             gazeDamp = 0.16;
@@ -615,7 +622,7 @@
           }
 
           function resetLookingGaze() {
-            if (gazeLocked || lookingExcited) return;
+            if (gazeLocked || lookingExcited || lookingSquinting) return;
             gazeDamp = 0.16;
             gazeTargetX = 0;
             gazeTargetY = 0;
@@ -627,9 +634,12 @@
           var lookingInteracted = false;
           var lookingAsleep = false;
           var lookingExcited = false;
+          var lookingSquinting = false;
           var blinkTimer = 0;
           var blinkFollowTimer = 0;
           var blinkAnims = [];
+          var squintAnims = [];
+          var squintClearTimer = 0;
           var sleepIdleTimer = 0;
           var sleepZTimer = 0;
           var sleepNodTimers = [];
@@ -700,7 +710,8 @@
               !lidEl ||
               !statementHovering ||
               lookingAsleep ||
-              lookingExcited
+              lookingExcited ||
+              lookingSquinting
             ) {
               return;
             }
@@ -733,6 +744,7 @@
               !statementHovering ||
               lookingAsleep ||
               lookingExcited ||
+              lookingSquinting ||
               reduceMotion.matches ||
               !fineHover.matches
             ) {
@@ -740,11 +752,18 @@
             }
             var delay = 2400 + Math.random() * 4800;
             blinkTimer = window.setTimeout(function () {
-              if (!statementHovering || lookingAsleep || lookingExcited) return;
+              if (!statementHovering || lookingAsleep || lookingExcited || lookingSquinting) {
+                return;
+              }
               blinkLookingEye();
               if (Math.random() < 0.2) {
                 blinkFollowTimer = window.setTimeout(function () {
-                  if (statementHovering && !lookingAsleep && !lookingExcited) {
+                  if (
+                    statementHovering &&
+                    !lookingAsleep &&
+                    !lookingExcited &&
+                    !lookingSquinting
+                  ) {
                     blinkLookingEye();
                   }
                 }, 150 + Math.random() * 140);
@@ -783,7 +802,13 @@
           }
 
           function lookingSleep() {
-            if (lookingAsleep || !lookingInteracted || !statementHovering || lookingExcited) {
+            if (
+              lookingAsleep ||
+              !lookingInteracted ||
+              !statementHovering ||
+              lookingExcited ||
+              lookingSquinting
+            ) {
               return;
             }
             if (document.visibilityState !== "visible") return;
@@ -875,13 +900,14 @@
             cancelSleepAnim();
             looking.classList.remove("is-asleep");
             clearSleepZs();
-            gazeLocked = false;
+            gazeLocked = lookingSquinting;
             gazeDamp = 0.16;
-            if (!lookingExcited) {
+            if (!lookingExcited && !lookingSquinting) {
               resetLookingGaze();
             }
-            if (startle && !reduceMotion.matches && lidEl) {
+            if (startle && !reduceMotion.matches && lidEl && !lookingSquinting) {
               window.setTimeout(function () {
+                if (lookingSquinting) return;
                 animateLookingLid(
                   [
                     { sy: 1, gazeOp: 1, eyeOp: 1, offset: 0 },
@@ -893,7 +919,7 @@
                 );
               }, 200);
             }
-            if (statementHovering && !lookingExcited) {
+            if (statementHovering && !lookingExcited && !lookingSquinting) {
               scheduleAmbientBlink();
             }
           }
@@ -905,12 +931,104 @@
               !lookingInteracted ||
               !statementHovering ||
               lookingExcited ||
+              lookingSquinting ||
               !fineHover.matches
             ) {
               return;
             }
             if (document.visibilityState !== "visible") return;
             sleepIdleTimer = window.setTimeout(lookingSleep, LOOKING_IDLE_MS);
+          }
+
+          function cancelLookingSquint() {
+            window.clearTimeout(squintClearTimer);
+            squintClearTimer = 0;
+            cancelAnimList(squintAnims);
+            lookingSquinting = false;
+            looking.classList.remove("is-skeptical");
+            if (!lookingAsleep) gazeLocked = false;
+          }
+
+          /* Poke the eye — half-lidded stare for ~1s, then ease back open. */
+          function squintLookingEye() {
+            if (!lidEl || lookingExcited) return;
+            if (lookingAsleep) lookingWake({ startle: false });
+            cancelLookingSquint();
+            cancelAmbientBlink();
+            lookingSquinting = true;
+            looking.classList.add("is-skeptical");
+            gazeLocked = true;
+            window.clearTimeout(sleepIdleTimer);
+            sleepIdleTimer = 0;
+
+            if (reduceMotion.matches) {
+              squintClearTimer = window.setTimeout(function () {
+                lookingSquinting = false;
+                looking.classList.remove("is-skeptical");
+                gazeLocked = false;
+                if (statementHovering) {
+                  scheduleAmbientBlink();
+                  armLookingIdle();
+                }
+              }, 1000);
+              return;
+            }
+
+            /* Hold current gaze; a slight downward cast reads as "looking at you." */
+            setLookingGazeTarget(
+              clampGaze(gazeX * 0.35, -GAZE_MAX_X * 0.35, GAZE_MAX_X * 0.35),
+              clampGaze(Math.max(gazeY, 0.55), -GAZE_MAX_Y, GAZE_MAX_Y * 0.55),
+              0.28
+            );
+
+            var squintAnim = animateLookingLid(
+              [
+                {
+                  sy: 1,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: 0,
+                  easing: "cubic-bezier(0.55, 0.05, 0.9, 0.2)",
+                },
+                {
+                  sy: 0.36,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: 0.16,
+                  easing: "linear",
+                },
+                {
+                  sy: 0.36,
+                  gazeOp: 1,
+                  eyeOp: 1,
+                  offset: 0.78,
+                  easing: "cubic-bezier(0.2, 0.85, 0.3, 1)",
+                },
+                { sy: 1, gazeOp: 1, eyeOp: 1, offset: 1 },
+              ],
+              { duration: 1100 },
+              squintAnims
+            );
+
+            function finishSquint() {
+              lookingSquinting = false;
+              looking.classList.remove("is-skeptical");
+              gazeLocked = false;
+              gazeDamp = 0.16;
+              if (statementHovering) {
+                resetLookingGaze();
+                scheduleAmbientBlink();
+                armLookingIdle();
+              } else {
+                resetLookingGaze();
+              }
+            }
+
+            if (squintAnim && typeof squintAnim.finished !== "undefined") {
+              squintAnim.finished.then(finishSquint).catch(function () {});
+            } else {
+              squintClearTimer = window.setTimeout(finishSquint, 1100);
+            }
           }
 
           function onLookingActivity() {
@@ -932,6 +1050,7 @@
             tile.addEventListener("pointerdown", onLookingActivity, { passive: true });
             tile.addEventListener("pointerleave", function () {
               statementHovering = false;
+              cancelLookingSquint();
               lookingWake({ startle: false });
               cancelAmbientBlink();
               resetLookingGaze();
@@ -949,8 +1068,17 @@
             });
           }
 
+          if (eyeEl) {
+            eyeEl.addEventListener("click", function (e) {
+              e.preventDefault();
+              e.stopPropagation();
+              squintLookingEye();
+            });
+          }
+
           document.addEventListener("visibilitychange", function () {
             if (document.visibilityState !== "visible") {
+              cancelLookingSquint();
               lookingWake({ startle: false });
             } else if (statementHovering) {
               armLookingIdle();
@@ -959,6 +1087,7 @@
 
           if (resumeEl && fineHover.matches) {
             resumeEl.addEventListener("mouseenter", function () {
+              cancelLookingSquint();
               lookingExcited = true;
               lookingWake({ startle: false });
               cancelAmbientBlink();
@@ -1026,6 +1155,7 @@
 
           function onLookingToggle(e) {
             if (e.target.closest && e.target.closest("a.tile__looking-resume")) return;
+            if (e.target.closest && e.target.closest(".tile__looking-eye")) return;
             e.preventDefault();
             setLookingExpanded(!looking.classList.contains("is-expanded"));
           }
