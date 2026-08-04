@@ -243,7 +243,22 @@ button { font: inherit; }
   text-decoration: none;
 }
 
+/* Shared image fade-in — charcoal/sampled fill shows until decode, then fade. */
+img.media-fade {
+  opacity: 0;
+  transition: opacity 400ms var(--e-out);
+}
+
+img.media-fade.is-loaded {
+  opacity: 1;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  img.media-fade {
+    opacity: 1;
+    transition: none;
+  }
+
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

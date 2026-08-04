@@ -11,10 +11,39 @@
     return n;
   }
 
+  function wireMediaFade(img) {
+    if (!img || img.dataset.mediaFade === "1") return;
+    img.dataset.mediaFade = "1";
+    img.classList.add("media-fade");
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      img.classList.add("is-loaded");
+      return;
+    }
+    var done = function () {
+      img.classList.add("is-loaded");
+    };
+    var reveal = function () {
+      if (typeof img.decode === "function") {
+        img.decode().then(done).catch(done);
+      } else {
+        done();
+      }
+    };
+    if (img.complete && img.naturalWidth > 0) {
+      reveal();
+    } else {
+      img.addEventListener("load", reveal, { once: true });
+      img.addEventListener("error", done, { once: true });
+    }
+  }
+
   function media(m) {
     var fig = el("figure", "pj-fig pj-fig--" + (m.fit || "cover"));
     if (m.overlay) fig.classList.add("pj-fig--video-overlay");
     if (m.label) fig.classList.add("pj-fig--labeled");
+    if (m.type === "image" && m.fill) {
+      fig.style.setProperty("--media-fill", m.fill);
+    }
     var node;
     if (m.type === "video") {
       node = document.createElement("video");
@@ -31,6 +60,7 @@
       node.src = m.src;
       node.alt = m.alt || "";
       node.loading = "lazy";
+      wireMediaFade(node);
     }
     fig.appendChild(node);
     if (m.overlay && m.overlay.src) {
@@ -39,6 +69,7 @@
       overlay.alt = m.overlay.alt || "";
       overlay.className = "pj-fig__overlay";
       overlay.loading = "lazy";
+      wireMediaFade(overlay);
       fig.appendChild(overlay);
     }
     if (m.label) {
@@ -109,10 +140,24 @@
     return head;
   }
 
+  function appendInlineText(parent, text) {
+    var parts = String(text).split(/(\*\*[^*]+\*\*)/g);
+    parts.forEach(function (part) {
+      if (!part) return;
+      if (part.slice(0, 2) === "**" && part.slice(-2) === "**") {
+        parent.appendChild(el("strong", null, part.slice(2, -2)));
+      } else {
+        parent.appendChild(document.createTextNode(part));
+      }
+    });
+  }
+
   function appendLedes(parent, lede, className) {
     var paragraphs = Array.isArray(lede) ? lede : [lede];
     paragraphs.forEach(function (text) {
-      parent.appendChild(el("p", className, text));
+      var p = el("p", className);
+      appendInlineText(p, text);
+      parent.appendChild(p);
     });
   }
 
@@ -202,12 +247,6 @@
     return wrap;
   }
 
-  function buildStoryHero(hero) {
-    var wrap = el("div", "pj-story__hero pj-sec reveal");
-    wrap.appendChild(media(hero));
-    return wrap;
-  }
-
   function buildStoryFootnote(footnote) {
     var wrap = el("div", "pj-story__footnote pj-sec reveal");
     var p = el("p", "pj-story__footnote-p");
@@ -234,11 +273,10 @@
       lead.appendChild(buildStorySectionHead(null, d.intro));
       story.appendChild(lead);
     }
-    if (d.hero) story.appendChild(buildStoryHero(d.hero));
-    if (d.footnote) story.appendChild(buildStoryFootnote(d.footnote));
     (d.sections || []).forEach(function (s) {
       story.appendChild(buildStorySection(s));
     });
+    if (d.footnote) story.appendChild(buildStoryFootnote(d.footnote));
     root.appendChild(story);
   }
 
@@ -318,6 +356,14 @@
     vids.forEach(function (v) {
       io.observe(v);
     });
+  };
+
+  window.initMediaFade = function (scope) {
+    var root = scope || document;
+    var imgs = root.querySelectorAll(
+      ".pj-fig > img, .pj-fig__overlay, .about__portrait img, .about__photo-frame img, .about__moment-art img"
+    );
+    imgs.forEach(wireMediaFade);
   };
 
   window.initReveal = function (scope) {

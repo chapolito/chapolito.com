@@ -571,6 +571,7 @@ export function initBentoBulgeOverlays(options = {}) {
     if (instant) {
       setupReveals(".pj-sec", true);
       window.initInview(doc);
+      if (window.initMediaFade) window.initMediaFade(doc);
       if (!skipPush) history.pushState({ id }, "", projectUrl(id));
       else history.replaceState({ id }, "", projectUrl(id));
       setPageMeta(projectMeta(p));
@@ -580,6 +581,7 @@ export function initBentoBulgeOverlays(options = {}) {
 
     setupReveals(".pj-sec", false);
     window.initInview(doc);
+    if (window.initMediaFade) window.initMediaFade(doc);
 
     if (!skipPush) history.pushState({ id }, "", projectUrl(id));
     setPageMeta(projectMeta(p));
@@ -623,6 +625,7 @@ export function initBentoBulgeOverlays(options = {}) {
       document.body.classList.add("is-detail-open", "is-detail-enter");
 
       if (window.initInview) window.initInview(doc);
+      if (window.initMediaFade) window.initMediaFade(doc);
       setupReveals(".about .reveal", false);
 
       if (!skipPush) history.pushState({ about: true }, "", aboutUrl());
@@ -650,6 +653,7 @@ export function initBentoBulgeOverlays(options = {}) {
     openOverlayCommon(instant, { about: true });
 
     if (window.initInview) window.initInview(doc);
+    if (window.initMediaFade) window.initMediaFade(doc);
     setupReveals(".about .reveal", instant);
 
     if (!skipPush) history.pushState({ about: true }, "", aboutUrl());

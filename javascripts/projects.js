@@ -65,7 +65,7 @@ window.PROJECTS = [
         {
           title: "Joinable Status",
           intro:
-            "I shipped joinable status and redesigned the social privacy settings **resulting in a 300% increase in people joining their friend’s games.**",
+            "I shipped joinable status and redesigned the social privacy settings **resulting in a 300% increase in people joining their friend's games.**",
           mediaRows: [
             {
               layout: "full",
@@ -126,6 +126,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/horizon/emotes-menu-vr.jpg",
+                  fill: "#73858c",
                   alt: "Emotes menu in Horizon VR",
                   fit: "cover",
                 },
@@ -192,6 +193,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/horizon/emotes-menu-vr.jpg",
+                  fill: "#73858c",
                   alt: "Emotes menu in Horizon VR",
                   fit: "cover",
                 },
@@ -232,12 +234,23 @@ window.PROJECTS = [
         { k: "Platforms", v: "Mobile" },
         { k: "Date", v: "2026" },
       ],
-      hero: {
-        type: "video",
-        src: "/images/horizon/Gaming-Profile-hero-image.mp4",
-        alt: "Horizon mobile app showing gaming profiles and friends activity",
-        fit: "contain",
-      },
+      sections: [
+        {
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "video",
+                  src: "/images/horizon/Gaming-Profile-hero-image.mp4",
+                  alt: "Horizon mobile app showing gaming profiles and friends activity",
+                  fit: "contain",
+                },
+              ],
+            },
+          ],
+        },
+      ],
       footnote: {
         lead: "This work is scheduled to ship in Summer 2026.",
         body:
@@ -278,6 +291,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/facebook-on-portal/FB-Live-woman-on-portal.jpg",
+                  fill: "#9fa19a",
                   alt: "Facebook Live on Portal with Smart Camera and live comments",
                   fit: "cover",
                 },
@@ -289,12 +303,14 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/facebook-on-portal/FB-Watch-loading-screen.jpg",
+                  fill: "#293042",
                   alt: "Facebook Live splash screen on Portal",
                   fit: "cover",
                 },
                 {
                   type: "image",
                   src: "/images/portal/facebook-on-portal/FB-Watch-prototype.jpg",
+                  fill: "#342f33",
                   alt: "Start Live Video setup on Portal",
                   fit: "cover",
                 },
@@ -306,6 +322,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/facebook-on-portal/FB-Live-TV.jpg",
+                  fill: "#4d3c38",
                   alt: "Facebook Live on Portal TV with audience comments",
                   fit: "cover",
                 },
@@ -338,12 +355,14 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/facebook-on-portal/FB-Watch-tv-icon.jpg",
+                  fill: "#25367a",
                   alt: "Facebook Watch app on Portal TV home screen",
                   fit: "cover",
                 },
                 {
                   type: "image",
                   src: "/images/portal/facebook-on-portal/FB-Watch-browse.jpg",
+                  fill: "#2f2e32",
                   alt: "Facebook Watch browse experience on Portal",
                   fit: "cover",
                 },
@@ -396,6 +415,7 @@ window.PROJECTS = [
                   fit: "cover",
                   overlay: {
                     src: "/images/portal/household-mode/household-mode-specs.png",
+                    fill: "#0e0e10",
                     alt: "Household mode animation specifications",
                   },
                 },
@@ -407,6 +427,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/household-mode/Household-Mode-label.jpg",
+                  fill: "#b0a69e",
                   alt: "Household mode label on Portal home screen",
                   fit: "cover",
                 },
@@ -424,6 +445,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/household-mode/Household-mode-discovery.jpg",
+                  fill: "#677075",
                   alt: "Household mode promo and app restriction settings on Portal",
                   fit: "cover",
                 },
@@ -442,6 +464,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/meta-accounts/Meta-accounts-across-devices.jpg",
+                  fill: "#595458",
                   alt: "Meta Accounts setup across Portal, Quest, mobile, and desktop",
                   fit: "cover",
                 },
@@ -453,6 +476,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/meta-accounts/Meta-accounts-login.jpg",
+                  fill: "#30343b",
                   alt: "Who's using Portal profile picker",
                   fit: "cover",
                 },
@@ -470,6 +494,7 @@ window.PROJECTS = [
                 {
                   type: "image",
                   src: "/images/portal/meta-accounts/Meta-accounts-setup-confirmation.jpg",
+                  fill: "#869195",
                   alt: "Meta account added confirmation on Portal",
                   fit: "cover",
                 },
@@ -479,5 +504,5 @@ window.PROJECTS = [
         },
       ],
     },
-  }
-];;
+  },
+];

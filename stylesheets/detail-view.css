@@ -212,7 +212,7 @@ body.is-home-enter .grid .tile {
   box-shadow: none;
   overflow: hidden;
   line-height: 0;
-  background: transparent;
+  background: var(--media-fill, transparent);
 }
 
 .pj-bento-media__tile .pj-fig img,
@@ -276,7 +276,7 @@ body.is-home-enter .grid .tile {
 .detail-split .pj-fig--contain {
   display: grid;
   place-items: center;
-  background: radial-gradient(120% 100% at 50% 0%, #2c2336 0%, #15101d 100%);
+  background: var(--media-fill, radial-gradient(120% 100% at 50% 0%, #2c2336 0%, #15101d 100%));
 }
 
 .detail-split .pj-hero--contain .pj-fig img,
@@ -299,7 +299,7 @@ body.is-home-enter .grid .tile {
   inset: 0;
   display: block;
   place-items: unset;
-  background: transparent;
+  background: var(--media-fill, transparent);
 }
 
 .detail-split .pj-bento__media .pj-bento-media__tile .pj-fig img,
@@ -334,7 +334,7 @@ body.is-home-enter .grid .tile {
   border: 1px solid var(--line);
   box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.8);
   overflow: hidden;
-  background: rgba(12, 10, 16, 0.35);
+  background: var(--media-fill, rgba(12, 10, 16, 0.35));
   line-height: 0;
 }
 
@@ -845,10 +845,10 @@ body.is-detail-closing .detail-close {
 
 .pj-story__media .pj-fig {
   margin: 0;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   box-shadow: none;
-  background: #222229;
+  background: var(--media-fill, #222229);
   overflow: hidden;
 }
 
@@ -890,10 +890,10 @@ body.is-detail-closing .detail-close {
   width: min(100%, 992px);
   max-width: 992px;
   margin: 0;
-  border-radius: 12px;
+  border-radius: 16px;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   box-shadow: none;
-  background: #222229;
+  background: var(--media-fill, #222229);
   overflow: hidden;
 }
 
@@ -1009,10 +1009,10 @@ body.is-detail-closing .detail-close {
 
 .pj-story--col-992 .pj-story__media .pj-fig {
   margin: 0;
-  border-radius: 48px;
+  border-radius: 16px;
   border: 0.5px solid rgba(255, 255, 255, 0.1);
   box-shadow: none;
-  background: #222229;
+  background: var(--media-fill, #222229);
   overflow: hidden;
 }
 
