@@ -86,14 +86,14 @@ window.PROJECTS = [
               media: [
                 {
                   type: "image",
-                  src: "/images/quest-vr/active-status-changes.png",
+                  src: "/images/quest-vr/active-status-changes.jpg",
                   fill: "#202e3a",
                   alt: "Active Status and Rich Presence toggles mapped to Joinable, Online, and Appear offline",
                   fit: "cover",
                 },
                 {
                   type: "image",
-                  src: "/images/quest-vr/active-status-migration.png",
+                  src: "/images/quest-vr/active-status-migration.jpg",
                   fill: "#716d66",
                   alt: "Profiles now control who sees your activity migration notice",
                   fit: "cover",
