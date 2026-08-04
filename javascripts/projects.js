@@ -63,6 +63,48 @@ window.PROJECTS = [
           ],
         },
         {
+          title: "Joinable Status",
+          intro:
+            "I shipped joinable status and redesigned the social privacy settings **resulting in a 300% increase in people joining their friend’s games.**",
+          mediaRows: [
+            {
+              layout: "full",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/quest-vr/joinable-status.jpg",
+                  fill: "#76606c",
+                  alt: "Joinable status dropdown in the Quest People menu",
+                  fit: "cover",
+                },
+              ],
+            },
+            {
+              layout: "double",
+              media: [
+                {
+                  type: "image",
+                  src: "/images/quest-vr/active-status-changes.png",
+                  fill: "#202e3a",
+                  alt: "Active Status and Rich Presence toggles mapped to Joinable, Online, and Appear offline",
+                  fit: "cover",
+                },
+                {
+                  type: "image",
+                  src: "/images/quest-vr/active-status-migration.png",
+                  fill: "#716d66",
+                  alt: "Profiles now control who sees your activity migration notice",
+                  fit: "cover",
+                },
+              ],
+            },
+          ],
+          body: [
+            "Previously, active status was a confusing mix of toggles to share your online status and current app. I simplified to a single dropdown: Joinable, online, and offline.",
+            "The simplified social privacy settings required a migration of existing settings, which I carefully designed to minimize disruption. The result was no measurable impact to retention or engagement.",
+          ],
+        },
+        {
           title: "In-game Communication",
           intro:
             "Horizon is Meta's social platform for VR. I led a small team to redesign in-world communication across text chat, voice, and emotes, including the in-game menu experience. This work was completed for both VR and Mobile.",
