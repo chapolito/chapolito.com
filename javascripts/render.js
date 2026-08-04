@@ -196,6 +196,17 @@
     return grid;
   }
 
+  function buildStoryBody(body) {
+    var bodyWrap = el("div", "pj-story__body");
+    var paragraphs = Array.isArray(body) ? body : [body];
+    paragraphs.forEach(function (text) {
+      var p = el("p", "pj-story__body-p");
+      appendInlineText(p, text);
+      bodyWrap.appendChild(p);
+    });
+    return bodyWrap;
+  }
+
   function buildStorySection(s) {
     var sec = el("section", "pj-story__section pj-sec reveal");
     if (s.title || s.intro) {
@@ -206,6 +217,7 @@
       var stack = el("div", "pj-story__media-stack");
       s.mediaRows.forEach(function (row) {
         stack.appendChild(buildStoryMediaRow(row));
+        if (row.caption) stack.appendChild(buildStoryBody(row.caption));
       });
       sec.appendChild(stack);
     } else if (s.media && s.media.length) {
@@ -216,14 +228,7 @@
       sec.appendChild(grid);
     }
 
-    if (s.body) {
-      var bodyWrap = el("div", "pj-story__body");
-      var paragraphs = Array.isArray(s.body) ? s.body : [s.body];
-      paragraphs.forEach(function (text) {
-        bodyWrap.appendChild(el("p", "pj-story__body-p", text));
-      });
-      sec.appendChild(bodyWrap);
-    }
+    if (s.body) sec.appendChild(buildStoryBody(s.body));
 
     return sec;
   }

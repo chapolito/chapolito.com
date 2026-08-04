@@ -78,6 +78,8 @@ window.PROJECTS = [
                   fit: "cover",
                 },
               ],
+              caption:
+                "Previously, active status was a confusing mix of toggles to share your online status and current app. I simplified to a single dropdown: Joinable, online, and offline.",
             },
             {
               layout: "double",
