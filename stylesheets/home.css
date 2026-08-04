@@ -717,6 +717,10 @@ body.is-home.is-home-enter .stage {
     transform 220ms var(--e-out),
     opacity 220ms var(--e-out);
 }
+.tile__looking-eye-lid {
+  transform-box: fill-box;
+  transform-origin: center;
+}
 .tile__looking-eye-gaze {
   transform-box: fill-box;
   transform-origin: center;
@@ -818,7 +822,7 @@ body.is-home.is-home-enter .stage {
 }
 @media (prefers-reduced-motion: reduce) {
   .tile__looking.is-asleep .tile__looking-eye-lid {
-    ry: 0.43;
+    transform: scale(1, 0.06);
   }
   .tile__looking.is-asleep .tile__looking-eye-gaze {
     opacity: 0;
@@ -861,25 +865,17 @@ body.is-home.is-home-enter .stage {
   animation-delay: 1.3s;
 }
 
-/* Résumé excitement — dilate + lean toward the button */
+/* Surprise / résumé excite — lids open wider via path morph; light scale + dilate */
 .tile__looking.is-excited .tile__looking-eye-pupil {
-  transform: scale(1.45);
+  transform: scale(1.22);
 }
 .tile__looking.is-excited .tile__looking-eye {
-  transform: scale(1.1);
+  transform: scale(1.04);
 }
 
-/* Skeptical squint — pupil narrows while lids half-close via WAAPI */
+/* Skeptical squint — pupil narrows; lid morphs via WAAPI to anatomical silhouette */
 .tile__looking.is-skeptical .tile__looking-eye-pupil {
   transform: scale(0.82);
-}
-.tile__looking.is-skeptical .tile__looking-eye {
-  transform: scale(1.02, 0.96);
-}
-@media (prefers-reduced-motion: reduce) {
-  .tile__looking.is-skeptical .tile__looking-eye-lid {
-    ry: 2.6;
-  }
 }
 
 /* Open chrome — chip size/colors only; inner layout is already final */

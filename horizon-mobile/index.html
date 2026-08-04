@@ -13,9 +13,9 @@
     <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gaming Profiles across Meta · Jesse O'Chapo</title>
-    <meta name="description" content="As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta." />
+    <meta name="description" content="As Horizon expanded across Facebook and Instagram, we needed to define how gaming profiles and networks would work across Meta. I led a cross-org design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction." />
     <meta property="og:title" content="Gaming Profiles across Meta · Jesse O'Chapo" />
-    <meta property="og:description" content="As Horizon expanded across Facebook and Instagram, we needed to define how gaming identity, profiles, and social connections would work across Meta." />
+    <meta property="og:description" content="As Horizon expanded across Facebook and Instagram, we needed to define how gaming profiles and networks would work across Meta. I led a cross-org design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction." />
     <meta property="og:url" content="https://www.chapolito.com/horizon-mobile/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Chapolito" />
@@ -286,11 +286,7 @@
       (function () {
         var grid = document.getElementById("grid");
         var projects = (window.PROJECTS || []).filter(function (p) {
-          return (
-            p.id !== "mk-play" &&
-            p.id !== "life360-messaging" &&
-            p.id !== "horizon-chat"
-          );
+          return p.id !== "horizon-chat";
         });
 
         function tileVideoSrc(src) {
@@ -486,11 +482,11 @@
             '<span class="tile__looking-lead">' +
             '<svg class="tile__looking-eye" viewBox="0 0 27 15" width="27" height="15" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">' +
             '<defs><clipPath id="looking-eye-lid-clip" clipPathUnits="userSpaceOnUse">' +
-            /* Ellipse ry shrinks shut — iris/pupil stay circular and get clipped (not stretched). */
-            '<ellipse class="tile__looking-eye-lid" cx="13.4015" cy="7.40741" rx="13.2" ry="7.2"/>' +
+            /* Smooth almond clip — 6 cubics (original silhouette, morph-compatible). */
+            '<path class="tile__looking-eye-lid" d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 6.47302 2.36046 4.71376 4.72318 3.1881C7.0859 1.66244 10.23919 0.37037 13.4015 0.37037C16.56375 0.37037 19.71702 1.70873 22.07974 3.25754C24.44245 4.80635 26.0146 6.56561 26.0146 7.40741Z"/>' +
             "</clipPath></defs>" +
             '<g clip-path="url(#looking-eye-lid-clip)">' +
-            '<path class="tile__looking-eye-sclera" d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 5.53863 7.07688 0.37037 13.4015 0.37037C19.726 0.37037 26.0146 5.72382 26.0146 7.40741Z" fill="#CCFDE9"/>' +
+            '<path class="tile__looking-eye-sclera" d="M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 6.47302 2.36046 4.71376 4.72318 3.1881C7.0859 1.66244 10.23919 0.37037 13.4015 0.37037C16.56375 0.37037 19.71702 1.70873 22.07974 3.25754C24.44245 4.80635 26.0146 6.56561 26.0146 7.40741Z" fill="#CCFDE9"/>' +
             '<g class="tile__looking-eye-gaze">' +
             '<path class="tile__looking-eye-iris" d="M13.4694 12.6603C16.5546 12.6603 19.0556 10.3102 19.0556 7.41122C19.0556 4.51226 16.5546 2.16219 13.4694 2.16219C10.3842 2.16219 7.88321 4.51226 7.88321 7.41122C7.88321 10.3102 10.3842 12.6603 13.4694 12.6603Z" fill="#47FFB2"/>' +
             '<path class="tile__looking-eye-pupil" d="M13.4022 9.26293C14.4911 9.26293 15.3738 8.43349 15.3738 7.41033C15.3738 6.38717 14.4911 5.55774 13.4022 5.55774C12.3134 5.55774 11.4307 6.38717 11.4307 7.41033C11.4307 8.43349 12.3134 9.26293 13.4022 9.26293Z" fill="#222229"/>' +
@@ -523,6 +519,7 @@
           var detailEl = looking.querySelector(".tile__looking-detail");
           var eyeEl = looking.querySelector(".tile__looking-eye");
           var lidEl = looking.querySelector(".tile__looking-eye-lid");
+          var scleraEl = looking.querySelector(".tile__looking-eye-sclera");
           var gazeEl = looking.querySelector(".tile__looking-eye-gaze");
           var gazeX = 0;
           var gazeY = 0;
@@ -661,15 +658,57 @@
             list.length = 0;
           }
 
-          /* Lid ry shrinks shut — clips unscaled iris/pupil; gaze/eye opacity for shut state. */
-          var LID_RY_OPEN = 7.2;
+          /* Blink/sleep: scaleY the almond clip.
+             Squint: morph d — lower-lid bulge, upper V, outer corner tucked in.
+             Rest uses the original smooth almond, expanded to 6 cubics so it can
+             morph to squint without baking the V into the idle shape. */
+          var LID_ORIGIN = "13.4015px 7.40741px";
+          var EYE_D_OPEN =
+            "M26.0146 7.40741C26.0146 9.091 19.726 14.4444 13.4015 14.4444C7.07688 14.4444 0.788321 9.27618 0.788321 7.40741C0.788321 6.47302 2.36046 4.71376 4.72318 3.1881C7.0859 1.66244 10.23919 0.37037 13.4015 0.37037C16.56375 0.37037 19.71702 1.70873 22.07974 3.25754C24.44245 4.80635 26.0146 6.56561 26.0146 7.40741Z";
+          /* Surprise — same smooth almond, lids open a little taller. */
+          var EYE_D_SURPRISED =
+            "M26.0146 7.40741C26.0146 9.29303 19.726 15.28884 13.4015 15.28884C7.07688 15.28884 0.788321 9.50043 0.788321 7.40741C0.788321 6.36089 2.36046 4.39052 4.72318 2.68178C7.0859 0.97304 10.23919 -0.47407 13.4015 -0.47407C16.56375 -0.47407 19.71702 1.02489 22.07974 2.75956C24.44245 4.49423 26.0146 6.4646 26.0146 7.40741Z";
+          /* Anatomical squint (state 3 silhouette, no eyelid stroke):
+             - inner (left) tip stays put
+             - outer (right) tip pushed in — muscle bunch, not uniform scale
+             - lower bulge up, higher on the right than the left
+             - upper: soft wide V that flows with the lid */
+          var EYE_D_SQUINT =
+            /* Softer wider upper V; lower bulge higher on the right than the left. */
+            "M21.55 8.45C20.2 9.55 16.8 10.35 14.0 10.25C10.2 10.55 3.0 9.35 0.788321 7.45C1.9 5.7 4.4 4.35 7.0 4.25C9.8 4.15 11.6 5.0 13.6 5.4C15.6 5.75 17.8 5.25 19.2 5.55C20.4 5.85 21.2 7.2 21.55 8.45Z";
+          var SURPRISE_MS = 480;
+          var SQUINT_MS = 2100;
+
+          function clearPathAnimates(el) {
+            if (!el) return;
+            Array.prototype.slice
+              .call(el.querySelectorAll("animate"))
+              .forEach(function (a) {
+                a.remove();
+              });
+          }
+
+          function resetLookingLidShape() {
+            clearPathAnimates(lidEl);
+            clearPathAnimates(scleraEl);
+            if (lidEl) {
+              lidEl.setAttribute("d", EYE_D_OPEN);
+              lidEl.style.removeProperty("d");
+              lidEl.style.removeProperty("transform");
+            }
+            if (scleraEl) {
+              scleraEl.setAttribute("d", EYE_D_OPEN);
+              scleraEl.style.removeProperty("d");
+            }
+          }
 
           function animateLookingLid(frames, options, store) {
             if (!lidEl || !gazeEl || !eyeEl) return null;
             cancelAnimList(store);
+            resetLookingLidShape();
             var lidFrames = frames.map(function (f) {
               return {
-                ry: LID_RY_OPEN * f.sy,
+                transform: "scale(1, " + f.sy + ")",
                 offset: f.offset,
                 easing: f.easing,
               };
@@ -688,11 +727,158 @@
                 easing: f.easing,
               };
             });
+            lidEl.style.transformOrigin = LID_ORIGIN;
             store.push(
               lidEl.animate(lidFrames, options),
               gazeEl.animate(gazeFrames, options),
               eyeEl.animate(eyeFrames, options)
             );
+            return store[0];
+          }
+
+          /* Clip-path needs SVG attribute morph (CSS d WAAPI won't update clipping). */
+          function morphSvgPath(el, fromD, toD, durMs, easing) {
+            if (!el) return null;
+            clearPathAnimates(el);
+            el.style.removeProperty("d");
+            el.style.removeProperty("transform");
+            el.setAttribute("d", fromD);
+            if (!durMs || durMs <= 0 || reduceMotion.matches) {
+              el.setAttribute("d", toD);
+              return null;
+            }
+            var anim = document.createElementNS("http://www.w3.org/2000/svg", "animate");
+            anim.setAttribute("attributeName", "d");
+            anim.setAttribute("from", fromD);
+            anim.setAttribute("to", toD);
+            anim.setAttribute("dur", (durMs / 1000).toFixed(3) + "s");
+            anim.setAttribute("fill", "freeze");
+            anim.setAttribute("calcMode", "spline");
+            anim.setAttribute("keyTimes", "0;1");
+            anim.setAttribute(
+              "keySplines",
+              easing || "0.55 0.05 0.9 0.2"
+            );
+            /* Commit the end shape onto the attribute so rest never depends on a
+               frozen SMIL presentation value after the animate node is cleared. */
+            anim.addEventListener("endEvent", function () {
+              el.setAttribute("d", toD);
+              if (anim.parentNode) anim.remove();
+            });
+            el.appendChild(anim);
+            if (typeof anim.beginElement === "function") anim.beginElement();
+            else el.setAttribute("d", toD);
+            return anim;
+          }
+
+          function morphLookingLidPath(fromD, toD, durMs, easing) {
+            return morphSvgPath(lidEl, fromD, toD, durMs, easing);
+          }
+
+          /* Wide lids + light scale — shared by résumé hover and poke surprise. */
+          function setLookingExcitedVisual(on, opts) {
+            opts = opts || {};
+            var dur =
+              opts.duration != null
+                ? opts.duration
+                : reduceMotion.matches
+                  ? 0
+                  : 200;
+            if (on) {
+              looking.classList.add("is-excited");
+              morphSvgPath(
+                lidEl,
+                EYE_D_OPEN,
+                EYE_D_SURPRISED,
+                dur,
+                "0.2 0.85 0.3 1"
+              );
+              morphSvgPath(
+                scleraEl,
+                EYE_D_OPEN,
+                EYE_D_SURPRISED,
+                dur,
+                "0.2 0.85 0.3 1"
+              );
+            } else {
+              looking.classList.remove("is-excited");
+              if (lookingSquinting) return;
+              morphSvgPath(
+                lidEl,
+                EYE_D_SURPRISED,
+                EYE_D_OPEN,
+                dur,
+                "0.55 0.05 0.9 0.2"
+              );
+              morphSvgPath(
+                scleraEl,
+                EYE_D_SURPRISED,
+                EYE_D_OPEN,
+                dur,
+                "0.55 0.05 0.9 0.2"
+              );
+            }
+          }
+
+          function animateLookingSquintShape(frames, options, store) {
+            if (!lidEl) return null;
+            cancelAnimList(store);
+            clearPathAnimates(lidEl);
+            lidEl.style.removeProperty("transform");
+            lidEl.style.removeProperty("d");
+
+            var duration = options.duration || SQUINT_MS;
+            var closeAt = Math.round((frames[1] && frames[1].offset != null ? frames[1].offset : 0.11) * duration);
+            var holdUntil = Math.round((frames[2] && frames[2].offset != null ? frames[2].offset : 0.8) * duration);
+            var timers = [];
+            var resolveFinish = null;
+            var finished = new Promise(function (resolve) {
+              resolveFinish = resolve;
+            });
+
+            morphLookingLidPath(
+              frames[0] && frames[0].d ? frames[0].d : EYE_D_OPEN,
+              EYE_D_SQUINT,
+              Math.max(closeAt, 1),
+              "0.55 0.05 0.9 0.2"
+            );
+            if (scleraEl) {
+              morphSvgPath(
+                scleraEl,
+                frames[0] && frames[0].d ? frames[0].d : EYE_D_OPEN,
+                EYE_D_OPEN,
+                Math.max(closeAt, 1),
+                "0.55 0.05 0.9 0.2"
+              );
+            }
+
+            timers.push(
+              window.setTimeout(function () {
+                morphLookingLidPath(
+                  EYE_D_SQUINT,
+                  EYE_D_OPEN,
+                  Math.max(duration - holdUntil, 1),
+                  "0.2 0.85 0.3 1"
+                );
+              }, holdUntil)
+            );
+
+            timers.push(
+              window.setTimeout(function () {
+                lidEl.setAttribute("d", EYE_D_OPEN);
+                clearPathAnimates(lidEl);
+                resolveFinish();
+              }, duration)
+            );
+
+            store.push({
+              cancel: function () {
+                timers.forEach(window.clearTimeout);
+                clearPathAnimates(lidEl);
+                lidEl.setAttribute("d", EYE_D_OPEN);
+              },
+              finished: finished,
+            });
             return store[0];
           }
 
@@ -946,73 +1132,38 @@
             cancelAnimList(squintAnims);
             lookingSquinting = false;
             looking.classList.remove("is-skeptical");
+            /* Don't strip résumé excite; otherwise close lids. */
+            if (!lookingExcited) {
+              looking.classList.remove("is-excited");
+              resetLookingLidShape();
+            } else {
+              clearPathAnimates(lidEl);
+              clearPathAnimates(scleraEl);
+              if (lidEl) lidEl.setAttribute("d", EYE_D_SURPRISED);
+              if (scleraEl) scleraEl.setAttribute("d", EYE_D_SURPRISED);
+            }
             if (!lookingAsleep) gazeLocked = false;
           }
 
-          /* Poke the eye — half-lidded stare for ~1s, then ease back open. */
+          /* Poke the eye — surprise dwell, then anatomical state-3 squint. */
           function squintLookingEye() {
             if (!lidEl || lookingExcited) return;
             if (lookingAsleep) lookingWake({ startle: false });
             cancelLookingSquint();
             cancelAmbientBlink();
             lookingSquinting = true;
-            looking.classList.add("is-skeptical");
             gazeLocked = true;
             window.clearTimeout(sleepIdleTimer);
             sleepIdleTimer = 0;
 
-            if (reduceMotion.matches) {
-              squintClearTimer = window.setTimeout(function () {
-                lookingSquinting = false;
-                looking.classList.remove("is-skeptical");
-                gazeLocked = false;
-                if (statementHovering) {
-                  scheduleAmbientBlink();
-                  armLookingIdle();
-                }
-              }, 1000);
-              return;
-            }
-
-            /* Hold current gaze; a slight downward cast reads as "looking at you." */
-            setLookingGazeTarget(
-              clampGaze(gazeX * 0.35, -GAZE_MAX_X * 0.35, GAZE_MAX_X * 0.35),
-              clampGaze(Math.max(gazeY, 0.55), -GAZE_MAX_Y, GAZE_MAX_Y * 0.55),
-              0.28
-            );
-
-            var squintAnim = animateLookingLid(
-              [
-                {
-                  sy: 1,
-                  gazeOp: 1,
-                  eyeOp: 1,
-                  offset: 0,
-                  easing: "cubic-bezier(0.55, 0.05, 0.9, 0.2)",
-                },
-                {
-                  sy: 0.36,
-                  gazeOp: 1,
-                  eyeOp: 1,
-                  offset: 0.16,
-                  easing: "linear",
-                },
-                {
-                  sy: 0.36,
-                  gazeOp: 1,
-                  eyeOp: 1,
-                  offset: 0.78,
-                  easing: "cubic-bezier(0.2, 0.85, 0.3, 1)",
-                },
-                { sy: 1, gazeOp: 1, eyeOp: 1, offset: 1 },
-              ],
-              { duration: 1100 },
-              squintAnims
-            );
+            /* Wide lids + light dilate — same excite language as résumé hover. */
+            setLookingExcitedVisual(true);
 
             function finishSquint() {
               lookingSquinting = false;
               looking.classList.remove("is-skeptical");
+              if (!lookingExcited) looking.classList.remove("is-excited");
+              resetLookingLidShape();
               gazeLocked = false;
               gazeDamp = 0.16;
               if (statementHovering) {
@@ -1024,11 +1175,62 @@
               }
             }
 
-            if (squintAnim && typeof squintAnim.finished !== "undefined") {
-              squintAnim.finished.then(finishSquint).catch(function () {});
-            } else {
-              squintClearTimer = window.setTimeout(finishSquint, 1100);
+            function startSquintHold() {
+              if (!lookingSquinting) return;
+              /* Drop excite CSS; lids morph surprised → squint (not back through open). */
+              looking.classList.remove("is-excited");
+              looking.classList.add("is-skeptical");
+
+              /* Iris/pupil stay put; lids do the work around them. */
+              setLookingGazeTarget(0, -0.45, 0.22);
+
+              if (reduceMotion.matches) {
+                if (lidEl) lidEl.setAttribute("d", EYE_D_SQUINT);
+                if (scleraEl) scleraEl.setAttribute("d", EYE_D_OPEN);
+                squintClearTimer = window.setTimeout(finishSquint, SQUINT_MS);
+                return;
+              }
+
+              var squintAnim = animateLookingSquintShape(
+                [
+                  {
+                    d: EYE_D_SURPRISED,
+                    offset: 0,
+                    easing: "cubic-bezier(0.55, 0.05, 0.9, 0.2)",
+                  },
+                  {
+                    d: EYE_D_SQUINT,
+                    offset: 0.11,
+                    easing: "linear",
+                  },
+                  {
+                    d: EYE_D_SQUINT,
+                    offset: 0.8,
+                    easing: "cubic-bezier(0.2, 0.85, 0.3, 1)",
+                  },
+                  { d: EYE_D_OPEN, offset: 1 },
+                ],
+                { duration: SQUINT_MS },
+                squintAnims
+              );
+
+              if (squintAnim && typeof squintAnim.finished !== "undefined") {
+                squintAnim.finished.then(finishSquint).catch(function () {});
+              } else {
+                squintClearTimer = window.setTimeout(finishSquint, SQUINT_MS);
+              }
             }
+
+            if (reduceMotion.matches) {
+              looking.classList.remove("is-excited");
+              looking.classList.add("is-skeptical");
+              if (lidEl) lidEl.setAttribute("d", EYE_D_SQUINT);
+              if (scleraEl) scleraEl.setAttribute("d", EYE_D_OPEN);
+              squintClearTimer = window.setTimeout(finishSquint, SQUINT_MS);
+              return;
+            }
+
+            squintClearTimer = window.setTimeout(startSquintHold, SURPRISE_MS);
           }
 
           function onLookingActivity() {
@@ -1091,14 +1293,14 @@
               lookingExcited = true;
               lookingWake({ startle: false });
               cancelAmbientBlink();
-              looking.classList.add("is-excited");
+              setLookingExcitedVisual(true);
               if (!reduceMotion.matches) {
                 setLookingGazeTarget(GAZE_MAX_X, -0.6, 0.16);
               }
             });
             resumeEl.addEventListener("mouseleave", function () {
               lookingExcited = false;
-              looking.classList.remove("is-excited");
+              setLookingExcitedVisual(false);
               gazeDamp = 0.16;
               resetLookingGaze();
               if (statementHovering) {
