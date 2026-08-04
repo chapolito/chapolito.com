@@ -31,7 +31,7 @@
   --about-aside-max: 317px;
   --about-bio-gap: 62px;
   --about-bio-collage-gap: clamp(24px, 4vw, 48px);
-  --about-radius: 48px;
+  --about-radius: 16px;
   --about-photo-fill: #000;
   --about-photo-stroke: rgba(255, 255, 255, 0.1);
   --about-photo-stroke-width: 1px;
@@ -560,10 +560,10 @@ body.is-detail-enter .about-page.about-overlay.is-revealed .about__hero-intro {
   }
 }
 
-/* Collage corner radius steps down at tablet */
+/* Collage corner radius — keep 16 at tablet (matches story media) */
 @media (max-width: 1000px) {
   .about {
-    --about-radius: 32px;
+    --about-radius: 16px;
   }
 }
 
