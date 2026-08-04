@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------
    Curated work set (v2). One source of truth for every variation.
 
-   - Trimmed to 7 (Wiki Game + Fanpics cut; quality bar).
+   - Home grid filters out horizon-chat (shown inside Quest case study).
    - `orientation` lets the grid place portrait phone clips in tall
      frames and landscape device clips in wide frames, so nothing gets
      upscaled into a blurry full-bleed.
@@ -437,110 +437,5 @@ window.PROJECTS = [
         },
       ],
     },
-  },
-
-  {
-    id: "mk-play",
-    title: "Playful by design",
-    product: "Messenger Kids",
-    era: "Meta",
-    orientation: "portrait",
-    feature: true,
-    hover: "ghost",
-    overlay: "pop",
-    tile: { type: "video", src: "/images/messenger-kids/missed-call.mp4", fit: "cover" },
-    detail: {
-      lede:
-        "Messenger Kids is a child's first messaging app, which means delight and safety in equal measure. I crafted the micro-interactions that make it feel alive without ever feeling unsafe.",
-      meta: [
-        { k: "Role", v: "Product Design" },
-        { k: "Platforms", v: "Android, iOS, fireOS, & Web" },
-        { k: "Date", v: "2017–2018" },
-      ],
-      hero: {
-        type: "image",
-        src: "/images/messenger-kids/hero-image.jpg",
-        alt: "Messenger Kids app on a tablet with playful UI",
-        fit: "cover",
-      },
-      sections: [
-        {
-          kicker: "Moments",
-          title: "Small motions, big personality",
-          body: "A set of interactions that reward kids for showing up, without dark patterns.",
-          layout: "grid2",
-          media: [
-            { type: "video", src: "/images/messenger-kids/GIF-button.mp4", alt: "GIF button", fit: "contain" },
-            { type: "video", src: "/images/messenger-kids/get-started-button.mp4", alt: "Get started button", fit: "contain" },
-            { type: "video", src: "/images/messenger-kids/inbox-tile.mp4", alt: "Inbox tile", fit: "contain" },
-            { type: "video", src: "/images/messenger-kids/add-button.mp4", alt: "Add button", fit: "contain" },
-          ],
-        },
-        {
-          kicker: "A call you missed",
-          title: "Even a missed call is friendly",
-          body:
-            "Kids don't always have their devices charged, on, or available — which led to a lot of missed calls. We built a digital version of the answering machine so they could leave a warm message when no one picked up.",
-          layout: "full",
-          media: [{ type: "video", src: "/images/messenger-kids/missed-call.mp4", alt: "Missed call", fit: "contain" }],
-        },
-        {
-          kicker: "Identity",
-          title: "Logo",
-          body:
-            "Designing the logo was only a couple weeks of the 2+ years I worked on Messenger Kids, but one of the most visible and lasting designs.",
-          layout: "full",
-          media: [{ type: "image", src: "/images/messenger-kids/mk-splatter.png", alt: "Messenger Kids logo", fit: "contain" }],
-        },
-      ],
-    },
-  },
-
-  {
-    id: "life360-messaging",
-    title: "Family Messaging",
-    product: "Life360",
-    era: "Earlier",
-    orientation: "portrait",
-    hover: "iris",
-    overlay: "float",
-    tile: { type: "video", src: "/images/life360/closing-the-loop.mp4", fit: "cover" },
-    detail: {
-      lede:
-        "At Life360 I designed family messaging and a delightful weather layer, closing the loop on 'where is everyone and are they okay?'",
-      meta: [
-        { k: "Role", v: "Product Design" },
-        { k: "Platforms", v: "Android & iOS" },
-        { k: "Date", v: "2016" },
-      ],
-      hero: {
-        type: "video",
-        src: "/images/life360/closing-the-loop.mp4",
-        alt: "Life360 family messaging closing the loop on location check-ins",
-        fit: "contain",
-      },
-      sections: [
-        {
-          kicker: "Messaging",
-          title: "Quick, warm, glanceable",
-          body: "Stickers and quick messages tuned for families on the move.",
-          layout: "grid2",
-          media: [
-            { type: "image", src: "/images/life360/messaging-stickers.jpg", alt: "Life360 stickers", fit: "cover" },
-            { type: "image", src: "/images/life360/quick-messages.jpg", alt: "Life360 quick messages", fit: "cover" },
-          ],
-        },
-        {
-          kicker: "Weather",
-          title: "A little delight",
-          body: "A weather layer that made checking in feel human.",
-          layout: "grid2",
-          media: [
-            { type: "image", src: "/images/life360/weather-android-ui.png", alt: "Life360 weather UI", fit: "cover" },
-            { type: "image", src: "/images/life360/weather-tooltip.png", alt: "Life360 weather tooltip", fit: "cover" },
-          ],
-        },
-      ],
-    },
-  },
-];
+  }
+];;

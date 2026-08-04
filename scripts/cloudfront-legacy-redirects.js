@@ -1,6 +1,6 @@
 // CloudFront Function (viewer-request) - 301 legacy paths to home.
 // Prefixes use a trailing slash or exact match so live routes stay reachable
-// (e.g. /portal-voice/, /horizon-chat/, /life360-messaging/, /quest-people/).
+// (e.g. /portal-voice/, /horizon-chat/, /quest-people/).
 
 function handler(event) {
   var request = event.request;
@@ -30,10 +30,12 @@ function shouldRedirect(uri) {
     "the-wiki-game",
     "quest-for-business",
     "messenger-kids",
+    "mk-play",
     "quest-vr",
     "portal",
     "horizon",
     "life360",
+    "life360-messaging",
   ];
 
   for (var i = 0; i < legacy.length; i++) {
@@ -56,11 +58,6 @@ function matchesLegacyPrefix(uri, name) {
       return false;
     }
     return startsWithSegment(uri, "horizon");
-  }
-
-  if (name === "life360") {
-    if (startsWithSegment(uri, "life360-messaging")) return false;
-    return startsWithSegment(uri, "life360");
   }
 
   if (name === "quest-vr") {
