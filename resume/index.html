@@ -369,12 +369,12 @@
         }
 
         .resume-page .resume__name {
-          font-size: 1.85rem;
+          font-size: 1.6rem;
           color: #fff !important;
         }
 
         .resume-page .resume__tagline {
-          font-size: 1rem;
+          font-size: 0.95rem;
           color: #fff !important;
         }
 
@@ -393,32 +393,32 @@
         }
 
         .resume-page .resume__section-title {
-          font-size: 1.35rem;
+          font-size: 1.15rem;
           color: #fff !important;
           break-after: avoid;
           page-break-after: avoid;
-          margin-bottom: 12px;
+          margin-bottom: 8px;
         }
 
         .resume-page .resume__subhead,
         .resume-page .resume__entry-company,
         .resume-page .resume__role-title {
-          font-size: 1rem;
+          font-size: 0.92rem;
           color: #fff !important;
         }
 
         .resume-page .resume__about-lede,
         .resume-page .resume__bullets li,
         .resume-page .resume__contact {
-          font-size: 11.5px;
-          line-height: 1.45;
+          font-size: 10.5px;
+          line-height: 1.4;
           color: #c4bed2 !important;
         }
 
         .resume-page .resume__role-title,
         .resume-page .resume__entry-dates {
-          font-size: 11.5px;
-          line-height: 1.45;
+          font-size: 10.5px;
+          line-height: 1.4;
         }
 
         .resume-page .resume__contact-site {
@@ -447,23 +447,23 @@
         .resume-page .resume__section {
           break-inside: auto;
           page-break-inside: auto;
-          margin-bottom: 22px;
+          margin-bottom: 20px;
         }
 
         .resume-page .resume__about-lede {
-          margin-bottom: 10px;
+          margin-bottom: 7px;
         }
 
         .resume-page .resume__about-block {
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
 
         .resume-page .resume__contact {
-          margin-bottom: 22px;
+          margin-bottom: 14px;
         }
 
         .resume-page .resume__timeline {
-          gap: 18px;
+          gap: 12px;
         }
 
         .resume-page .resume__entry-head {
@@ -471,6 +471,7 @@
           page-break-inside: avoid;
           break-after: avoid;
           page-break-after: avoid;
+          margin-bottom: 8px;
         }
 
         .resume-page .resume__entry {
@@ -484,20 +485,26 @@
         }
 
         .resume-page .resume__roles {
-          gap: 12px;
+          gap: 8px;
         }
 
+        /* Tall roles flow across a page break rather than jumping whole and
+           stranding a half page of blank space. */
         .resume-page .resume__role {
-          break-inside: avoid;
-          page-break-inside: avoid;
+          break-inside: auto;
+          page-break-inside: auto;
         }
 
         .resume-page .resume__role-title {
-          margin-bottom: 4px;
+          margin-bottom: 3px;
+          break-after: avoid;
+          page-break-after: avoid;
         }
 
         .resume-page .resume__bullets li {
-          margin-bottom: 4px;
+          margin-bottom: 3px;
+          break-inside: avoid;
+          page-break-inside: avoid;
         }
 
         .resume-page .resume__role + .resume__role {
@@ -514,7 +521,7 @@
       @page {
         size: letter;
         /* Applies on every printed page, including page 2 top */
-        margin: 0.55in 0.65in;
+        margin: 0.45in 0.55in;
         background: #07060a;
       }
     </style>
@@ -576,13 +583,13 @@
             </div>
             <div class="resume__entry-body">
               <div class="resume__entry-head">
-                <h3 class="resume__entry-company" id="resume-meta">Meta</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Jan 2017 - May 2026 &middot; 9yrs 5mos</span>
+                <h3 class="resume__entry-company" id="resume-meta">Meta</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Jan 2017 - Jul 2026 &middot; 9yrs 7mos</span>
               </div>
               <div class="resume__roles">
                 <div class="resume__role">
                   <h4 class="resume__role-title">
                     Principal Product Designer &middot; Horizon Games &middot;
-                    <span class="resume__role-duration">10mos</span>
+                    <span class="resume__role-duration">1yr</span>
                   </h4>
                   <ul class="resume__bullets">
                     <li>
@@ -613,7 +620,7 @@
                 <div class="resume__role">
                   <h4 class="resume__role-title">
                     Product Design Manager &middot; Quest for Business &middot;
-                    <span class="resume__role-duration">1yr 2mos</span>
+                    <span class="resume__role-duration">1yr 1mos</span>
                   </h4>
                   <ul class="resume__bullets">
                     <li>
@@ -625,8 +632,8 @@
                 </div>
                 <div class="resume__role">
                   <h4 class="resume__role-title">
-                    Staff Product Designer &middot; Portal &middot;
-                    <span class="resume__role-duration">1yr</span>
+                    Staff/Senior Product Designer &middot; Portal &middot;
+                    <span class="resume__role-duration">3yrs 4mos</span>
                   </h4>
                   <ul class="resume__bullets">
                     <li>
@@ -638,14 +645,6 @@
                       Designed Household Mode, a parental control feature restricting app and contact access behind
                       account authentication.
                     </li>
-                  </ul>
-                </div>
-                <div class="resume__role">
-                  <h4 class="resume__role-title">
-                    Senior Product Designer &middot; Portal &middot;
-                    <span class="resume__role-duration">2yrs 4mos</span>
-                  </h4>
-                  <ul class="resume__bullets">
                     <li>
                       Shipped Facebook Watch, Facebook Live, Notes, and AI voice assistant features on Portal and Portal
                       TV.

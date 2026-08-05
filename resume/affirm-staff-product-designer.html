@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resume - Jesse O'Chapo</title>
+    <meta name="description" content="Resume of Jesse O'Chapo, Staff Product Designer." />
+    <meta name="robots" content="noindex" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600;1,700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png" />
+    <link rel="stylesheet" href="/stylesheets/tokens.css" />
+    <link rel="stylesheet" href="/stylesheets/home.css" />
+    <style>
+      /* Resume-only styles - scoped to .resume-page */
+      .resume-page {
+        --font-display: "Adieu", system-ui, sans-serif;
+        font-variant-ligatures: none;
+        font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "kern" 0;
+        font-kerning: none;
+      }
+
+      /*
+        Display headings: Adieu with PDF-extraction mitigations.
+        Negative tracking + kerning make Chrome insert mid-word breaks
+        in the PDF text layer; keep spacing neutral for print/ATS.
+      */
+      .resume-page .resume__name,
+      .resume-page .resume__tagline,
+      .resume-page .resume__section-title,
+      .resume-page .resume__subhead,
+      .resume-page .resume__entry-company {
+        font-family: var(--font-display);
+        font-kerning: none;
+        font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "kern" 0;
+        letter-spacing: 0;
+        word-spacing: normal;
+        text-rendering: geometricPrecision;
+      }
+
+      .resume-page .resume-chrome {
+        position: relative;
+        z-index: 1;
+        max-width: 992px;
+        margin: 0 auto;
+        padding: clamp(40px, 6vw, 72px) clamp(24px, 5vw, 64px) clamp(48px, 6vw, 72px);
+      }
+
+        .resume-page .resume__name {
+          margin: 0 0 10px;
+          font-size: clamp(2rem, 4.8vw, 2.75rem);
+          font-weight: 700;
+          line-height: 1.02;
+          color: var(--ink);
+        }
+
+      .resume-page .resume__tagline {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.45em;
+        margin: 0 0 12px;
+        font-size: clamp(0.95rem, 2vw, 1.125rem);
+        line-height: 1.3;
+        color: var(--ink);
+      }
+
+      .resume-page .resume__tagline-title {
+        font-weight: 700;
+      }
+
+      .resume-page .resume__tagline-sep {
+        display: block;
+        width: 7px;
+        height: 7px;
+        flex-shrink: 0;
+      }
+
+      .resume-page .resume__tagline-loc {
+        font-weight: 400;
+      }
+
+      .resume-page .resume__contact {
+        display: block;
+        margin: 0 0 56px;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--ink-dim);
+        line-height: 1.6;
+      }
+
+      .resume-page .resume__contact > * {
+        vertical-align: middle;
+      }
+
+      .resume-page .resume__contact-sep {
+        display: inline;
+        white-space: pre;
+      }
+
+      .resume-page .resume__contact a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .resume-page .resume__contact-site {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--ink);
+      }
+
+      .resume-page .resume__section {
+        margin-bottom: 56px;
+      }
+
+      .resume-page .resume__section-title {
+        margin: 0 0 24px;
+        font-size: clamp(1.5rem, 3.2vw, 1.875rem);
+        font-weight: 700;
+        line-height: 1.05;
+        color: var(--ink);
+      }
+
+      .resume-page .resume__about-lede {
+        margin: 0 0 22px;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.65;
+        color: var(--ink-dim);
+      }
+
+      .resume-page .resume__about-block {
+        margin-bottom: 18px;
+      }
+
+      .resume-page .resume__about-block:last-child {
+        margin-bottom: 0;
+      }
+
+      .resume-page .resume__subhead {
+        margin: 0 0 8px;
+        font-size: 1.125rem;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--ink);
+      }
+
+      .resume-page .resume__about-block .resume__about-lede {
+        margin-bottom: 0;
+      }
+
+      .resume-page .resume__timeline {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 36px;
+      }
+
+      .resume-page .resume__timeline::before {
+        content: "";
+        position: absolute;
+        left: 20px;
+        top: 34px;
+        bottom: 18px;
+        width: 1px;
+        background: var(--line-2);
+        pointer-events: none;
+      }
+
+      .resume-page .resume__entry {
+        position: relative;
+        display: grid;
+        grid-template-columns: 40px minmax(0, 1fr);
+        gap: 0 14px;
+        align-items: start;
+      }
+
+      .resume-page .resume__entry-marker {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        width: 40px;
+        min-height: 32px;
+        padding-top: 1px;
+        flex-shrink: 0;
+      }
+
+      .resume-page .resume__entry-marker img,
+      .resume-page .resume__entry-marker svg {
+        display: block;
+        width: auto;
+        height: auto;
+        border-radius: 0;
+      }
+
+      .resume-page .resume__entry-marker--meta img {
+        width: 34px;
+        height: auto;
+      }
+
+      .resume-page .resume__entry-marker--app-icon img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .resume-page .resume__entry-marker--fanpics img {
+        height: 32px;
+        width: auto;
+      }
+
+      .resume-page .resume__entry-marker--chapolito img {
+        width: 38px;
+        height: auto;
+        max-height: 22px;
+      }
+
+      .resume-page .resume__entry-marker--mtv img {
+        width: 38px;
+        height: auto;
+      }
+
+      .resume-page .resume__entry-marker--seal img {
+        width: 32px;
+        height: 32px;
+      }
+
+      .resume-page .resume__entry-head {
+        display: block;
+        margin-bottom: 14px;
+        line-height: 1.3;
+      }
+
+      .resume-page .resume__entry-company {
+        display: inline;
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .resume-page .resume__entry-head-sep {
+        display: inline;
+        white-space: pre;
+      }
+
+      .resume-page .resume__entry-dates {
+        display: inline;
+        margin: 0;
+        font-family: var(--font-mono);
+        font-size: 13px;
+        font-weight: 400;
+        color: var(--ink-mut);
+      }
+
+      .resume-page .resume__roles {
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .resume-page .resume__role-title {
+        margin: 0 0 8px;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        font-weight: 600;
+        line-height: 1.4;
+        color: var(--ink);
+      }
+
+      .resume-page .resume__role-duration {
+        font-weight: 400;
+        color: var(--ink-mut);
+      }
+
+      .resume-page .resume__bullets {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .resume-page .resume__bullets li {
+        position: relative;
+        margin: 0 0 8px;
+        padding-left: 14px;
+        font-family: var(--font-mono);
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 1.65;
+        color: var(--ink-dim);
+      }
+
+      .resume-page .resume__bullets li:last-child {
+        margin-bottom: 0;
+      }
+
+      .resume-page .resume__bullets li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0.62em;
+        width: 4px;
+        height: 4px;
+        border-radius: 1px;
+        background: var(--ink-mut);
+      }
+
+      @media print {
+        .resume-page .home-bg,
+        .resume-page .u-glow,
+
+        .resume-page::before,
+        .resume-page::after {
+          display: none !important;
+        }
+
+        .resume-page {
+          background: #07060a !important;
+          background-image: none !important;
+          color: #fff !important;
+          font-size: 12.5px;
+          text-rendering: auto;
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          hyphens: none;
+          -webkit-hyphens: none;
+          word-break: normal;
+          overflow-wrap: normal;
+          margin: 0;
+          padding: 0;
+        }
+
+        html {
+          background: #07060a !important;
+        }
+
+        .resume-page .resume-chrome {
+          max-width: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        /*
+          Adieu looks right on screen but breaks PDF text extraction.
+          Print uses Arial Black (confirmed clean for copy/paste / ATS).
+        */
+        .resume-page .resume__name,
+        .resume-page .resume__tagline,
+        .resume-page .resume__section-title,
+        .resume-page .resume__subhead,
+        .resume-page .resume__entry-company {
+          font-family: "Arial Black", "Arial Bold", Helvetica, Arial, sans-serif !important;
+          font-kerning: none !important;
+          font-feature-settings: "liga" 0, "clig" 0, "dlig" 0, "kern" 0 !important;
+          letter-spacing: 0 !important;
+          word-spacing: normal !important;
+          text-rendering: geometricPrecision !important;
+        }
+
+        .resume-page .resume__name {
+          font-size: 1.6rem;
+          color: #fff !important;
+        }
+
+        .resume-page .resume__tagline {
+          font-size: 0.95rem;
+          color: #fff !important;
+        }
+
+        .resume-page .resume__tagline-sep {
+          display: none !important;
+        }
+
+        .resume-page .resume__tagline-title::after {
+          content: " · ";
+          font-weight: 400;
+          color: #847e96;
+        }
+
+        .resume-page .resume__tagline-loc {
+          color: #c4bed2 !important;
+        }
+
+        .resume-page .resume__section-title {
+          font-size: 1.15rem;
+          color: #fff !important;
+          break-after: avoid;
+          page-break-after: avoid;
+          margin-bottom: 8px;
+        }
+
+        .resume-page .resume__subhead,
+        .resume-page .resume__entry-company,
+        .resume-page .resume__role-title {
+          font-size: 0.92rem;
+          color: #fff !important;
+        }
+
+        .resume-page .resume__about-lede,
+        .resume-page .resume__bullets li,
+        .resume-page .resume__contact {
+          font-size: 10.5px;
+          line-height: 1.4;
+          color: #c4bed2 !important;
+        }
+
+        .resume-page .resume__role-title,
+        .resume-page .resume__entry-dates {
+          font-size: 10.5px;
+          line-height: 1.4;
+        }
+
+        .resume-page .resume__contact-site {
+          background: rgba(255, 255, 255, 0.08) !important;
+          color: #fff !important;
+        }
+
+        .resume-page .resume__entry-dates,
+        .resume-page .resume__role-duration {
+          color: #847e96 !important;
+        }
+
+        .resume-page .resume__timeline::before {
+          background: rgba(255, 255, 255, 0.16) !important;
+        }
+
+        .resume-page .resume__bullets li::before {
+          background: #847e96 !important;
+        }
+
+        .resume-page .resume__header {
+          break-after: avoid;
+          page-break-after: avoid;
+        }
+
+        .resume-page .resume__section {
+          break-inside: auto;
+          page-break-inside: auto;
+          margin-bottom: 20px;
+        }
+
+        .resume-page .resume__about-lede {
+          margin-bottom: 7px;
+        }
+
+        .resume-page .resume__about-block {
+          margin-bottom: 6px;
+        }
+
+        .resume-page .resume__contact {
+          margin-bottom: 14px;
+        }
+
+        .resume-page .resume__timeline {
+          gap: 12px;
+        }
+
+        .resume-page .resume__entry-head {
+          break-inside: avoid;
+          page-break-inside: avoid;
+          break-after: avoid;
+          page-break-after: avoid;
+          margin-bottom: 8px;
+        }
+
+        .resume-page .resume__entry {
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        .resume-page .resume__entry--multi {
+          break-inside: auto;
+          page-break-inside: auto;
+        }
+
+        .resume-page .resume__roles {
+          gap: 8px;
+        }
+
+        /* Tall roles flow across a page break rather than jumping whole and
+           stranding a half page of blank space. */
+        .resume-page .resume__role {
+          break-inside: auto;
+          page-break-inside: auto;
+        }
+
+        .resume-page .resume__role-title {
+          margin-bottom: 3px;
+          break-after: avoid;
+          page-break-after: avoid;
+        }
+
+        .resume-page .resume__bullets li {
+          margin-bottom: 3px;
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+
+        .resume-page .resume__role + .resume__role {
+          break-before: auto;
+          page-break-before: auto;
+        }
+
+        .resume-page a {
+          color: inherit !important;
+          text-decoration: none !important;
+        }
+      }
+
+      @page {
+        size: letter;
+        /* Applies on every printed page, including page 2 top */
+        margin: 0.45in 0.55in;
+        background: #07060a;
+      }
+    </style>
+  </head>
+  <body class="u-grain resume-page">
+    <div class="home-bg" aria-hidden="true"></div>
+    <div class="u-glow" aria-hidden="true"></div>
+
+    <main class="resume-chrome" id="main">
+      <header class="resume__header">
+        <h1 class="resume__name">Jesse O'Chapo</h1>
+        <p class="resume__tagline">
+          <span class="resume__tagline-title">Staff Product Designer</span>
+          <img
+            class="resume__tagline-sep"
+            src="/images/resume/asterisk%20middle%20dote.svg"
+            alt=""
+            width="7"
+            height="7"
+          />
+          <span class="resume__tagline-loc">Santa Cruz, California</span>
+        </p>
+        <p class="resume__contact">
+          <a class="resume__contact-site" href="https://www.chapolito.com/">chapolito.com</a><span class="resume__contact-sep"> · </span><a href="mailto:jesse@chapolito.com">jesse@chapolito.com</a><span class="resume__contact-sep"> · </span><span>760.814.0831</span>
+        </p>
+      </header>
+
+      <section class="resume__section" aria-labelledby="resume-about">
+        <h2 class="resume__section-title" id="resume-about">About</h2>
+        <p class="resume__about-lede">
+          Staff Product Designer who sets direction in ambiguous spaces and stays hands-on through execution. Partners
+          with product, engineering, data science, and research to turn customer needs, business goals, and technical
+          constraints into clear product strategy and polished consumer experiences. Balances immediate delivery with a
+          coherent long-term vision, using research, experimentation, and analytics to learn quickly and improve
+          outcomes.
+        </p>
+        <div class="resume__about-block">
+          <h3 class="resume__subhead">Skills</h3>
+          <p class="resume__about-lede">
+            Product Design, Design Strategy, Product Thinking, Systems Thinking, Interaction Design, Visual Design,
+            Design Systems, Data-Informed Design, Experimentation &amp; A/B Testing, User Research, Prototyping,
+            Cross-functional Collaboration, Consumer &amp; Subscription Growth, Accessibility
+          </p>
+        </div>
+        <div class="resume__about-block">
+          <h3 class="resume__subhead">Tools</h3>
+          <p class="resume__about-lede">
+            Figma, Design Systems, AI Prototyping (Cursor/Claude Code), Generative AI (image/video), Agentic Workflow
+            Design, Experimentation &amp; Analytics, iOS, Android, HTML/CSS/JS
+          </p>
+        </div>
+      </section>
+
+      <section class="resume__section" aria-labelledby="resume-experience">
+        <h2 class="resume__section-title" id="resume-experience">Experience</h2>
+
+        <div class="resume__timeline">
+          <article class="resume__entry resume__entry--multi" aria-labelledby="resume-meta">
+            <div class="resume__entry-marker resume__entry-marker--meta" aria-hidden="true">
+              <img src="/images/resume/Meta.svg" alt="" width="34" height="23" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-meta">Meta</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Jan 2017 - Jul 2026 &middot; 9yrs 7mos</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    Principal Product Designer &middot; Horizon Games &middot;
+                    <span class="resume__role-duration">1yr</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Owned and drove a cross-org design initiative across Facebook, Instagram, Horizon, and central
+                      product, partnering with product, engineering, and research to solve a paradigm-breaking
+                      challenge: coexisting a second profile and separate network inside consumer apps built around a
+                      single account. Aligned directors and VPs on a coherent ecosystem direction.
+                    </li>
+                  </ul>
+                </div>
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    Staff Product Designer &middot; Quest VR (Oculus) &middot;
+                    <span class="resume__role-duration">1yr 11mos</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Owned design strategy for Quest VR social features, balancing near-term execution with long-term
+                      vision; guided senior designers through delivery while holding the craft bar.
+                    </li>
+                    <li>
+                      Simplified a fragmented privacy model into an intuitive, trust-building experience; navigated a
+                      complex GDPR-compliant migration for users with conflicting settings. Shipped Joinable Status,
+                      driving a 300% increase in players joining friends' active games through data-informed
+                      iteration.
+                    </li>
+                  </ul>
+                </div>
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    Product Design Manager &middot; Quest for Business &middot;
+                    <span class="resume__role-duration">1yr 1mos</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Led a team of 6 shipping Quest for Business experiences; balanced user needs, business goals,
+                      and technical constraints to coexist enterprise and personal accounts on one device while
+                      preserving personal privacy from employer access.
+                    </li>
+                  </ul>
+                </div>
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    Staff/Senior Product Designer &middot; Portal &middot;
+                    <span class="resume__role-duration">3yrs 4mos</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Redesigned Portal login and account flows for the Meta Accounts migration; partnered
+                      cross-functionally to evaluate platform requirements against Portal's customers and advocated to
+                      deviate where requirements would have degraded the experience, protecting coherence across the
+                      Meta ecosystem without sacrificing polish.
+                    </li>
+                    <li>
+                      Designed Household Mode, a parental-control experience that restricted app and contact access
+                      behind account authentication, building confidence for families on a shared device.
+                    </li>
+                    <li>
+                      Shipped polished consumer experiences on Portal and Portal TV: Facebook Watch, Live, Notes, and
+                      an AI voice assistant. Iterated quickly with product and engineering to deliver seamless,
+                      delightful interactions at scale.
+                    </li>
+                  </ul>
+                </div>
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    Product Designer &middot; Messenger &middot;
+                    <span class="resume__role-duration">2yrs 3mos</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Design lead for Connections and Growth on Messenger Kids, championing a test-and-learn approach:
+                      redesigned parent-initiated friending and shipped Kid Codes (kid-initiated), driving kids with
+                      3+ non-sibling connections from 15% to 37% (+146%) in 6 months via experimentation and
+                      analytics.
+                    </li>
+                    <li>
+                      Defined and shipped Messenger Kids zero-to-one, owning onboarding, login, and parent dashboard
+                      design end-to-end; collaborated with legal, privacy, product, and engineering to achieve a 90%
+                      onboarding completion rate at launch.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="resume__entry" aria-labelledby="resume-life360">
+            <div class="resume__entry-marker resume__entry-marker--app-icon" aria-hidden="true">
+              <img src="/images/resume/Life360.svg" alt="" width="32" height="32" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-life360">Life360</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Apr 2016 - Jan 2017 &middot; 10mo</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    <span>Senior Product Designer</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Designed and A/B-tested upsell experiences for crash-detection launch and subscription growth,
+                      pairing craft with experimentation to help drive revenue to ~$5M ARR.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="resume__entry" aria-labelledby="resume-fanpics">
+            <div class="resume__entry-marker resume__entry-marker--fanpics" aria-hidden="true">
+              <img src="/images/resume/Fanpics.svg" alt="" width="19" height="32" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-fanpics">Fanpics</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Feb 2014 - Apr 2016 &middot; 2yrs 3mos</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    <span>Lead Product Designer</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Owned end-to-end product design for Android and iOS consumer apps; defined the roadmap that
+                      scaled robotic camera installations from 0 to 5 NBA, NHL, and MLS teams, balancing near-term
+                      shipping with long-term growth strategy.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="resume__entry" aria-labelledby="resume-spritzr">
+            <div class="resume__entry-marker resume__entry-marker--app-icon" aria-hidden="true">
+              <img src="/images/resume/Spritzr.svg" alt="" width="32" height="32" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-spritzr">Spritzr</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Dec 2012 - Jan 2014 &middot; 1yr 2mos</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    <span>Lead Product Designer</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Shipped a zero-to-one consumer dating app connecting people through friends-of-friends networks.
+                      Full-stack design ownership across visual, interaction, and front-end in HTML/CSS/JS/Python,
+                      iterating quickly in an ambiguous, early-stage environment.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="resume__entry" aria-labelledby="resume-chapolito">
+            <div class="resume__entry-marker resume__entry-marker--chapolito" aria-hidden="true">
+              <img src="/images/chapolito-logo-footer.svg" alt="" width="28" height="9" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-chapolito">Chapolito</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Jan 2007 - May 2013 &middot; 6yrs 5mos</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    <span>Lead Product Designer</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Crafted polished Android, iOS, and web experiences for Sony, Qualcomm, Nivea, Paramount, and
+                      more, with high craft visual and interaction design under tight client constraints.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="resume__entry" aria-labelledby="resume-mtv">
+            <div class="resume__entry-marker resume__entry-marker--mtv" aria-hidden="true">
+              <img src="/images/resume/MTV.svg" alt="" width="38" height="27" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-mtv">MTV Networks</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Aug 2008 - Jan 2010 &middot; 1yr 6mos</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    <span>UI Designer</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>
+                      Designed consumer-facing networks and awareness campaigns for MTV and VH1, winning a Webby for
+                      craft and innovation.
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="resume__entry" aria-labelledby="resume-ucsd-work">
+            <div class="resume__entry-marker resume__entry-marker--seal" aria-hidden="true">
+              <img src="/images/resume/UCSD.svg" alt="" width="32" height="32" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-ucsd-work">UCSD</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">Jun 2006 - Jan 2007 &middot; 8mos</span>
+              </div>
+              <div class="resume__roles">
+                <div class="resume__role">
+                  <h4 class="resume__role-title">
+                    <span>Graphic Designer</span>
+                  </h4>
+                  <ul class="resume__bullets">
+                    <li>Designed posters, flyers, and a quarterly 70-page events guide.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="resume__section" aria-labelledby="resume-education">
+        <h2 class="resume__section-title" id="resume-education">Education</h2>
+
+        <div class="resume__timeline">
+          <article class="resume__entry" aria-labelledby="resume-ucsd-edu">
+            <div class="resume__entry-marker resume__entry-marker--seal" aria-hidden="true">
+              <img src="/images/resume/UCSD.svg" alt="" width="32" height="32" />
+            </div>
+            <div class="resume__entry-body">
+              <div class="resume__entry-head">
+                <h3 class="resume__entry-company" id="resume-ucsd-edu">UCSD</h3><span class="resume__entry-head-sep" aria-hidden="true"> </span><span class="resume__entry-dates">2004 - 2008</span>
+              </div>
+              <ul class="resume__bullets">
+                <li>Bachelor of Fine Arts in Digital Design</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
