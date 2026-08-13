@@ -102,7 +102,6 @@ window.PROJECTS = [
             },
           ],
           body: [
-            "Previously, active status was a confusing mix of toggles to share your online status and current app. I simplified to a single dropdown: Joinable, online, and offline.",
             "The simplified social privacy settings required a migration of existing settings, which I carefully designed to minimize disruption. The result was no measurable impact to retention or engagement.",
           ],
         },
@@ -227,9 +226,9 @@ window.PROJECTS = [
       layout: "story",
       storyColumn: "992",
       lede:
-        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming profiles and networks would work across Meta. I led a cross-org design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction.",
+        "As Horizon expanded onto Facebook and Instagram, we needed one model for gaming profiles and networks across Meta. I led a design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction.",
       intro:
-        "As Horizon expanded across Facebook and Instagram, we needed to define how gaming profiles and networks would work across Meta. I led a cross-org design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction.",
+        "As Horizon expanded onto Facebook and Instagram, we needed one model for gaming profiles and networks across Meta. I led a design sprint across Facebook, Instagram, Horizon, and Central Product, and aligned directors and VPs on a single direction.",
       meta: [
         { k: "Project", brand: "meta", v: "Horizon" },
         { k: "Role", v: "Design lead, guiding 5 designers" },
@@ -256,7 +255,7 @@ window.PROJECTS = [
       footnote: {
         lead: "This work is scheduled to ship in Summer 2026.",
         body:
-          "I can share the full case study during a portfolio review, including how we defined a shared gaming profile across Meta, aligned directors and VPs across four orgs, and designed the foundations for gaming profiles across Facebook and Instagram.",
+          "I can share the full case study in a portfolio review.",
       },
     },
   },
@@ -338,7 +337,7 @@ window.PROJECTS = [
         {
           title: "Facebook Watch",
           intro:
-            "In addition to video calls and going live, people used their Portals to consume media. I adapted Facebook Watch so people could easily watch their favorite shows and videos from creators.",
+            "In addition to video calls and going live, people also used Portal to watch videos, shows, and movies. I adapted Facebook Watch so they could browse and play their favorite Facebook content.",
           mediaRows: [
             {
               layout: "full",
