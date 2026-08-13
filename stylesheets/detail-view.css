@@ -788,6 +788,13 @@ body.is-detail-closing .detail-close {
   margin-bottom: 0;
 }
 
+/* Story sections/footnotes also get `.pj-sec` for reveals. project.css
+   loads after this sheet and sets `.pj-sec { margin-top: … }`, which
+   would reintroduce a large gap before the Gaming Profiles footnote. */
+.pj-doc--story .pj-sec {
+  margin-top: 0;
+}
+
 .pj-story__lead {
   margin-bottom: 0;
 }
