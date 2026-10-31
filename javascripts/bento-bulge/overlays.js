@@ -363,8 +363,7 @@ export function initBentoBulgeOverlays(options = {}) {
   function isStatementPassthroughTarget(target) {
     if (!target || !target.closest) return false;
     return Boolean(
-      target.closest(".tile__looking") ||
-        target.closest(".tile__statement-social-link") ||
+      target.closest(".tile__statement-social-link") ||
         target.closest(".tile__mailpill")
     );
   }
